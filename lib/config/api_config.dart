@@ -8,13 +8,14 @@ class ApiConfig {
   /// ✅ Auto-switching base URL based on environment with DNS fallbacks
   static String get baseUrl {
     if (kReleaseMode) {
-      // 🎯 For Play Store / App Store builds with multiple fallbacks
+      // For Play Store / App Store builds
       return 'https://bitcoincloudmining.onrender.com';
     }
 
     if (kIsWeb) {
-      // 🧪 Web - use production server to avoid CORS issues
-      return 'https://bitcoincloudmining.onrender.com';
+      // Web debug mode: use localhost for local backend testing
+      // For production web builds, kReleaseMode will be true above
+      return 'http://localhost:5000';
     }
 
     if (Platform.isAndroid) {
@@ -133,7 +134,7 @@ class ApiConfig {
   // Alias for sendVerificationOTP for backward compatibility
   static String get sendVerificationOtp => sendVerificationOTP;
   // Using verifyEmail endpoint for OTP verification
-  @deprecated
+  @Deprecated('Use verifyEmail instead. This endpoint is deprecated.')
   static const String verifyOTP = '/api/auth/verify-email';
   // Alias for verifyOTP for backward compatibility
   // The verifyOtp getter should point to verifyEmail endpoint since that's what the backend uses

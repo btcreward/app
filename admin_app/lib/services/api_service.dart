@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 
 import '../config/api_config.dart';
+import '../utils/app_logger.dart';
 
 class ApiService {
   static final ApiService _instance = ApiService._internal();
@@ -35,8 +36,11 @@ class ApiService {
           'Content-Type': 'application/json',
           if (auth && _token != null) 'Authorization': 'Bearer $_token',
         };
-        print('POST $url (Attempt ${retryCount + 1}/$maxRetries)');
-        print('Request headers: $headers');
+        AdminAppLogger.debug(
+          'POST $url (Attempt ${retryCount + 1}/$maxRetries)',
+          tag: 'HTTP',
+        );
+        AdminAppLogger.debug('Request headers: $headers', tag: 'HTTP');
 
         final response = await http
             .post(url, headers: headers, body: jsonEncode(data))
@@ -50,7 +54,10 @@ class ApiService {
         return response;
       } catch (e) {
         retryCount++;
-        print('Attempt $retryCount failed: $e');
+        AdminAppLogger.warning(
+          'Attempt $retryCount failed: $e',
+          tag: 'HTTP_RETRY',
+        );
 
         if (e.toString().contains('Unauthorized')) {
           throw Exception('Unauthorized: Token expired or invalid');
@@ -86,8 +93,11 @@ class ApiService {
           'Content-Type': 'application/json',
           if (auth && _token != null) 'Authorization': 'Bearer $_token',
         };
-        print('GET $url (Attempt ${retryCount + 1}/$maxRetries)');
-        print('Request headers: $headers');
+        AdminAppLogger.debug(
+          'GET $url (Attempt ${retryCount + 1}/$maxRetries)',
+          tag: 'HTTP',
+        );
+        AdminAppLogger.debug('Request headers: $headers', tag: 'HTTP');
 
         final response = await http
             .get(url, headers: headers)
@@ -101,7 +111,10 @@ class ApiService {
         return response;
       } catch (e) {
         retryCount++;
-        print('Attempt $retryCount failed: $e');
+        AdminAppLogger.warning(
+          'Attempt $retryCount failed: $e',
+          tag: 'HTTP_RETRY',
+        );
 
         if (e.toString().contains('Unauthorized')) {
           throw Exception('Unauthorized: Token expired or invalid');
@@ -141,8 +154,11 @@ class ApiService {
           'Content-Type': 'application/json',
           if (auth && _token != null) 'Authorization': 'Bearer $_token',
         };
-        print('PUT $url (Attempt ${retryCount + 1}/$maxRetries)');
-        print('Request headers: $headers');
+        AdminAppLogger.debug(
+          'PUT $url (Attempt ${retryCount + 1}/$maxRetries)',
+          tag: 'HTTP',
+        );
+        AdminAppLogger.debug('Request headers: $headers', tag: 'HTTP');
 
         final response = await http
             .put(url, headers: headers, body: jsonEncode(data))
@@ -154,7 +170,10 @@ class ApiService {
         return response;
       } catch (e) {
         retryCount++;
-        print('Attempt $retryCount failed: $e');
+        AdminAppLogger.warning(
+          'Attempt $retryCount failed: $e',
+          tag: 'HTTP_RETRY',
+        );
 
         if (e.toString().contains('Unauthorized')) {
           throw Exception('Unauthorized: Token expired or invalid');
@@ -185,21 +204,27 @@ class ApiService {
         ApiConfig.getUsers,
         auth: true,
       ); // auth: true hardcoded
-      print(
-        'fetchUsers response: statusCode =  [32m [1m [4m [7m [41m [43m [44m [45m [46m [47m [49m [0m${response.statusCode}, body = ${response.body}',
+      AdminAppLogger.info(
+        'fetchUsers response: statusCode=${response.statusCode}, body=${response.body}',
+        tag: 'FETCH_USERS',
       );
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         return data['data']['users'] ?? [];
       } else {
-        print(
-          'fetchUsers error: statusCode = ${response.statusCode}, body = ${response.body}',
+        AdminAppLogger.error(
+          'fetchUsers error: statusCode=${response.statusCode}, body=${response.body}',
+          tag: 'FETCH_USERS',
         );
         throw Exception('Failed to load users');
       }
     } catch (e, stack) {
-      print('Exception in fetchUsers: $e');
-      print('Stacktrace: $stack');
+      AdminAppLogger.error(
+        'Exception in fetchUsers: $e',
+        tag: 'FETCH_USERS',
+        error: e,
+        stackTrace: stack,
+      );
       throw Exception('Failed to load users: $e');
     }
   }
@@ -269,13 +294,17 @@ class ApiService {
       'status': 'completed', // <-- status field add kiya
       if (note != null) 'note': note,
     };
-    print('Current token (adjustWallet): $_token'); // <-- yahan print kiya
-    print(
-      'Adjusting wallet: userId=\x1b[32m$userId\x1b[0m, amount=\x1b[33m${body['amount']}\x1b[0m, type=\x1b[36m$type\x1b[0m, status=\x1b[35m${body['status']}\x1b[0m, note=$note',
+    AdminAppLogger.debug(
+      'Current token (adjustWallet): $_token',
+      tag: 'ADJUST_WALLET',
     );
-    print('POST $url');
-    print('Request headers: $headers');
-    print('Request body: $body');
+    AdminAppLogger.info(
+      'Adjusting wallet: userId=$userId, amount=${body['amount']}, type=$type, status=${body['status']}, note=$note',
+      tag: 'ADJUST_WALLET',
+    );
+    AdminAppLogger.debug('POST $url', tag: 'ADJUST_WALLET');
+    AdminAppLogger.debug('Request headers: $headers', tag: 'ADJUST_WALLET');
+    AdminAppLogger.debug('Request body: $body', tag: 'ADJUST_WALLET');
 
     try {
       final response = await http.post(
@@ -284,59 +313,99 @@ class ApiService {
         body: jsonEncode(body),
       );
 
-      print(
+      AdminAppLogger.info(
         'AdjustWallet response: status=${response.statusCode}, body=${response.body}',
+        tag: 'ADJUST_WALLET',
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         return jsonDecode(response.body);
       } else {
-        print(
+        AdminAppLogger.error(
           'AdjustWallet error: status=${response.statusCode}, body=${response.body}',
+          tag: 'ADJUST_WALLET',
         );
         throw Exception(
           'Failed to adjust wallet: ${response.statusCode} - ${response.body}',
         );
       }
     } catch (e) {
-      print('AdjustWallet exception: $e');
-      print('Exception type: ${e.runtimeType}');
+      AdminAppLogger.error(
+        'AdjustWallet exception: $e',
+        tag: 'ADJUST_WALLET',
+        error: e,
+      );
+      AdminAppLogger.debug(
+        'Exception type: ${e.runtimeType}',
+        tag: 'ADJUST_WALLET',
+      );
 
       // Detailed error analysis
       if (e is SocketException) {
-        print('Network error: SocketException - ${e.message}');
-        print('OS Error: ${e.osError}');
-        print('Address: ${e.address}');
-        print('Port: ${e.port}');
+        AdminAppLogger.error(
+          'Network error: SocketException - ${e.message}',
+          tag: 'ADJUST_WALLET',
+          error: e,
+        );
+        AdminAppLogger.debug('OS Error: ${e.osError}', tag: 'ADJUST_WALLET');
+        AdminAppLogger.debug('Address: ${e.address}', tag: 'ADJUST_WALLET');
+        AdminAppLogger.debug('Port: ${e.port}', tag: 'ADJUST_WALLET');
       } else if (e is HttpException) {
-        print('HTTP error: HttpException - ${e.message}');
+        AdminAppLogger.error(
+          'HTTP error: HttpException - ${e.message}',
+          tag: 'ADJUST_WALLET',
+          error: e,
+        );
       } else if (e is FormatException) {
-        print('Format error: FormatException - ${e.message}');
+        AdminAppLogger.error(
+          'Format error: FormatException - ${e.message}',
+          tag: 'ADJUST_WALLET',
+          error: e,
+        );
       } else if (e is TimeoutException) {
-        print('Timeout error: TimeoutException - ${e.message}');
+        AdminAppLogger.error(
+          'Timeout error: TimeoutException - ${e.message}',
+          tag: 'ADJUST_WALLET',
+          error: e,
+        );
       } else if (e is HandshakeException) {
-        print('SSL/TLS error: HandshakeException - ${e.message}');
+        AdminAppLogger.error(
+          'SSL/TLS error: HandshakeException - ${e.message}',
+          tag: 'ADJUST_WALLET',
+          error: e,
+        );
       } else if (e is CertificateException) {
-        print('Certificate error: CertificateException - ${e.message}');
+        AdminAppLogger.error(
+          'Certificate error: CertificateException - ${e.message}',
+          tag: 'ADJUST_WALLET',
+          error: e,
+        );
       }
 
       // Check if it's a CORS issue
       if (e.toString().contains('CORS') || e.toString().contains('cors')) {
-        print('CORS ERROR DETECTED! This is likely a CORS policy issue.');
+        AdminAppLogger.error(
+          'CORS ERROR DETECTED! This is likely a CORS policy issue.',
+          tag: 'ADJUST_WALLET',
+        );
       }
 
       // Check if it's a connection refused
       if (e.toString().contains('Connection refused') ||
           e.toString().contains('connection refused')) {
-        print(
+        AdminAppLogger.error(
           'CONNECTION REFUSED! Backend server might not be running on port 5000.',
+          tag: 'ADJUST_WALLET',
         );
       }
 
       // Check if it's a timeout
       if (e.toString().contains('timeout') ||
           e.toString().contains('Timeout')) {
-        print('TIMEOUT ERROR! Request took too long to complete.');
+        AdminAppLogger.error(
+          'TIMEOUT ERROR! Request took too long to complete.',
+          tag: 'ADJUST_WALLET',
+        );
       }
 
       throw Exception('Failed to adjust wallet: $e');

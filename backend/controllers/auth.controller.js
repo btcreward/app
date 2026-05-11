@@ -79,7 +79,7 @@ exports.register = catchAsync(async (req, res, next) => {
       password, // Pass plain password, will be hashed by pre-save middleware
       isEmailVerified: false,
       userId,
-      userReferralCode,
+      referralCode: userReferralCode, // Fix: use correct field name matching User model
       status: 'active'
     });
 
@@ -143,7 +143,7 @@ exports.register = catchAsync(async (req, res, next) => {
           fullName: user.fullName,
           userName: user.userName,
           userEmail: user.userEmail,
-          userReferralCode: user.userReferralCode
+          referralCode: user.referralCode // Fix: use correct field name
         },
         token
       }
@@ -217,43 +217,6 @@ exports.verifyEmail = catchAsync(async (req, res, next) => {
       error: error.message
     });
   }
-
-  // Create user with verified email
-  const user = new User({
-    ...pendingUser,
-    isEmailVerified: true
-  });
-
-  await user.save();
-
-  // Create wallet for user
-  const wallet = new Wallet({
-    user: user._id,
-    balance: 0
-  });
-  await wallet.save();
-
-  // Clear session data
-  delete req.session.pendingUser;
-
-  // Generate JWT token
-  const token = jwt.sign(
-    { id: user._id },
-    process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRES_IN || process.env.JWT_EXPIRE || '30d' }
-  );
-
-  res.status(201).json({
-    message: 'Registration successful',
-    token,
-    user: {
-      id: user._id,
-      fullName: user.fullName,
-      username: user.username,
-      email: user.userEmail,
-      referralCode: user.referralCode
-    }
-  });
 });
 
 // Error handler
@@ -328,10 +291,11 @@ exports.login = catchAsync(async (req, res, next) => {
       }
     });
   } catch (error) {
-    console.error('❌ Login error:', error);
+    console.error('❌ Login error:', error.message, error.stack);
     return res.status(500).json({
       success: false,
-      message: 'An error occurred during login'
+      message: 'An error occurred during login',
+      error: error.message
     });
   }
 });

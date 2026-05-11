@@ -2,13 +2,13 @@ import 'dart:async'; // For Timer
 import 'dart:io' show exit, Platform;
 
 import 'package:audioplayers/audioplayers.dart'; // For AudioPlayer
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:bitcoin_cloud_mining/providers/auth_provider.dart';
 import 'package:bitcoin_cloud_mining/providers/network_provider.dart';
 import 'package:bitcoin_cloud_mining/providers/wallet_provider.dart';
 import 'package:bitcoin_cloud_mining/services/ad_service.dart';
 import 'package:bitcoin_cloud_mining/services/mining_notification_service.dart';
 import 'package:bitcoin_cloud_mining/services/sound_notification_service.dart';
+import 'package:bitcoin_cloud_mining/utils/app_logger.dart';
 import 'package:bitcoin_cloud_mining/widgets/home_swipeable_ad.dart';
 import 'package:bitcoin_cloud_mining/widgets/network_status_widget.dart';
 import 'package:bitcoin_cloud_mining/widgets/server_connection_animation.dart';
@@ -17,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart'; // For Flutter Toast
 import 'package:font_awesome_flutter/font_awesome_flutter.dart'; // For FontAwesomeIcons
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // For SharedPreferences
@@ -30,26 +31,24 @@ class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  HomeScreenState createState() => HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
+class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   // Constants
-  static const int MINING_DURATION_MINUTES = 30;
-  static const double BASE_MINING_RATE =
+  static const int miningDurationMinutes = 30;
+  static const double baseMiningRate =
       0.000000000000000009; // 0.000000000000000009 BTC per second
-  static const double INITIAL_POWER_BOOST_RATE =
-      0.5; // Initial boost multiplier
-  static const double POWER_BOOST_INCREMENT = 0.1; // Increment per click
-  static const int POWER_BOOST_DURATION_MINUTES = 5; // 5 minutes duration
-  static const double TAP_REWARD_RATE =
+  static const double initialPowerBoostRate = 0.5; // Initial boost multiplier
+  static const double powerBoostIncrement = 0.1; // Increment per click
+  static const int powerBoostDurationMinutes = 5; // 5 minutes duration
+  static const double tapRewardRate =
       0.000000000000001000; // 5x increased reward
 
   // Variables
   late final AdService _adService;
   double _hashRate = 2.5;
   bool _isMining = false;
-  Timer? _miningTimer;
   Timer? _powerBoostTimer;
   int _percentage = 0;
   double _miningEarnings = 0.0;
@@ -65,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   bool _isPowerBoostActive = false;
   double _currentPowerBoostMultiplier = 0.0;
   int _powerBoostClickCount = 0;
-  double _currentMiningRate = BASE_MINING_RATE;
+  double _currentMiningRate = baseMiningRate;
   String _miningStatus = 'Ready';
   String? _lastError;
 
@@ -81,6 +80,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   bool _isSciFiLoading = false;
   int _sciFiCooldownSeconds = 0;
   Timer? _sciFiCooldownTimer;
+
+  // Flag to prevent duplicate initialization
+  bool _isInitialized = false;
 
   // Periodic save timer to save earnings every 30 seconds
   Timer? _periodicSaveTimer;
@@ -116,18 +118,19 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     try {
       // Get the screen width to determine the best ad size
       final screenWidth = MediaQuery.of(context).size.width.toInt();
-      
+
       // Try to get the adaptive banner size for the current orientation
       AdSize? adSize;
       try {
-        adSize = AdSize.getCurrentOrientationInlineAdaptiveBannerAdSize(screenWidth);
+        adSize =
+            AdSize.getCurrentOrientationInlineAdaptiveBannerAdSize(screenWidth);
       } catch (e) {
         debugPrint('⚠️ Could not get adaptive ad size: $e');
       }
-      
+
       // Use the adaptive size if available, otherwise fall back to a standard banner
       final targetAdSize = adSize ?? const AdSize(width: 320, height: 50);
-      
+
       // Create the banner ad with the determined size
       _bannerAd = BannerAd(
         adUnitId: 'ca-app-pub-3537329799200606/2028008282',
@@ -138,8 +141,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             debugPrint('✅ Adaptive Banner ad loaded');
             // Get the actual platform ad size after loading
             final platformAdSize = await (ad as BannerAd).getPlatformAdSize();
-            debugPrint('📏 Ad size: ${platformAdSize?.width}x${platformAdSize?.height}');
-            
+            debugPrint(
+                '📏 Ad size: ${platformAdSize?.width}x${platformAdSize?.height}');
+
             if (mounted) {
               setState(() {
                 _isBannerAdLoaded = true;
@@ -171,7 +175,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       _loadFallbackBannerAd();
     }
   }
-  
+
   // Fallback method to load a standard banner ad
   Future<void> _loadFallbackBannerAd() async {
     try {
@@ -265,11 +269,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
     _audioPlayer = AudioPlayer();
     _adService = AdService();
-    
+
     // Initialize banner ad
     _initializeBannerAd();
     _middleBannerAdFuture = _getMiddleBannerAdWidget();
-    
+
     Future.microtask(() async {
       await _adService.initialize();
       // हर बार ads reload करें
@@ -342,11 +346,18 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         break;
       case AppLifecycleState.paused:
       case AppLifecycleState.inactive:
-      case AppLifecycleState.hidden:
-        // App going to background - save state
+        // App going to background - keep mining active, just save state
         if (_isMining) {
           _saveMiningState();
-          // Mining ke dauran hi floating bubble show karo
+          // Don't cancel timers - keep mining running in background
+          // Mining notification will handle background state
+        }
+        break;
+      case AppLifecycleState.hidden:
+        // App hidden - keep mining active
+        if (_isMining) {
+          _saveMiningState();
+          // Don't cancel timers - keep mining running
         }
         break;
       case AppLifecycleState.detached:
@@ -362,43 +373,51 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   @override
   void dispose() {
     _nativeAdAutoRefreshTimer?.cancel();
-    // Only save mining state, don't add earnings prematurely
+    // Don't cancel mining timer - let it continue in background
     if (_isMining) {
       _saveMiningState();
+      // Keep mining notification active - don't stop it when screen is disposed
+      // MiningNotificationService.stopMiningNotification();
     }
 
-    _cancelAllTimers();
-    _uiUpdateTimer?.cancel();
+    // Only cancel non-mining timers
+    _adTimer?.cancel();
+    _adReloadTimer?.cancel();
+    _powerBoostTimer?.cancel();
+    // Don't cancel mining timer - let it continue in background
+    // _uiUpdateTimer?.cancel();
     _periodicSaveTimer?.cancel();
     _adUiUpdateTimer?.cancel();
 
-    // Stop mining notification
-    MiningNotificationService.stopMiningNotification();
+    // Don't stop mining notification when screen is disposed
+    // MiningNotificationService.stopMiningNotification();
 
     WidgetsBinding.instance.removeObserver(this);
     _audioPlayer.dispose();
     _scrollController.dispose();
-    _adService.dispose();
+    // Note: Don't dispose AdService here as it's a singleton shared across the app
     _bannerAd?.dispose();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
   void _cancelAllTimers() {
-    _miningTimer?.cancel();
+    // Don't cancel mining timer - let it continue in background
+    // _miningTimer?.cancel();
     _adTimer?.cancel();
     _adReloadTimer?.cancel();
     _powerBoostTimer?.cancel();
-    _uiUpdateTimer?.cancel();
-    _miningTimer = null;
+    // Don't cancel mining timer - let it continue in background
+    // _uiUpdateTimer?.cancel();
+    // _miningTimer = null;
     _adTimer = null;
     _adReloadTimer = null;
     _powerBoostTimer = null;
-    _uiUpdateTimer = null;
+    // _uiUpdateTimer = null;
   }
 
   Future<void> _initializeApp() async {
-    if (!mounted) return;
+    if (!mounted || _isInitialized) return;
 
     try {
       // Initialize all processes silently
@@ -406,7 +425,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       await _loadUserProfile();
       await _loadPercentage();
 
+      // Mark as initialized
+      _isInitialized = true;
+
       // Load wallet balance from backend
+      if (!mounted) return;
       final walletProvider =
           Provider.of<WalletProvider>(context, listen: false);
       await walletProvider.loadWallet();
@@ -443,11 +466,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       if (_isMining && _miningStartTime != null) {
         final now = DateTime.now();
         final elapsedMinutes = now.difference(_miningStartTime!).inMinutes;
-        if (elapsedMinutes < MINING_DURATION_MINUTES) {
+        if (elapsedMinutes < miningDurationMinutes) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Please wait \\${MINING_DURATION_MINUTES - elapsedMinutes} minutes for current session to complete',
+                'Please wait \\${miningDurationMinutes - elapsedMinutes} minutes for current session to complete',
                 style: const TextStyle(fontSize: 16),
               ),
               backgroundColor: Colors.orange,
@@ -462,7 +485,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               _isMining = false;
               _miningStartTime = null;
               _miningProgress = 0.0;
-              _currentMiningRate = BASE_MINING_RATE;
+              _currentMiningRate = baseMiningRate;
               _hashRate = 2.5;
               _isPowerBoostActive = false;
               _currentPowerBoostMultiplier = 0.0;
@@ -487,7 +510,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         _miningProgress = 0.0;
         _miningEarnings = 0.0;
         _miningStatus = 'Active';
-        _currentMiningRate = BASE_MINING_RATE;
+        _currentMiningRate = baseMiningRate;
         _lastMiningTime = 0;
         _totalMiningTime = 0;
         _isPowerBoostActive = false;
@@ -501,6 +524,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       _startMiningUiTimer();
 
       // Start mining notification
+      if (!mounted) return;
       final walletProvider = context.read<WalletProvider>();
       final currentBalance = walletProvider.balance.toStringAsFixed(18);
       await MiningNotificationService.startMiningNotification(
@@ -531,7 +555,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     await MiningNotificationService.completeMiningNotification();
 
     _cancelAllTimers();
-    _uiUpdateTimer?.cancel();
+    // Don't cancel mining timer here - only cancel when mining is actually completed
+    // _uiUpdateTimer?.cancel();
 
     // Calculate final earnings based on actual elapsed time
     double earningsToAdd = 0.0;
@@ -542,8 +567,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
       // Only add earnings if mining session was at least partially completed
       // and mining session has actually completed (30 minutes or more)
-      if (elapsedMinutes >= MINING_DURATION_MINUTES) {
-        final miningRate = BASE_MINING_RATE *
+      if (elapsedMinutes >= miningDurationMinutes) {
+        final miningRate = baseMiningRate *
             (1 + (_isPowerBoostActive ? _currentPowerBoostMultiplier : 0.0));
         earningsToAdd =
             double.parse((miningRate * elapsedSeconds).toStringAsFixed(18));
@@ -555,7 +580,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               'Your mining session has completed successfully! You can start a new session now.',
         );
       } else {
-        // '⏰ Mining session not completed yet ($elapsedMinutes/$MINING_DURATION_MINUTES minutes), no earnings added');
+        // '⏰ Mining session not completed yet ($elapsedMinutes/$miningDurationMinutes minutes), no earnings added');
       }
     }
 
@@ -564,7 +589,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         _isMining = false;
         _miningStartTime = null;
         _miningProgress = 0.0;
-        _currentMiningRate = BASE_MINING_RATE;
+        _currentMiningRate = baseMiningRate;
         _hashRate = 2.5;
         _isPowerBoostActive = false;
         _currentPowerBoostMultiplier = 0.0;
@@ -578,6 +603,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
     if (earningsToAdd > 0) {
       try {
+        if (!mounted) return;
         final walletProvider = context.read<WalletProvider>();
 
         // Add earnings non-blocking for immediate UI update
@@ -649,9 +675,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     }
     final secondsElapsed = now.difference(_lastEarningUpdateTime!).inSeconds;
     if (secondsElapsed > 0) {
-      double rate = BASE_MINING_RATE;
+      double rate = baseMiningRate;
       if (_wasPowerBoostActive) {
-        rate = BASE_MINING_RATE * (1 + _lastPowerBoostMultiplier);
+        rate = baseMiningRate * (1 + _lastPowerBoostMultiplier);
       }
       final earningToAdd = rate * secondsElapsed;
       _totalEarnings += earningToAdd;
@@ -661,11 +687,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     }
     setState(() {
       _currentMiningRate = _isPowerBoostActive
-          ? BASE_MINING_RATE * (1 + _currentPowerBoostMultiplier)
-          : BASE_MINING_RATE;
+          ? baseMiningRate * (1 + _currentPowerBoostMultiplier)
+          : baseMiningRate;
       _miningEarnings = double.parse(_totalEarnings.toStringAsFixed(18));
       final elapsedMinutes = now.difference(_miningStartTime!).inMinutes;
-      _miningProgress = (elapsedMinutes / MINING_DURATION_MINUTES) * 100;
+      _miningProgress = (elapsedMinutes / miningDurationMinutes) * 100;
       if (_miningProgress > 100) _miningProgress = 100;
     });
 
@@ -733,7 +759,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   // Load mining state and settings
   Future<void> _initializeData() async {
-    if (!mounted) return;
+    if (!mounted || _isInitialized) return;
     try {
       final prefs = await SharedPreferences.getInstance();
       if (!mounted) return;
@@ -747,7 +773,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       final String loadedMiningStatus =
           prefs.getString('miningStatus') ?? 'Inactive';
       final double loadedCurrentMiningRate =
-          prefs.getDouble('currentMiningRate') ?? BASE_MINING_RATE;
+          prefs.getDouble('currentMiningRate') ?? baseMiningRate;
       final int loadedLastMiningTime = prefs.getInt('lastMiningTime') ?? 0;
       final bool loadedIsPowerBoostActive =
           prefs.getBool('powerBoostActive') ?? false;
@@ -771,7 +797,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         final now = DateTime.now();
         elapsedSeconds = now.difference(loadedMiningStartTime).inSeconds;
         final elapsedMinutes = elapsedSeconds ~/ 60;
-        if (elapsedMinutes >= MINING_DURATION_MINUTES) {
+        if (elapsedMinutes >= miningDurationMinutes) {
           miningExpired = true;
         }
       }
@@ -782,7 +808,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         final now = DateTime.now();
         final elapsedSecondsPB =
             now.difference(loadedPowerBoostStartTime).inSeconds;
-        if (elapsedSecondsPB >= POWER_BOOST_DURATION_MINUTES * 60) {
+        if (elapsedSecondsPB >= powerBoostDurationMinutes * 60) {
           powerBoostExpired = true;
         }
       }
@@ -800,7 +826,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           _miningProgress = 0.0;
           _miningEarnings = 0.0;
           _miningStatus = 'Completed';
-          _currentMiningRate = BASE_MINING_RATE;
+          _currentMiningRate = baseMiningRate;
           _lastMiningTime = 0;
           _isPowerBoostActive = false;
           _currentPowerBoostMultiplier = 0.0;
@@ -814,7 +840,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           _miningProgress = 0.0;
           _miningEarnings = 0.0;
           _miningStatus = 'Inactive';
-          _currentMiningRate = BASE_MINING_RATE;
+          _currentMiningRate = baseMiningRate;
           _lastMiningTime = 0;
           _isPowerBoostActive = false;
           _currentPowerBoostMultiplier = 0.0;
@@ -842,6 +868,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             _powerBoostStartTime = loadedPowerBoostStartTime;
             _hashRate = loadedHashRate;
           }
+
+          // Restart mining timer if mining was active and not expired
+          if (loadedIsMining &&
+              loadedMiningStartTime != null &&
+              !miningExpired) {
+            _updateMiningProgressFromElapsed();
+            _startMiningUiTimer();
+          }
         }
       });
 
@@ -863,7 +897,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           _isMining = false;
           _miningStartTime = null;
           _miningProgress = 0.0;
-          _currentMiningRate = BASE_MINING_RATE;
+          _currentMiningRate = baseMiningRate;
           _hashRate = 2.5;
           _isPowerBoostActive = false;
           _currentPowerBoostMultiplier = 0.0;
@@ -897,7 +931,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt('percentage', _percentage);
-    } catch (e) {}
+    } catch (e) {
+      AppLogger.error('HomeScreen error', error: e);
+    }
   }
 
   @override
@@ -914,6 +950,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           }
 
           // Show confirmation dialog
+          if (!mounted || !context.mounted) return;
           final shouldExit = await showDialog<bool>(
             context: context,
             barrierDismissible: false,
@@ -1749,7 +1786,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
     final now = DateTime.now();
     final elapsedMinutes = now.difference(_miningStartTime!).inMinutes;
-    final remainingMinutes = MINING_DURATION_MINUTES - elapsedMinutes;
+    final remainingMinutes = miningDurationMinutes - elapsedMinutes;
 
     if (remainingMinutes <= 0) return '';
 
@@ -1768,8 +1805,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
     final now = DateTime.now();
     final elapsedSeconds = now.difference(_powerBoostStartTime!).inSeconds;
-    final remainingSeconds =
-        (POWER_BOOST_DURATION_MINUTES * 60) - elapsedSeconds;
+    final remainingSeconds = (powerBoostDurationMinutes * 60) - elapsedSeconds;
 
     if (remainingSeconds <= 0) return '';
 
@@ -1830,14 +1866,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
             // Calculate new multiplier
             if (_powerBoostClickCount == 1) {
-              _currentPowerBoostMultiplier = INITIAL_POWER_BOOST_RATE;
+              _currentPowerBoostMultiplier = initialPowerBoostRate;
             } else {
-              _currentPowerBoostMultiplier += POWER_BOOST_INCREMENT;
+              _currentPowerBoostMultiplier += powerBoostIncrement;
             }
 
             // Update mining rate with new multiplier
             _currentMiningRate =
-                BASE_MINING_RATE * (1 + _currentPowerBoostMultiplier);
+                baseMiningRate * (1 + _currentPowerBoostMultiplier);
             _hashRate = 2.5 * (1 + _currentPowerBoostMultiplier);
             _powerBoostStartTime = DateTime.now();
           });
@@ -1861,7 +1897,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           // Start power boost timer
           _powerBoostTimer?.cancel();
           _powerBoostTimer = Timer(
-            const Duration(minutes: POWER_BOOST_DURATION_MINUTES),
+            const Duration(minutes: powerBoostDurationMinutes),
             () {
               if (!mounted) return;
               setState(() {
@@ -1945,7 +1981,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
         // Add reward non-blocking for immediate UI update
         walletProvider.addEarning(
-          TAP_REWARD_RATE,
+          tapRewardRate,
           type: 'tap',
           description: 'Tap reward',
         );
@@ -1962,15 +1998,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         // Show different messages based on tap count
         if (mounted) {
           String message =
-              '🚀 Magic tapped! +${TAP_REWARD_RATE.toStringAsFixed(18)} BTC';
+              '🚀 Magic tapped! +${tapRewardRate.toStringAsFixed(18)} BTC';
           Color backgroundColor = Colors.green;
 
           if (_sciFiTapCount % 10 == 0) {
             message =
-                '🏆 Achievement Unlocked! +${TAP_REWARD_RATE.toStringAsFixed(18)} BTC';
+                '🏆 Achievement Unlocked! +${tapRewardRate.toStringAsFixed(18)} BTC';
             backgroundColor = Colors.amber;
           } else if (_sciFiTapCount % 5 == 0) {
-            message = '⚡ Power Up! +${TAP_REWARD_RATE.toStringAsFixed(18)} BTC';
+            message = '⚡ Power Up! +${tapRewardRate.toStringAsFixed(18)} BTC';
             backgroundColor = Colors.orange;
           }
 
@@ -2039,7 +2075,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       // Save percentage safely
       try {
         await _savePercentage();
-      } catch (saveError) {}
+      } catch (saveError) {
+        // Ignore percentage save errors
+      }
 
       // Always reset loading state
       if (mounted) {
@@ -2105,7 +2143,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       // Note: Tap rewards are already added immediately in _onSciFiObjectTapped()
       // So we don't need to add them again here
       // This method is kept for any future pending earnings that might need periodic saving
-    } catch (e) {}
+    } catch (e) {
+      AppLogger.error('HomeScreen error', error: e);
+    }
   }
 
   void _startPeriodicSaveTimer() {
@@ -2136,20 +2176,30 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   void _startMiningUiTimer() {
+    debugPrint('🔥 Starting mining timer...');
     _uiUpdateTimer?.cancel();
     _uiUpdateTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (!mounted || !_isMining || _miningStartTime == null) {
+      // Only check mining state, don't cancel if not mounted
+      // This allows mining to continue in background
+      if (!_isMining || _miningStartTime == null) {
+        debugPrint(
+            '🛑 Mining timer cancelled: _isMining=$_isMining, _miningStartTime=$_miningStartTime');
         timer.cancel();
         return;
       }
+
+      // Always update progress even if not mounted
       _updateMiningProgressFromElapsed();
+
       // If mining completed, stop timer
       final now = DateTime.now();
       final elapsedMinutes = now.difference(_miningStartTime!).inMinutes;
-      if (elapsedMinutes >= MINING_DURATION_MINUTES) {
+      if (elapsedMinutes >= miningDurationMinutes) {
+        debugPrint('✅ Mining completed, stopping timer');
         timer.cancel();
         _resetMiningState();
       }
     });
+    debugPrint('✅ Mining timer started successfully');
   }
 }

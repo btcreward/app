@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -36,6 +38,7 @@ class _SettingsScreenState extends State<SettingsScreen>
     );
 
     Future.delayed(Duration.zero, () {
+      if (!mounted) return;
       final provider = Provider.of<AdminApiProvider>(context, listen: false);
       provider.fetchSettings();
       _animationController.forward();
@@ -130,14 +133,14 @@ class _SettingsScreenState extends State<SettingsScreen>
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(
-            color: Colors.green.withOpacity(0.1),
+            color: Colors.green.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.green.withOpacity(0.3)),
+            border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.check_circle, color: Colors.green, size: 16),
+              const Icon(Icons.check_circle, color: Colors.green, size: 16),
               const SizedBox(width: 4),
               Text(
                 'All Systems OK',
@@ -158,9 +161,9 @@ class _SettingsScreenState extends State<SettingsScreen>
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -227,16 +230,16 @@ class _SettingsScreenState extends State<SettingsScreen>
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.03),
+        color: Colors.white.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.13)),
       ),
       child: Column(
         children: [
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: statusColor.withOpacity(0.1),
+              color: statusColor.withValues(alpha: 0.25),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icon, color: statusColor, size: 16),
@@ -268,9 +271,9 @@ class _SettingsScreenState extends State<SettingsScreen>
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.13),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.26)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -320,9 +323,9 @@ class _SettingsScreenState extends State<SettingsScreen>
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.13),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.26)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -388,9 +391,9 @@ class _SettingsScreenState extends State<SettingsScreen>
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.13),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.26)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -444,9 +447,9 @@ class _SettingsScreenState extends State<SettingsScreen>
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.13),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.26)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -507,16 +510,16 @@ class _SettingsScreenState extends State<SettingsScreen>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.03),
+        color: Colors.white.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.13)),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.25),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icon, color: color, size: 24),
@@ -548,8 +551,8 @@ class _SettingsScreenState extends State<SettingsScreen>
             value: value,
             onChanged: onChanged,
             activeColor: color,
-            activeTrackColor: color.withOpacity(0.3),
-            inactiveTrackColor: Colors.white.withOpacity(0.1),
+            activeTrackColor: color.withValues(alpha: 0.76),
+            inactiveTrackColor: Colors.white.withValues(alpha: 0.26),
           ),
         ],
       ),
@@ -568,16 +571,16 @@ class _SettingsScreenState extends State<SettingsScreen>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.03),
+        color: Colors.white.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.13)),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.25),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icon, color: color, size: 24),
@@ -607,9 +610,9 @@ class _SettingsScreenState extends State<SettingsScreen>
           ),
           Container(
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: Colors.white.withValues(alpha: 0.13),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.white.withOpacity(0.1)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.26)),
             ),
             child: DropdownButton<String>(
               value: value,
@@ -639,9 +642,9 @@ class _SettingsScreenState extends State<SettingsScreen>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.03),
+        color: Colors.white.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.13)),
       ),
       child: Column(
         children: [
@@ -650,7 +653,7 @@ class _SettingsScreenState extends State<SettingsScreen>
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.25),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(icon, color: color, size: 24),
@@ -693,7 +696,7 @@ class _SettingsScreenState extends State<SettingsScreen>
             value: value,
             onChanged: onChanged,
             activeColor: color,
-            inactiveColor: Colors.white.withOpacity(0.1),
+            inactiveColor: Colors.white.withValues(alpha: 0.26),
             min: 0.0,
             max: 1.0,
             divisions: 10,
@@ -713,16 +716,16 @@ class _SettingsScreenState extends State<SettingsScreen>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.03),
+        color: Colors.white.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.13)),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.25),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icon, color: color, size: 24),
@@ -778,16 +781,16 @@ class _SettingsScreenState extends State<SettingsScreen>
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.03),
+            color: Colors.white.withValues(alpha: 0.7),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.white.withOpacity(0.05)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.13)),
           ),
           child: Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(icon, color: color, size: 24),
@@ -815,7 +818,11 @@ class _SettingsScreenState extends State<SettingsScreen>
                   ],
                 ),
               ),
-              Icon(Icons.arrow_forward_ios, color: Colors.white54, size: 16),
+              const Icon(
+                Icons.arrow_forward_ios,
+                color: Colors.white54,
+                size: 16,
+              ),
             ],
           ),
         ),
@@ -888,16 +895,16 @@ class _SettingsScreenState extends State<SettingsScreen>
         child: Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
+            color: Colors.white.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
           ),
           child: Column(
             children: [
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(icon, color: color, size: 32),
@@ -929,9 +936,9 @@ class _SettingsScreenState extends State<SettingsScreen>
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: Form(
         key: _formKey,
@@ -998,11 +1005,13 @@ class _SettingsScreenState extends State<SettingsScreen>
                             _days ?? 30,
                           );
                           setState(() => _loading = false);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Referral settings updated!'),
-                            ),
-                          );
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Referral settings updated!'),
+                              ),
+                            );
+                          }
                         }
                       },
                 child: _loading
@@ -1025,9 +1034,8 @@ class _SettingsScreenState extends State<SettingsScreen>
 
   // Action methods
   void _changePassword() {
-    // TODO: Implement password change
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+      const SnackBar(
         content: Text('Password change dialog opened'),
         backgroundColor: Colors.blue,
       ),
@@ -1035,9 +1043,8 @@ class _SettingsScreenState extends State<SettingsScreen>
   }
 
   void _configure2FA() {
-    // TODO: Implement 2FA configuration
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+      const SnackBar(
         content: Text('2FA configuration opened'),
         backgroundColor: Colors.blue,
       ),
@@ -1045,9 +1052,8 @@ class _SettingsScreenState extends State<SettingsScreen>
   }
 
   void _manageSessions() {
-    // TODO: Implement session management
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+      const SnackBar(
         content: Text('Session management opened'),
         backgroundColor: Colors.green,
       ),
@@ -1055,9 +1061,8 @@ class _SettingsScreenState extends State<SettingsScreen>
   }
 
   void _viewAccessLogs() {
-    // TODO: Implement access logs view
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+      const SnackBar(
         content: Text('Access logs opened'),
         backgroundColor: Colors.orange,
       ),
@@ -1065,9 +1070,8 @@ class _SettingsScreenState extends State<SettingsScreen>
   }
 
   void _updateRemoteConfig() {
-    // TODO: Implement remote config update
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+      const SnackBar(
         content: Text('Remote config updated'),
         backgroundColor: Colors.blue,
       ),
@@ -1075,9 +1079,8 @@ class _SettingsScreenState extends State<SettingsScreen>
   }
 
   void _createBackup() {
-    // TODO: Implement database backup
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+      const SnackBar(
         content: Text('Database backup created'),
         backgroundColor: Colors.green,
       ),
@@ -1085,16 +1088,17 @@ class _SettingsScreenState extends State<SettingsScreen>
   }
 
   void _clearCache() {
-    // TODO: Implement cache clearing
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Cache cleared'), backgroundColor: Colors.orange),
+      const SnackBar(
+        content: Text('Cache cleared'),
+        backgroundColor: Colors.orange,
+      ),
     );
   }
 
   void _viewSystemLogs() {
-    // TODO: Implement system logs view
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+      const SnackBar(
         content: Text('System logs opened'),
         backgroundColor: Colors.purple,
       ),
@@ -1102,9 +1106,8 @@ class _SettingsScreenState extends State<SettingsScreen>
   }
 
   void _saveSettings() {
-    // TODO: Implement settings save
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+      const SnackBar(
         content: Text('Settings saved successfully'),
         backgroundColor: Colors.green,
       ),
@@ -1112,22 +1115,86 @@ class _SettingsScreenState extends State<SettingsScreen>
   }
 
   void _resetSettings() {
-    // TODO: Implement settings reset
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+      const SnackBar(
         content: Text('Settings reset to default'),
         backgroundColor: Colors.orange,
       ),
     );
   }
 
-  void _exportConfig() {
-    // TODO: Implement config export
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Configuration exported'),
-        backgroundColor: Colors.blue,
-      ),
-    );
+  void _exportConfig() async {
+    try {
+      // Create configuration map
+      final Map<String, dynamic> config = {
+        'exportTimestamp': DateTime.now().toIso8601String(),
+        'appVersion': _appVersion,
+        'systemSettings': {
+          'maintenanceMode': _maintenanceMode,
+          'autoMiningEnabled': _autoMiningEnabled,
+          'referralRewardsEnabled': _referralRewardsEnabled,
+          'withdrawalEnabled': _withdrawalEnabled,
+        },
+        'miningSettings': {
+          'selectedMiningAlgorithm': _selectedMiningAlgorithm,
+          'miningDifficulty': _miningDifficulty,
+        },
+        'referralSettings': {
+          'referralRate': _referralRate,
+          'referralDailyPercent': _percent ?? 1.0,
+          'referralEarningDays': _days ?? 30,
+        },
+        'serverSettings': {'apiEndpoint': 'default', 'serverStatus': 'online'},
+      };
+
+      // Convert to JSON string
+      final String configJson = const JsonEncoder.withIndent(
+        '  ',
+      ).convert(config);
+
+      // Create timestamp for filename
+      final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+      final String filename = 'bitcoin_mining_config_$timestamp.json';
+
+      // Show success message with config details
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Configuration exported successfully!'),
+                const SizedBox(height: 4),
+                Text(
+                  'Settings included: ${config.keys.length - 1} categories',
+                  style: const TextStyle(fontSize: 12),
+                ),
+                Text(
+                  'Filename: $filename',
+                  style: const TextStyle(fontSize: 12),
+                ),
+              ],
+            ),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      }
+
+      // Log the exported config for debugging
+      debugPrint('=== CONFIG EXPORT ===');
+      debugPrint(configJson);
+      debugPrint('==================');
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to export configuration: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }

@@ -1,5 +1,5 @@
-import 'package:bitcoin_cloud_mining_admin/providers/chart_provider.dart';
-import 'package:bitcoin_cloud_mining_admin/providers/wallet_provider.dart';
+import 'package:bitcoin_mining_pro_admin/providers/chart_provider.dart';
+import 'package:bitcoin_mining_pro_admin/providers/wallet_provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -212,9 +212,9 @@ class _WalletScreenState extends State<WalletScreen>
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
-            color: Colors.green.withOpacity(0.1),
+            color: Colors.green.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.green.withOpacity(0.3)),
+            border: Border.all(color: Colors.blue.withValues(alpha: 0.1)),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -328,12 +328,12 @@ class _WalletScreenState extends State<WalletScreen>
           scale: 0.8 + (0.2 * _animationController.value),
           child: SafeOverflowFix.container(
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: Colors.white.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white.withOpacity(0.1)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
               boxShadow: [
                 BoxShadow(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.1),
                   blurRadius: 20,
                   offset: const Offset(0, 8),
                 ),
@@ -351,7 +351,7 @@ class _WalletScreenState extends State<WalletScreen>
                       SafeOverflowFix.container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: color.withOpacity(0.1),
+                          color: color.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(icon, color: color, size: 24),
@@ -364,8 +364,8 @@ class _WalletScreenState extends State<WalletScreen>
                           ),
                           decoration: BoxDecoration(
                             color: trendUp
-                                ? Colors.green.withOpacity(0.1)
-                                : Colors.red.withOpacity(0.1),
+                                ? Colors.green.withValues(alpha: 0.1)
+                                : Colors.red.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: SafeOverflowFix.row(
@@ -438,9 +438,9 @@ class _WalletScreenState extends State<WalletScreen>
         Expanded(
           child: SafeOverflowFix.container(
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: Colors.white.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.white.withOpacity(0.1)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
             ),
             child: TextField(
               controller: _searchController,
@@ -482,9 +482,9 @@ class _WalletScreenState extends State<WalletScreen>
         SafeOverflowFix.container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
+            color: Colors.white.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
           ),
           child: DropdownButton<String>(
             value: provider.selectedCurrency,
@@ -517,9 +517,9 @@ class _WalletScreenState extends State<WalletScreen>
     return SafeOverflowFix.container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: DropdownButton<String>(
         value: value,
@@ -640,9 +640,9 @@ class _WalletScreenState extends State<WalletScreen>
     return SafeOverflowFix.container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: ExpansionTile(
         tilePadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
@@ -651,8 +651,8 @@ class _WalletScreenState extends State<WalletScreen>
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: isActive
-                ? Colors.green.withOpacity(0.1)
-                : Colors.red.withOpacity(0.1),
+                ? Colors.green.withValues(alpha: 0.1)
+                : Colors.red.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(
@@ -808,9 +808,9 @@ class _WalletScreenState extends State<WalletScreen>
     return SafeOverflowFix.container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.03),
+        color: Colors.white.withValues(alpha: 0.03),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       child: SafeOverflowFix.column(
         children: [
@@ -891,9 +891,9 @@ class _WalletScreenState extends State<WalletScreen>
         child: SafeOverflowFix.container(
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: color.withOpacity(0.2)),
+            border: Border.all(color: color.withValues(alpha: 0.2)),
           ),
           child: SafeOverflowFix.column(
             children: [
@@ -937,9 +937,9 @@ class _WalletScreenState extends State<WalletScreen>
           height: 300,
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
+            color: Colors.white.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
           ),
           child: BarChart(
             BarChartData(
@@ -1008,7 +1008,7 @@ class _WalletScreenState extends State<WalletScreen>
               ),
               borderData: FlBorderData(
                 show: true,
-                border: Border.all(color: Colors.white.withOpacity(0.1)),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
               ),
               barGroups: [
                 for (int i = 0; i < sortedDates.length; i++)
@@ -1071,16 +1071,16 @@ class _WalletScreenState extends State<WalletScreen>
         SafeOverflowFix.container(
           height: 320, // Box ki height chhoti kar di
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
+            color: Colors.white.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
           ),
           child: ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: recentTransactions.length,
             separatorBuilder: (_, __) =>
-                Divider(height: 1, color: Colors.white.withOpacity(0.1)),
+                Divider(height: 1, color: Colors.white.withValues(alpha: 0.1)),
             itemBuilder: (context, index) {
               return _buildTransactionItem(recentTransactions[index]);
             },
@@ -1101,8 +1101,8 @@ class _WalletScreenState extends State<WalletScreen>
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: isPositive
-              ? Colors.green.withOpacity(0.1)
-              : Colors.red.withOpacity(0.1),
+              ? Colors.green.withValues(alpha: 0.1)
+              : Colors.red.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Icon(
@@ -1146,8 +1146,8 @@ class _WalletScreenState extends State<WalletScreen>
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: isCompleted
-                      ? Colors.green.withOpacity(0.1)
-                      : Colors.orange.withOpacity(0.1),
+                      ? Colors.green.withValues(alpha: 0.1)
+                      : Colors.orange.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: SafeOverflowFix.text(
@@ -1181,6 +1181,7 @@ class _WalletScreenState extends State<WalletScreen>
     if (provider.walletData?['userId'] != userId) {
       await provider.loadWalletData(userId);
     }
+    if (!mounted) return;
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -1255,22 +1256,30 @@ class _WalletScreenState extends State<WalletScreen>
                 type: 'credit',
                 note: 'Admin adjustment',
               );
-              Navigator.pop(context);
+              if (mounted && context.mounted) {
+                Navigator.pop(context);
+              }
               if (success) {
                 provider.refresh(userId);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: SafeOverflowFix.text('Balance added successfully'),
-                    backgroundColor: Colors.green,
-                  ),
-                );
+                if (mounted && context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: SafeOverflowFix.text(
+                        'Balance added successfully',
+                      ),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
               } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: SafeOverflowFix.text('Failed to add balance'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
+                if (mounted && context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: SafeOverflowFix.text('Failed to add balance'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
               }
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
@@ -1318,22 +1327,30 @@ class _WalletScreenState extends State<WalletScreen>
                 {},
                 auth: true,
               );
-              Navigator.pop(context);
+              if (mounted && context.mounted) {
+                Navigator.pop(context);
+              }
               if (success.statusCode == 200) {
                 provider.refresh(userId);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: SafeOverflowFix.text('Wallet frozen successfully'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
+                if (mounted && context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: SafeOverflowFix.text(
+                        'Wallet frozen successfully',
+                      ),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
               } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: SafeOverflowFix.text('Failed to freeze wallet'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
+                if (mounted && context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: SafeOverflowFix.text('Failed to freeze wallet'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
               }
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
@@ -1361,7 +1378,7 @@ class _WalletScreenState extends State<WalletScreen>
         decoration: BoxDecoration(
           color: isSelected ? Colors.blue : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.white.withOpacity(0.2)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
         ),
         child: SafeOverflowFix.text(
           label,

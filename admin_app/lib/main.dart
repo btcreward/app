@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as developer;
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -22,16 +23,28 @@ void main() {
   // Flutter framework errors
   FlutterError.onError = (FlutterErrorDetails details) {
     FlutterError.presentError(details);
-    print('Flutter Error: \\${details.exception}');
-    print('Stack trace: \\${details.stack}');
+    developer.log(
+      'Flutter Error: ${details.exception}',
+      level: 1000,
+      name: 'FlutterError',
+    );
+    developer.log(
+      'Stack trace: ${details.stack}',
+      level: 1000,
+      name: 'FlutterError',
+    );
   };
 
   // Dart (async) errors
   runZonedGuarded<Future<void>>(
     () async {
-      print('App is starting...');
+      developer.log('App is starting...', level: 800, name: 'AppStartup');
       WidgetsFlutterBinding.ensureInitialized();
-      print('WidgetsFlutterBinding initialized');
+      developer.log(
+        'WidgetsFlutterBinding initialized',
+        level: 800,
+        name: 'AppStartup',
+      );
       runApp(
         MultiProvider(
           providers: [
@@ -42,11 +55,11 @@ void main() {
           child: const AdminApp(),
         ),
       );
-      print('runApp called');
+      developer.log('runApp called', level: 800, name: 'AppStartup');
     },
     (error, stackTrace) {
-      print('Caught Error: \\$error');
-      print('Stack trace: \\$stackTrace');
+      developer.log('Caught Error: $error', level: 1000, name: 'ZoneError');
+      developer.log('Stack trace: $stackTrace', level: 1000, name: 'ZoneError');
     },
   );
 }
@@ -59,7 +72,7 @@ class AdminApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => AdminApiProvider(),
       child: MaterialApp(
-        title: 'Bitcoin Cloud Mining Admin',
+        title: 'Bitcoin Mining Pro Admin',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.blue,

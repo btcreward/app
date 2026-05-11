@@ -1,11 +1,11 @@
 {
-    "name": "Bitcoin Cloud Mining",
+    "name": "Bitcoin Mining Pro",
     "short_name": "BTC Mining",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#FFFFFF",
     "theme_color": "#000000",
-    "description": "A Bitcoin cloud mining application",
+    "description": "A Bitcoin mining pro application",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

@@ -58,7 +58,7 @@ class _NewTodayUsersScreenState extends State<NewTodayUsersScreen> {
               itemBuilder: (context, index) {
                 final user = todayUsers[index];
                 return Card(
-                  color: Colors.white.withOpacity(0.05),
+                  color: Colors.white.withValues(alpha: 0.05),
                   margin: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 8,
@@ -76,7 +76,7 @@ class _NewTodayUsersScreenState extends State<NewTodayUsersScreen> {
                       ),
                     ),
                     trailing: IconButton(
-                      icon: Icon(Icons.delete, color: Colors.red),
+                      icon: const Icon(Icons.delete, color: Colors.red),
                       onPressed: () => _removeUser(index),
                     ),
                   ),

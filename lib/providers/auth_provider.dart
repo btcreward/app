@@ -7,6 +7,7 @@ import 'package:bitcoin_cloud_mining/services/analytics_service.dart';
 import 'package:bitcoin_cloud_mining/services/api_service.dart';
 import 'package:bitcoin_cloud_mining/services/google_auth_service.dart';
 // wallet_service.dart file does not exist, so it has been removed
+import 'package:bitcoin_cloud_mining/utils/app_logger.dart';
 import 'package:bitcoin_cloud_mining/utils/constants.dart';
 import 'package:bitcoin_cloud_mining/utils/error_handler.dart';
 import 'package:bitcoin_cloud_mining/utils/number_formatter.dart';
@@ -22,6 +23,7 @@ import '../config/api_config.dart';
 typedef ApiResponse = Map<String, dynamic>;
 
 /// Standard response structure
+/// ```
 /// {
 ///   'success': bool,
 ///   'message': String,
@@ -29,6 +31,7 @@ typedef ApiResponse = Map<String, dynamic>;
 ///   'error': String?,
 ///   'token': String?,
 /// }
+/// ```
 
 class AuthProvider extends ChangeNotifier {
   final _client = http.Client();
@@ -212,7 +215,9 @@ class AuthProvider extends ChangeNotifier {
       await StorageUtils.saveToken(token);
       _token = token;
       notifyListeners();
-    } catch (e) {}
+    } catch (e) {
+      // Ignore token save errors
+    }
   }
 
   Future<Map<String, dynamic>> login({
@@ -293,12 +298,18 @@ class AuthProvider extends ChangeNotifier {
           'error': 'RATE_LIMITED'
         };
       } else {
-        throw ApiError(data['message'] ?? 'Login failed');
+        final errorMsg = data['message'] ??
+            data['errors']?.toString() ??
+            'Login failed (${response.statusCode})';
+        AppLogger.authError('Login failed', error: errorMsg);
+        throw ApiError(errorMsg);
       }
     } catch (e) {
+      AppLogger.authError('Login exception', error: e.toString());
       return {
         'success': false,
-        'message': 'Login failed: ${e.toString()}',
+        'message': 'An error occurred during login',
+        'error': e.toString()
       };
     }
   }
@@ -470,7 +481,9 @@ class AuthProvider extends ChangeNotifier {
           if (response.statusCode != 200) {
             // errorData variable ko hata diya gaya hai
           }
-        } catch (e) {}
+        } catch (e) {
+          // Ignore error handling for non-200 responses
+        }
       }
 
       // Clear local storage
@@ -1404,7 +1417,7 @@ class AuthProvider extends ChangeNotifier {
   Future<bool> checkConnectivity() async {
     try {
       final connectivityResult = await Connectivity().checkConnectivity();
-      return connectivityResult != ConnectivityResult.none;
+      return !connectivityResult.contains(ConnectivityResult.none);
     } catch (e) {
       return false;
     }
@@ -1423,6 +1436,13 @@ class AuthProvider extends ChangeNotifier {
       }
 
       // Use Google Auth Service
+      if (!context.mounted) {
+        return {
+          'success': false,
+          'message': 'Context no longer available',
+          'error': 'CONTEXT_UNMOUNTED'
+        };
+      }
       final result = await GoogleAuthService().signInWithGoogle(context);
 
       if (result['success']) {
@@ -1430,7 +1450,8 @@ class AuthProvider extends ChangeNotifier {
         await _updateUserState(result['data']);
 
         // Track analytics
-        AnalyticsService().logEvent('google_sign_in_success');
+        await AnalyticsService.trackCustomEvent(
+            eventName: 'google_sign_in_success');
 
         return {
           'success': true,
@@ -1445,8 +1466,10 @@ class AuthProvider extends ChangeNotifier {
         };
       }
     } catch (e) {
-      AnalyticsService().logEvent('google_sign_in_error',
-          parameters: {'error': e.toString()});
+      await AnalyticsService.trackCustomEvent(
+        eventName: 'google_sign_in_error',
+        parameters: {'error': e.toString()},
+      );
 
       return {
         'success': false,
@@ -1466,7 +1489,7 @@ class AuthProvider extends ChangeNotifier {
       await _clearUserData();
 
       // Track analytics
-      AnalyticsService().logEvent('user_sign_out');
+      await AnalyticsService.trackCustomEvent(eventName: 'user_sign_out');
 
       notifyListeners();
     } catch (e) {

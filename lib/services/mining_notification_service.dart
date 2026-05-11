@@ -31,8 +31,8 @@ class MiningNotificationService {
 
       // Create mining notification channel
       await _createMiningChannel();
-
     } catch (e) {
+      // Ignore notification errors
     }
   }
 
@@ -77,8 +77,8 @@ class MiningNotificationService {
       _updateTimer = Timer.periodic(const Duration(seconds: 300), (_) {
         _updateMiningNotification();
       });
-
     } catch (e) {
+      // Ignore notification errors
     }
   }
 
@@ -92,6 +92,7 @@ class MiningNotificationService {
       _updateTimer?.cancel();
       _updateTimer = null;
     } catch (e) {
+      // Ignore notification errors
     }
   }
 
@@ -126,7 +127,7 @@ class MiningNotificationService {
         largeIcon: const DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
         styleInformation: BigTextStyleInformation(
           '$content\n\n🚀 Keep mining, keep earning! 💸',
-          contentTitle: '⛏️ Bitcoin Cloud Mining - Mining in Progress',
+          contentTitle: '⛏️ Bitcoin Mining Pro - Mining in Progress',
           summaryText: 'Mining is active. Don\'t close the app!',
         ),
         category: AndroidNotificationCategory.service,
@@ -137,12 +138,12 @@ class MiningNotificationService {
 
       await _notifications.show(
         _notificationId,
-        '⛏️ Bitcoin Cloud Mining - Mining in Progress',
+        '⛏️ Bitcoin Mining Pro - Mining in Progress',
         null, // body is handled by BigTextStyleInformation
         notificationDetails,
       );
-
     } catch (e) {
+      // Ignore notification errors
     }
   }
 
@@ -226,6 +227,7 @@ class MiningNotificationService {
       _updateTimer = null;
       // Notification ko remove nahi karenge, bas timer band karenge
     } catch (e) {
+      // Ignore notification errors
     }
   }
 
@@ -285,6 +287,7 @@ class MiningNotificationService {
         return 0; // Less than 1 minute
       }
     } catch (e) {
+      // Ignore notification errors
     }
     return 0;
   }

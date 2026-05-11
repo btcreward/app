@@ -7,10 +7,10 @@ class WalletCard extends StatefulWidget {
   const WalletCard({super.key});
 
   @override
-  _WalletCardState createState() => _WalletCardState();
+  WalletCardState createState() => WalletCardState();
 }
 
-class _WalletCardState extends State<WalletCard> {
+class WalletCardState extends State<WalletCard> {
   bool _isLoading = true;
   String _error = '';
   final ApiService _apiService = ApiService();

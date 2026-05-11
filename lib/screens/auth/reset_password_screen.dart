@@ -46,10 +46,12 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
           _otpSent = true;
           _errorMessage = null;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(response['message'] ?? 'OTP sent successfully')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text(response['message'] ?? 'OTP sent successfully')),
+          );
+        }
       } else {
         setState(() {
           _errorMessage = response['message'] ?? 'Failed to send OTP';
@@ -132,11 +134,13 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) {
           await Future.delayed(Duration(milliseconds: 100));
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (context) => const LoginDialog(),
-          );
+          if (mounted && context.mounted) {
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (context) => const LoginDialog(),
+            );
+          }
         }
       },
       child: Scaffold(

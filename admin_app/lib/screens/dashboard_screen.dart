@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:decimal/decimal.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -47,6 +49,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
 
     Future.delayed(Duration.zero, () async {
+      if (!mounted) return;
       final provider = Provider.of<AdminApiProvider>(context, listen: false);
 
       // Fetch users first (this will also update totalUserCount)
@@ -105,7 +108,12 @@ class _DashboardScreenState extends State<DashboardScreen>
         _serverStatus['AdMob Integration'] = random > 25;
       });
     } catch (e) {
-      print('Server status check failed: $e');
+      // Log server status check error
+      developer.log(
+        'Server status check failed: $e',
+        level: 1000,
+        name: 'DashboardError',
+      );
     } finally {
       if (mounted) {
         setState(() {
@@ -223,7 +231,7 @@ class _DashboardScreenState extends State<DashboardScreen>
               ),
               const SizedBox(height: 4),
               Text(
-                'Bitcoin Cloud Mining Analytics',
+                'Bitcoin Mining Pro Analytics',
                 style: GoogleFonts.poppins(
                   fontSize: 14,
                   color: Colors.white70,
@@ -238,9 +246,11 @@ class _DashboardScreenState extends State<DashboardScreen>
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
+                  color: Colors.green.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.green.withOpacity(0.3)),
+                  border: Border.all(
+                    color: Colors.green.withValues(alpha: 0.3),
+                  ),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -283,7 +293,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Bitcoin Cloud Mining Analytics',
+                        'Bitcoin Mining Pro Analytics',
                         style: GoogleFonts.poppins(
                           fontSize: 16,
                           color: Colors.white70,
@@ -298,9 +308,11 @@ class _DashboardScreenState extends State<DashboardScreen>
                       vertical: 8,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.1),
+                      color: Colors.green.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.green.withOpacity(0.3)),
+                      border: Border.all(
+                        color: Colors.green.withValues(alpha: 0.3),
+                      ),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -475,15 +487,15 @@ class _DashboardScreenState extends State<DashboardScreen>
           scale: 0.8 + (0.2 * _animationController.value),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: Colors.white.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
                 width: 1,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.1),
                   blurRadius: 20,
                   offset: const Offset(0, 8),
                 ),
@@ -499,7 +511,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: color.withOpacity(0.1),
+                          color: color.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(icon, color: color, size: 24),
@@ -511,8 +523,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                         ),
                         decoration: BoxDecoration(
                           color: trendUp
-                              ? Colors.green.withOpacity(0.1)
-                              : Colors.red.withOpacity(0.1),
+                              ? Colors.green.withValues(alpha: 0.1)
+                              : Colors.red.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: SafeFix.row(
@@ -598,9 +610,11 @@ class _DashboardScreenState extends State<DashboardScreen>
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.1),
+                    color: Colors.white.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white.withOpacity(0.2)),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.2),
+                    ),
                   ),
                   child: SafeFix.row(
                     children: [
@@ -675,9 +689,9 @@ class _DashboardScreenState extends State<DashboardScreen>
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: SafeFix.column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -763,7 +777,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     dotData: const FlDotData(show: false),
                     belowBarData: BarAreaData(
                       show: true,
-                      color: const Color(0xFF3B82F6).withOpacity(0.1),
+                      color: const Color(0xFF3B82F6).withValues(alpha: 0.1),
                     ),
                   ),
                 ],
@@ -800,9 +814,9 @@ class _DashboardScreenState extends State<DashboardScreen>
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -850,7 +864,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     dotData: const FlDotData(show: false),
                     belowBarData: BarAreaData(
                       show: true,
-                      color: const Color(0xFF3B82F6).withOpacity(0.1),
+                      color: const Color(0xFF3B82F6).withValues(alpha: 0.1),
                     ),
                   ),
                 ],
@@ -866,9 +880,9 @@ class _DashboardScreenState extends State<DashboardScreen>
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: SafeFix.column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -926,9 +940,9 @@ class _DashboardScreenState extends State<DashboardScreen>
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.1),
+              color: Colors.blue.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.blue.withOpacity(0.2)),
+              border: Border.all(color: Colors.blue.withValues(alpha: 0.2)),
             ),
             child: Row(
               children: [
@@ -996,9 +1010,9 @@ class _DashboardScreenState extends State<DashboardScreen>
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: SafeFix.column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1057,9 +1071,9 @@ class _DashboardScreenState extends State<DashboardScreen>
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: color.withOpacity(0.2)),
+              border: Border.all(color: color.withValues(alpha: 0.2)),
             ),
             child: Row(
               children: [
@@ -1116,11 +1130,15 @@ class _DashboardScreenState extends State<DashboardScreen>
                 hintStyle: GoogleFonts.poppins(color: Colors.white54),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
+                  borderSide: BorderSide(
+                    color: Colors.white.withValues(alpha: 0.2),
+                  ),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
+                  borderSide: BorderSide(
+                    color: Colors.white.withValues(alpha: 0.2),
+                  ),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -1148,22 +1166,27 @@ class _DashboardScreenState extends State<DashboardScreen>
                   listen: false,
                 );
                 await provider.sendNotification(messageController.text.trim());
+                if (!mounted) return;
                 if (provider.error == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Notification sent successfully'),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Failed to send notification: ${provider.error}',
+                  if (mounted && context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Notification sent successfully'),
+                        backgroundColor: Colors.green,
                       ),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
+                    );
+                  }
+                } else {
+                  if (mounted && context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'Failed to send notification: ${provider.error}',
+                        ),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
                 }
               }
             },
@@ -1242,9 +1265,9 @@ class _DashboardScreenState extends State<DashboardScreen>
           child: Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: Colors.white.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.white.withOpacity(0.1)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
             ),
             child: Row(
               children: [
@@ -1265,6 +1288,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     final provider = Provider.of<AdminApiProvider>(context, listen: false);
     try {
       await provider.exportUsers();
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Users data exported successfully'),
@@ -1285,13 +1309,16 @@ class _DashboardScreenState extends State<DashboardScreen>
     final provider = Provider.of<AdminApiProvider>(context, listen: false);
     try {
       await provider.exportWallets();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Wallet data exported successfully'),
-          backgroundColor: Colors.green,
-        ),
-      );
+      if (mounted && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Wallet data exported successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Failed to export wallet data: $e'),
@@ -1305,19 +1332,23 @@ class _DashboardScreenState extends State<DashboardScreen>
     final provider = Provider.of<AdminApiProvider>(context, listen: false);
     try {
       await provider.exportTransactions();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Transaction data exported successfully'),
-          backgroundColor: Colors.green,
-        ),
-      );
+      if (mounted && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Transaction data exported successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to export transaction data: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      if (mounted && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to export transaction data: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -1342,9 +1373,11 @@ class _DashboardScreenState extends State<DashboardScreen>
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.3),
+                    color: Colors.black.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.white.withOpacity(0.1)),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.1),
+                    ),
                   ),
                   child: SingleChildScrollView(
                     child: SafeFix.column(
@@ -1402,14 +1435,33 @@ class _DashboardScreenState extends State<DashboardScreen>
             ),
           ),
           ElevatedButton(
-            onPressed: () {
-              // TODO: Implement refresh logs
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Logs refreshed'),
-                  backgroundColor: Colors.blue,
-                ),
-              );
+            onPressed: () async {
+              // Refresh logs functionality
+              try {
+                final provider = Provider.of<AdminApiProvider>(
+                  context,
+                  listen: false,
+                );
+                await provider
+                    .fetchDashboardAnalytics(); // Refresh analytics data
+                if (mounted && context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Logs and analytics refreshed'),
+                      backgroundColor: Colors.blue,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (mounted && context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Failed to refresh logs: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
             child: Text(
@@ -1435,7 +1487,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(
-              color: levelColor.withOpacity(0.2),
+              color: levelColor.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
@@ -1493,9 +1545,9 @@ class _DashboardScreenState extends State<DashboardScreen>
         const SizedBox(height: 16),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
+            color: Colors.white.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
           ),
           child: provider.latestWithdrawals.isEmpty
               ? Padding(
@@ -1524,8 +1576,10 @@ class _DashboardScreenState extends State<DashboardScreen>
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: provider.latestWithdrawals.length,
-                  separatorBuilder: (_, __) =>
-                      Divider(height: 1, color: Colors.white.withOpacity(0.1)),
+                  separatorBuilder: (_, __) => Divider(
+                    height: 1,
+                    color: Colors.white.withValues(alpha: 0.1),
+                  ),
                   itemBuilder: (context, index) {
                     final wd = provider.latestWithdrawals[index];
                     return ListTile(
@@ -1536,7 +1590,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                       leading: Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.amber.withOpacity(0.1),
+                          color: Colors.amber.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Icon(
@@ -1567,8 +1621,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                             ),
                             decoration: BoxDecoration(
                               color: wd['status'] == 'completed'
-                                  ? Colors.green.withOpacity(0.1)
-                                  : Colors.orange.withOpacity(0.1),
+                                  ? Colors.green.withValues(alpha: 0.1)
+                                  : Colors.orange.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
@@ -1607,9 +1661,9 @@ class _DashboardScreenState extends State<DashboardScreen>
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: SafeFix.column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1637,15 +1691,17 @@ class _DashboardScreenState extends State<DashboardScreen>
                       showTitles: true,
                       getTitlesWidget: (value, meta) {
                         int idx = value.toInt();
-                        if (idx % 2 != 0 || idx < 0 || idx > 23)
+                        if (idx % 2 != 0 || idx < 0 || idx > 23) {
                           return Container();
-                        return Text(
-                          '$idx',
-                          style: const TextStyle(
-                            color: Colors.white70,
-                            fontSize: 10,
-                          ),
-                        );
+                        } else {
+                          return Text(
+                            '$idx',
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 10,
+                            ),
+                          );
+                        }
                       },
                       interval: 1,
                     ),
@@ -1674,7 +1730,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     dotData: const FlDotData(show: false),
                     belowBarData: BarAreaData(
                       show: true,
-                      color: const Color(0xFF06B6D4).withOpacity(0.1),
+                      color: const Color(0xFF06B6D4).withValues(alpha: 0.1),
                     ),
                   ),
                 ],

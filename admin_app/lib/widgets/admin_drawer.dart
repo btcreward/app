@@ -19,7 +19,7 @@ class AdminDrawer extends StatelessWidget {
               backgroundColor: Colors.transparent,
               child: ClipOval(
                 child: Image.asset(
-                  'assets/Bitcoin Cloud Mining Logo.png',
+                  'assets/images/app_logo.png',
                   width: 70,
                   height: 70,
                   fit: BoxFit.cover,

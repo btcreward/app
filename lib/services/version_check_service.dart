@@ -26,9 +26,13 @@ class VersionCheckService {
 
       // 🔍 Step 5: Compare versions
       if (_isOutdated(currentVersion, latestVersion)) {
-        _showForceUpdateDialog(context);
+        // Check if the widget is still in the tree before showing dialog
+        if (context.mounted) {
+          _showForceUpdateDialog(context);
+        }
       }
     } catch (e) {
+      // Log error silently or handle as needed
     }
   }
 
@@ -42,6 +46,7 @@ class VersionCheckService {
         if (curr[i] > latestV[i]) return false;
       }
     } catch (e) {
+      // Return false if version parsing fails
     }
     return false;
   }
@@ -62,6 +67,7 @@ class VersionCheckService {
               if (await canLaunchUrl(uri)) {
                 await launchUrl(uri, mode: LaunchMode.externalApplication);
               } else {
+                // Handle case where URL cannot be launched
               }
             },
             child: const Text('Update Now'),

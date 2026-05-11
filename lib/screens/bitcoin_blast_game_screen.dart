@@ -5,6 +5,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:bitcoin_cloud_mining/providers/wallet_provider.dart';
 import 'package:bitcoin_cloud_mining/services/ad_service.dart';
 import 'package:bitcoin_cloud_mining/services/sound_notification_service.dart';
+import 'package:bitcoin_cloud_mining/utils/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -20,10 +21,10 @@ class BitcoinBlastGameScreen extends StatefulWidget {
   });
 
   @override
-  _BitcoinBlastGameScreenState createState() => _BitcoinBlastGameScreenState();
+  BitcoinBlastGameScreenState createState() => BitcoinBlastGameScreenState();
 }
 
-class _BitcoinBlastGameScreenState extends State<BitcoinBlastGameScreen> {
+class BitcoinBlastGameScreenState extends State<BitcoinBlastGameScreen> {
   double score = 0.0;
   double gameEarnings = 0.0; // Add temporary wallet for game earnings
   int timeLeft = 60;
@@ -65,13 +66,15 @@ class _BitcoinBlastGameScreenState extends State<BitcoinBlastGameScreen> {
     try {
       _audioPlayer.stop();
       _audioPlayer.dispose();
-    } catch (e) {}
+    } catch (e) {
+      AppLogger.error('BitcoinBlast error', error: e);
+    }
     gameTimer?.cancel();
     itemTimer?.cancel();
     animationTimer?.cancel();
     _interstitialTimer?.cancel();
     _disposeBannerAd();
-    _adService.dispose();
+    // Note: Don't dispose AdService here as it's a singleton shared across the app
     exitGame();
     adBubbleTimer?.cancel();
     super.dispose();
@@ -106,7 +109,7 @@ class _BitcoinBlastGameScreenState extends State<BitcoinBlastGameScreen> {
       await _audioPlayer.setReleaseMode(ReleaseMode.stop);
       // Try to play background music with better error handling
       try {
-        await _audioPlayer.play(AssetSource('audio/background.mp3'));
+        await _audioPlayer.play(AssetSource('sounds/notification_alert.mp3'));
       } catch (e) {
         // Continue without background music
       }
@@ -415,14 +418,6 @@ class _BitcoinBlastGameScreenState extends State<BitcoinBlastGameScreen> {
               child: const Text('Play Again',
                   style: TextStyle(color: Colors.white)),
             ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                _onDialogClose();
-                exitGame();
-              },
-              child: const Text('Exit', style: TextStyle(color: Colors.white)),
-            ),
           ],
         );
       },
@@ -567,7 +562,9 @@ class _BitcoinBlastGameScreenState extends State<BitcoinBlastGameScreen> {
       // Stop audio
       try {
         await _audioPlayer.stop();
-      } catch (e) {}
+      } catch (e) {
+        AppLogger.error('BitcoinBlast error', error: e);
+      }
 
       // Proceed with exit flow
       await _exitAfterAd();
@@ -677,7 +674,7 @@ class _BitcoinBlastGameScreenState extends State<BitcoinBlastGameScreen> {
   Future<void> _playCollectSound() async {
     try {
       // Try to play collect sound with better error handling
-      await _audioPlayer.play(AssetSource('audio/collect.mp3'));
+      await _audioPlayer.play(AssetSource('sounds/earning_notification.mp3'));
     } catch (e) {
       // Continue without sound
     }

@@ -3,9 +3,10 @@ import 'dart:async';
 import 'package:bitcoin_cloud_mining/providers/wallet_provider.dart';
 import 'package:bitcoin_cloud_mining/services/ad_service.dart';
 import 'package:bitcoin_cloud_mining/services/sound_notification_service.dart';
+import 'package:bitcoin_cloud_mining/utils/app_logger.dart';
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -20,10 +21,10 @@ class HashRushGameScreen extends StatefulWidget {
   });
 
   @override
-  _HashRushGameScreenState createState() => _HashRushGameScreenState();
+  HashRushGameScreenState createState() => HashRushGameScreenState();
 }
 
-class _HashRushGameScreenState extends State<HashRushGameScreen> {
+class HashRushGameScreenState extends State<HashRushGameScreen> {
   bool _hasExited = false;
   int tapCount = 0;
   double earnedBTC = 0.0;
@@ -61,7 +62,7 @@ class _HashRushGameScreenState extends State<HashRushGameScreen> {
     // New: Check if ad was required from previous session
     _loadAdRequiredState();
     _adService.addListener(_onAdStateChanged); // Listen for ad state changes
-    
+
     // Load banner ad
     _loadBannerAd();
   }
@@ -147,9 +148,10 @@ class _HashRushGameScreenState extends State<HashRushGameScreen> {
   void _loadBannerAd() {
     // Dispose the existing banner ad if it exists
     _bannerAd?.dispose();
-    
+
     _bannerAd = BannerAd(
-      adUnitId: 'ca-app-pub-3537329799200606/2028008282', // Your banner ad unit ID
+      adUnitId:
+          'ca-app-pub-3537329799200606/2028008282', // Your banner ad unit ID
       size: AdSize.mediumRectangle, // 300x250 banner ad
       request: const AdRequest(),
       listener: BannerAdListener(
@@ -175,7 +177,7 @@ class _HashRushGameScreenState extends State<HashRushGameScreen> {
         },
       ),
     );
-    
+
     _bannerAd?.load();
   }
 
@@ -191,7 +193,7 @@ class _HashRushGameScreenState extends State<HashRushGameScreen> {
     autoMinerTimer?.cancel();
     boostTimer?.cancel();
     periodicSaveTimer?.cancel();
-    _adService.dispose();
+    // Note: Don't dispose AdService here as it's a singleton shared across the app
     super.dispose();
   }
 
@@ -550,7 +552,7 @@ class _HashRushGameScreenState extends State<HashRushGameScreen> {
       }
 
       // Save earnings and exit
-      if (earnedBTC > 0) {
+      if (earnedBTC > 0 && mounted) {
         final walletProvider =
             Provider.of<WalletProvider>(context, listen: false);
         await walletProvider.addEarning(
@@ -626,7 +628,9 @@ class _HashRushGameScreenState extends State<HashRushGameScreen> {
       setState(() {
         earnedBTC = 0.0;
       });
-    } catch (e) {}
+    } catch (e) {
+      AppLogger.error('HashRush error', error: e);
+    }
   }
 
   // Handle back button press (for both app bar and Android back button)
@@ -727,10 +731,8 @@ class _HashRushGameScreenState extends State<HashRushGameScreen> {
           ),
           title: Text(
             widget.gameTitle,
-            style: GoogleFonts.poppins(
-              fontSize: 20, 
-              fontWeight: FontWeight.bold
-            ),
+            style:
+                GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           toolbarHeight: 50,
         ),
@@ -886,7 +888,7 @@ class _HashRushGameScreenState extends State<HashRushGameScreen> {
                             width: 300,
                             height: 250,
                             margin: const EdgeInsets.only(
-                              bottom: 16, 
+                              bottom: 16,
                               top: 30,
                               left: 16,
                               right: 16,
@@ -912,7 +914,8 @@ class _HashRushGameScreenState extends State<HashRushGameScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.purple),
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.purple),
                         ),
                         const SizedBox(height: 20),
                         Text(
@@ -1126,10 +1129,10 @@ class CountdownOverlay extends StatefulWidget {
   });
 
   @override
-  _CountdownOverlayState createState() => _CountdownOverlayState();
+  CountdownOverlayState createState() => CountdownOverlayState();
 }
 
-class _CountdownOverlayState extends State<CountdownOverlay> {
+class CountdownOverlayState extends State<CountdownOverlay> {
   int remainingTime = 0;
   Timer? countdownTimer;
 

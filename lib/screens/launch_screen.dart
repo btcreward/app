@@ -6,7 +6,6 @@ import 'package:bitcoin_cloud_mining/widgets/login_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class LaunchScreen extends StatefulWidget {
   const LaunchScreen({super.key});
@@ -24,8 +23,7 @@ class _LaunchScreenState extends State<LaunchScreen>
   late Animation<double> _scaleAnimation;
   late Animation<double> _rotateAnimation;
   late Animation<double> _pulseAnimation;
-  bool _isAnimationComplete = false;
-  bool _isFirstLaunch = true;
+  bool _isNavigating = false;
 
   // Add primary color
   late Color primaryColor;
@@ -34,83 +32,70 @@ class _LaunchScreenState extends State<LaunchScreen>
     _mainController.stop();
     _rotationController.stop();
     _pulseController.stop();
-    setState(() {
-      _isAnimationComplete = true;
-    });
   }
 
   @override
   void initState() {
     super.initState();
-    _checkIfFirstLaunch();
     _initializeAnimations();
-  }
-
-  Future<void> _checkIfFirstLaunch() async {
-    final prefs = await SharedPreferences.getInstance();
-    _isFirstLaunch = prefs.getBool('is_first_launch') ?? true;
-
-    // Check if user is logged out (no token in storage)
-    final token = await StorageUtils.getToken();
-    final isLoggedOut = token == null;
-
-    // If logged out, show login dialog immediately
-    if (isLoggedOut) {
-      Future.delayed(const Duration(seconds: 1), () {
-        if (mounted && !_isAnimationComplete) {
-          _showLoginDialogImmediately();
-        }
-      });
-      return;
-    }
-
-    // Set delay based on whether it's first launch or reload
-    final delay = _isFirstLaunch ? 10 : 5;
-
-    // Delay the initialization to show animation first
-    Future.delayed(Duration(seconds: delay), () {
-      if (mounted && !_isAnimationComplete) {
-        _initializeApp();
-      }
-    });
-
-    // Mark first launch as completed
-    if (_isFirstLaunch) {
-      await prefs.setBool('is_first_launch', false);
-    }
+    // Start auth check immediately - no delay!
+    _initializeApp();
   }
 
   Future<void> _initializeApp() async {
     try {
+      final token = await StorageUtils.getToken();
+
+      if (token == null) {
+        // No token = not logged in, show login after brief animation
+        // Give 1.5 seconds for the splash animation to show
+        await Future.delayed(const Duration(milliseconds: 1500));
+        if (mounted && !_isNavigating) {
+          _isNavigating = true;
+          _showLoginDialog();
+        }
+        return;
+      }
+
+      // Token exists - verify and navigate immediately
+      if (!mounted || !context.mounted) return;
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       await authProvider.initializeAuth();
-      final token = await authProvider.getToken();
+      final currentToken = await authProvider.getToken();
 
-      if (token != null && authProvider.isAuthenticated) {
-        _stopAnimations();
-        // Navigate directly to navigation screen if user is already authenticated
-        Navigator.of(context).pushReplacementNamed('/navigation');
+      if (currentToken != null && authProvider.isAuthenticated) {
+        if (mounted && !_isNavigating) {
+          _isNavigating = true;
+          _stopAnimations();
+          Navigator.of(context).pushReplacementNamed('/navigation');
+        }
       } else {
-        _showLoginDialog();
+        if (mounted && !_isNavigating) {
+          _isNavigating = true;
+          _showLoginDialog();
+        }
       }
     } catch (e) {
-      if (mounted) _showLoginDialog();
+      if (mounted && !_isNavigating) {
+        _isNavigating = true;
+        _showLoginDialog();
+      }
     }
   }
 
   void _initializeAnimations() {
-    // Set duration based on whether it's first launch or reload
-    final duration = _isFirstLaunch ? 10 : 5;
+    // Shortened animation duration for faster startup
+    const duration = Duration(seconds: 2);
 
     // Main controller for fade and scale
     _mainController = AnimationController(
-      duration: Duration(seconds: duration),
+      duration: duration,
       vsync: this,
     );
 
     // Rotation controller (continuous)
     _rotationController = AnimationController(
-      duration: Duration(seconds: duration),
+      duration: const Duration(seconds: 4),
       vsync: this,
     );
     _rotationController.repeat();
@@ -154,32 +139,12 @@ class _LaunchScreenState extends State<LaunchScreen>
       ),
     );
 
-    _mainController.forward().then((_) {
-      if (mounted) {
-        setState(() {
-          _isAnimationComplete = true;
-        });
-      }
-    });
+    _mainController.forward();
   }
 
   void _showLoginDialog() {
     if (!mounted) return;
     _stopAnimations();
-    // Remove the launch screen from the stack and show login as a full screen route
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (context) => const LoginDialog(),
-        fullscreenDialog: true,
-      ),
-    );
-  }
-
-  // Method to show login dialog immediately (for logout scenario)
-  void _showLoginDialogImmediately() {
-    if (!mounted) return;
-    _stopAnimations();
-    // Show login dialog immediately without delay
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (context) => const LoginDialog(),
@@ -380,7 +345,7 @@ class _LaunchScreenState extends State<LaunchScreen>
                                     children: [
                                       // Shadow Text
                                       Text(
-                                        'Bitcoin Cloud Mining',
+                                        'Bitcoin Mining Pro',
                                         style: GoogleFonts.poppins(
                                           fontSize: 28, // reduced from 40
                                           fontWeight: FontWeight.bold,
@@ -391,7 +356,7 @@ class _LaunchScreenState extends State<LaunchScreen>
                                       ),
                                       // Main Text
                                       Text(
-                                        'Bitcoin Cloud Mining',
+                                        'Bitcoin Mining Pro',
                                         style: GoogleFonts.poppins(
                                           fontSize: 28, // reduced from 40
                                           fontWeight: FontWeight.bold,

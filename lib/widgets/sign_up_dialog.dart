@@ -331,7 +331,7 @@ class _SignUpDialogState extends State<SignUpDialog> {
           ),
         );
 
-        if (verified == true) {
+        if (verified == true && mounted) {
           Navigator.of(context, rootNavigator: true)
               .pop(); // Close signup dialog
           Navigator.of(context, rootNavigator: true).push(
@@ -367,11 +367,13 @@ class _SignUpDialogState extends State<SignUpDialog> {
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) {
           await Future.delayed(Duration(milliseconds: 100));
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (context) => const LoginDialog(),
-          );
+          if (mounted && context.mounted) {
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (context) => const LoginDialog(),
+            );
+          }
         }
       },
       child: Scaffold(

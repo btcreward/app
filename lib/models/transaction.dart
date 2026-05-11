@@ -1,4 +1,3 @@
-
 class Transaction {
   final String id;
   final String transactionId;
@@ -162,6 +161,7 @@ class Transaction {
         try {
           timestamp = DateTime.parse(json['timestamp'].toString());
         } catch (e) {
+          // Invalid timestamp format, use current time as fallback
         }
       }
 

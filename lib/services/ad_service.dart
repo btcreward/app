@@ -14,23 +14,31 @@ class AdService with ChangeNotifier {
   factory AdService() => _instance;
   AdService._internal();
 
+  bool _disposed = false;
+  bool _isInitializing = false;
+  bool _isInitialized = false;
+
   // Ad configuration
-  static const int MAX_RETRY_ATTEMPTS = 2; // Reduced from 3 to 2
-  static const Duration RETRY_DELAY =
+  static const int maxRetryAttempts = 2; // Reduced from 3 to 2
+  static const Duration retryDelay =
       Duration(seconds: 3); // Reduced from 5 to 3
-  static const Duration AD_CACHE_DURATION = Duration(minutes: 30);
+  static const Duration adCacheDuration = Duration(minutes: 30);
+
+  // Test mode configuration - set to true for testing
+  static const bool forceTestMode = true; // Force test ads even in release
 
   // Unity Ads Configuration - User's real Game IDs
-  static const String UNITY_GAME_ID_ANDROID =
+  static const String unityGameIdAndroid =
       '5916099'; // User's Unity Game ID for Android
-  static const String UNITY_GAME_ID_IOS =
+  static const String unityGameIdIos =
       '5916098'; // User's Unity Game ID for iOS
-  static const bool UNITY_TEST_MODE = false; // Set to false for production
+  static const bool unityTestMode =
+      forceTestMode; // Use forceTestMode for Unity test ads
 
   // Unity initialization retry configuration
-  static const int MAX_UNITY_INIT_RETRIES = 3;
-  static const Duration UNITY_INIT_RETRY_DELAY = Duration(seconds: 5);
-  static const Duration UNITY_BANNER_TIMEOUT = Duration(seconds: 15);
+  static const int maxUnityInitRetries = 3;
+  static const Duration unityInitRetryDelay = Duration(seconds: 5);
+  static const Duration unityBannerTimeout = Duration(seconds: 15);
 
   // Unity Ad Unit IDs - Real placement IDs for your Unity Dashboard
   final Map<String, Map<String, String>> _unityAdUnitIds = {
@@ -52,17 +60,21 @@ class AdService with ChangeNotifier {
   // AdMob IDs
   final Map<String, Map<String, String>> _adMobUnitIds = {
     'android': {
-      'native': 'ca-app-pub-3537329799200606/2260507229', // Native_Contract_Card
+      'native':
+          'ca-app-pub-3537329799200606/2260507229', // Native_Contract_Card
       'banner': 'ca-app-pub-3537329799200606/2028008282', // Home_Banner_Ad
-      'swipeable_banner': 'ca-app-pub-3537329799200606/2028008282', // Using same as banner for now
+      'swipeable_banner':
+          'ca-app-pub-3537329799200606/2028008282', // Using same as banner for now
     },
     'ios': {
-      'native': 'ca-app-pub-3537329799200606/2260507229', // Native_Contract_Card
+      'native':
+          'ca-app-pub-3537329799200606/2260507229', // Native_Contract_Card
       'banner': 'ca-app-pub-3537329799200606/2028008282', // Home_Banner_Ad
-      'swipeable_banner': 'ca-app-pub-3537329799200606/2028008282', // Using same as banner for now
+      'swipeable_banner':
+          'ca-app-pub-3537329799200606/2028008282', // Using same as banner for now
     },
   };
-  
+
   /// Returns the banner ad unit ID for the current platform
   /// This is specifically for the swipeable carousel banner ads
   String? getBannerAdUnitId() {
@@ -169,6 +181,8 @@ class AdService with ChangeNotifier {
   bool get isRewardedAdLoaded => _isRewardedAdLoaded;
   bool get isBannerAdLoaded => _isBannerAdLoaded;
   bool get isNativeAdLoaded => _isNativeAdLoaded;
+  bool get isInitialized => _isInitialized;
+  bool get isInitializing => _isInitializing;
 
   // Get ad unit ID based on platform and ad type
   String _getAdUnitId(String adType) {
@@ -186,7 +200,7 @@ class AdService with ChangeNotifier {
   }
 
   String _getUnityGameId() {
-    return Platform.isAndroid ? UNITY_GAME_ID_ANDROID : UNITY_GAME_ID_IOS;
+    return Platform.isAndroid ? unityGameIdAndroid : unityGameIdIos;
   }
 
   // Update ad metrics
@@ -224,7 +238,9 @@ class AdService with ChangeNotifier {
       final failuresJson =
           _adFailures.entries.map((e) => '${e.key}:${e.value}').join(',');
       await prefs.setString('ad_failures', failuresJson);
-    } catch (e) {}
+    } catch (e) {
+      // Ignore errors
+    }
   }
 
   // Load metrics from SharedPreferences
@@ -247,7 +263,9 @@ class AdService with ChangeNotifier {
           }
         }
       }
-    } catch (e) {}
+    } catch (e) {
+      // Ignore errors
+    }
   }
 
   // Load ad with retry mechanism
@@ -291,7 +309,7 @@ class AdService with ChangeNotifier {
     final cacheTime = _adCacheTimes[adType];
     if (cacheTime == null) return false;
 
-    return DateTime.now().difference(cacheTime) < AD_CACHE_DURATION;
+    return DateTime.now().difference(cacheTime) < adCacheDuration;
   }
 
   Timer? _bannerAdRefreshTimer;
@@ -301,6 +319,10 @@ class AdService with ChangeNotifier {
     _bannerAdRefreshTimer?.cancel();
     _bannerAdRefreshTimer =
         Timer.periodic(const Duration(seconds: 25), (timer) {
+      if (_disposed) {
+        timer.cancel();
+        return;
+      }
       // Unity ads don't need manual disposal
       _isBannerAdLoaded = false;
       loadBannerAd(); // Reload Unity banner ad
@@ -309,8 +331,7 @@ class AdService with ChangeNotifier {
 
   // Load banner ad
   Future<void> loadBannerAd() async {
-    if (!_isUnityInitialized) {
-      debugPrint('Unity Ads not initialized yet');
+    if (_disposed || !_isUnityInitialized) {
       return;
     }
 
@@ -320,8 +341,9 @@ class AdService with ChangeNotifier {
       'banner',
       () async {
         final adUnitId = _getAdUnitId('banner');
-        if (adUnitId.isEmpty)
+        if (adUnitId.isEmpty) {
           throw Exception('Invalid Unity banner ad unit ID');
+        }
 
         // Load Unity Banner Ad
         await UnityAds.load(
@@ -329,7 +351,6 @@ class AdService with ChangeNotifier {
           onComplete: (placementId) {
             _isBannerAdLoaded = true;
             _startBannerAdAutoRefresh();
-            debugPrint('Unity Banner Ad loaded: $placementId');
 
             // Update mediation metrics for successful load
             if (_isMediationEnabled) {
@@ -338,7 +359,6 @@ class AdService with ChangeNotifier {
           },
           onFailed: (placementId, error, message) {
             _isBannerAdLoaded = false;
-            debugPrint('Unity Banner Ad failed to load: $error - $message');
 
             // Update mediation metrics for failed load
             if (_isMediationEnabled) {
@@ -357,23 +377,17 @@ class AdService with ChangeNotifier {
 
   /// Returns a Unity banner ad widget when loaded, or a placeholder if not available.
   Future<Widget?> getBannerAdWidget() async {
-    debugPrint(
-        '🎯 getBannerAdWidget called - Unity initialized: $_isUnityInitialized, Banner loaded: $_isBannerAdLoaded');
-
     if (!_isUnityInitialized) {
-      debugPrint('⚠️ Unity not initialized, returning placeholder');
       return _getBannerPlaceholder('Unity Ads not initialized');
     }
 
     // If already loaded, return Unity banner widget (singleton)
     if (_isBannerAdLoaded) {
-      debugPrint('✅ Banner already loaded, returning widget');
       return getUnityBannerWidget();
     }
 
     // Only try to load if not already loading
     if (!_isBannerAdLoaded) {
-      debugPrint('🔄 Banner not loaded, attempting to load...');
       await loadBannerAd();
 
       // Wait for the ad to be loaded, polling every 100ms, up to 2 seconds
@@ -386,10 +400,8 @@ class AdService with ChangeNotifier {
     }
 
     if (_isBannerAdLoaded) {
-      debugPrint('✅ Banner loaded successfully, returning widget');
       return getUnityBannerWidget();
     } else {
-      debugPrint('❌ Banner failed to load, returning placeholder');
       return _getBannerPlaceholder('Unity Banner Ad Loading...');
     }
   }
@@ -399,7 +411,7 @@ class AdService with ChangeNotifier {
     // Use the same dimensions as largeBanner (320x100)
     const double width = 320;
     const double height = 100;
-    
+
     return Container(
       width: width,
       height: height,
@@ -439,25 +451,18 @@ class AdService with ChangeNotifier {
   Widget getUnityBannerWidget() {
     // Return existing banner widget instance to prevent duplicates
     if (_bannerWidgetInstance != null) {
-      debugPrint('🔄 Returning existing banner widget instance');
       return _bannerWidgetInstance!;
     }
 
     final adUnitId = _getAdUnitId('banner');
-    debugPrint('🎯 Creating new Unity banner widget with ID: $adUnitId');
 
     _bannerWidgetInstance = SizedBox(
       height: 50,
       child: UnityBannerAd(
         placementId: adUnitId,
-        onLoad: (placementId) {
-          debugPrint('✅ Unity Banner Ad displayed: $placementId');
-        },
-        onClick: (placementId) {
-          debugPrint('👆 Unity Banner Ad clicked: $placementId');
-        },
+        onLoad: (placementId) {},
+        onClick: (placementId) {},
         onFailed: (placementId, error, message) {
-          debugPrint('❌ Unity Banner Ad display failed: $error - $message');
           // Reset banner instance on failure to allow retry
           _bannerWidgetInstance = null;
         },
@@ -561,7 +566,7 @@ class AdService with ChangeNotifier {
 
   // Load rewarded ad with better error handling and mediation tracking
   Future<void> loadRewardedAd() async {
-    if (kIsWeb) return;
+    if (_disposed || kIsWeb) return;
 
     debugPrint(' Loading Unity Rewarded Ad...');
 
@@ -635,7 +640,7 @@ class AdService with ChangeNotifier {
 
   // Load native ad with retry mechanism and auto-refresh
   Future<void> loadNativeAd() async {
-    if (_isNativeAdLoaded) {
+    if (_disposed || _isNativeAdLoaded) {
       return;
     }
 
@@ -729,6 +734,10 @@ class AdService with ChangeNotifier {
     _nativeAdRefreshTimer?.cancel();
     // Refresh native ad every 1 minute (60 seconds)
     _nativeAdRefreshTimer = Timer.periodic(const Duration(minutes: 1), (timer) {
+      if (_disposed) {
+        timer.cancel();
+        return;
+      }
       _isNativeAdLoaded = false;
       _nativeAd?.dispose();
       _nativeAd = null;
@@ -1089,7 +1098,10 @@ class AdService with ChangeNotifier {
 
   // Initialize ads
   Future<void> initialize() async {
-    if (kIsWeb) return;
+    if (_disposed || kIsWeb || _isInitializing || _isInitialized) return;
+
+    _isInitializing = true;
+    debugPrint('🎯 Hash Rush: Initializing ads...');
 
     try {
       // Initialize AdMob (for native ads only)
@@ -1102,26 +1114,46 @@ class AdService with ChangeNotifier {
       // Initialize mediation
       await _initializeMediation();
 
-      // Preload ads
-      loadBannerAd(); // Unity banner
-      loadRewardedAd(); // Unity rewarded
-      loadNativeAd(); // AdMob native
-    } catch (e) {
-      debugPrint('AdService initialization error: $e');
+      // Wait a moment for Unity Ads to be fully ready
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      // Preload ads only if Unity Ads is properly initialized
+      if (_isUnityInitialized) {
+        await Future.wait([
+          loadBannerAd(), // Unity banner
+          loadRewardedAd(), // Unity rewarded
+        ]);
+      }
+
+      // Load native ads separately (AdMob)
+      await loadNativeAd();
+
+      _isInitialized = true;
+      debugPrint('🎯 Hash Rush: All ads initialized. Status: $_isInitialized');
+      debugPrint('🎯 Hash Rush: Rewarded ad loaded: $_isRewardedAdLoaded');
+      debugPrint(
+          '🎯 Hash Rush: Interstitial ad loaded: $_isInterstitialAdLoaded');
+      debugPrint('🎯 Hash Rush: Banner ad loaded: $_isBannerAdLoaded');
+      debugPrint('🎯 Hash Rush: Native ad loaded: $_isNativeAdLoaded');
+    } catch (e, stackTrace) {
+      debugPrint('🎯 Hash Rush: AdService initialization error: $e');
+      debugPrint('🎯 Hash Rush: Stack trace: $stackTrace');
+    } finally {
+      _isInitializing = false;
     }
   }
 
   // Initialize Unity Ads with retry logic
   Future<void> _initializeUnityAdsWithRetry() async {
-    if (_unityInitRetryCount >= MAX_UNITY_INIT_RETRIES) {
+    if (_unityInitRetryCount >= maxUnityInitRetries) {
       debugPrint(
-          '❌ Max Unity initialization retries reached ($MAX_UNITY_INIT_RETRIES)');
+          '❌ Max Unity initialization retries reached ($maxUnityInitRetries)');
       return;
     }
 
     _unityInitRetryCount++;
     debugPrint(
-        '🔄 Unity initialization attempt $_unityInitRetryCount/$MAX_UNITY_INIT_RETRIES');
+        '🔄 Unity initialization attempt $_unityInitRetryCount/$maxUnityInitRetries');
 
     try {
       await _initializeUnityAds();
@@ -1133,12 +1165,12 @@ class AdService with ChangeNotifier {
       debugPrint(
           '❌ Unity initialization attempt $_unityInitRetryCount failed: $e');
 
-      if (_unityInitRetryCount < MAX_UNITY_INIT_RETRIES) {
+      if (_unityInitRetryCount < maxUnityInitRetries) {
         debugPrint(
-            '⏳ Scheduling retry in ${UNITY_INIT_RETRY_DELAY.inSeconds} seconds...');
+            '⏳ Scheduling retry in ${unityInitRetryDelay.inSeconds} seconds...');
         _unityInitRetryTimer?.cancel();
         _unityInitRetryTimer =
-            Timer(UNITY_INIT_RETRY_DELAY, _initializeUnityAdsWithRetry);
+            Timer(unityInitRetryDelay, _initializeUnityAdsWithRetry);
       } else {
         debugPrint('💥 All Unity initialization attempts failed');
       }
@@ -1150,7 +1182,7 @@ class AdService with ChangeNotifier {
       final gameId = _getUnityGameId();
       debugPrint('\n=== UNITY ADS INITIALIZATION DEBUG ===');
       debugPrint('🎮 Game ID: $gameId');
-      debugPrint('🧪 Test Mode: $UNITY_TEST_MODE');
+      debugPrint('🧪 Test Mode: $unityTestMode');
       debugPrint('📱 Platform: ${Platform.isAndroid ? "Android" : "iOS"}');
       debugPrint('📚 Unity Ads Plugin Version: 0.3.20');
       debugPrint('🔍 Checking Unity Ads availability...');
@@ -1193,7 +1225,7 @@ class AdService with ChangeNotifier {
 
       await UnityAds.init(
         gameId: gameId,
-        testMode: UNITY_TEST_MODE,
+        testMode: unityTestMode,
         onComplete: () {
           debugPrint('📢 Unity Ads onComplete callback triggered!');
           if (!hasCompleted) {
@@ -1961,37 +1993,43 @@ class AdService with ChangeNotifier {
 
   /// Load AdMob banner ad specifically for swipeable carousel for a specific screen
   /// Uses LARGE_BANNER size for better visibility in the carousel
-  Future<void> loadSwipeableBannerAd(String screenId, {int retryCount = 0}) async {
+  Future<void> loadSwipeableBannerAd(String screenId,
+      {int retryCount = 0}) async {
     if (kIsWeb) {
-      debugPrint('🌐 [SwipeableBanner] Skipping banner ad load on web platform');
+      debugPrint(
+          '🌐 [SwipeableBanner] Skipping banner ad load on web platform');
       return;
     }
 
     const maxRetries = 2; // Maximum number of retry attempts
     final adKey = '${screenId}_banner';
-    
+
     try {
-      debugPrint('🔄 [SwipeableBanner] Loading banner ad for screen: $screenId (Attempt ${retryCount + 1}/${maxRetries + 1})');
+      debugPrint(
+          '🔄 [SwipeableBanner] Loading banner ad for screen: $screenId (Attempt ${retryCount + 1}/${maxRetries + 1})');
 
       // Dispose existing ad if any
       if (_swipeableBannerAds[adKey] != null) {
-        debugPrint('♻️ [SwipeableBanner] Disposing existing banner ad for key: $adKey');
+        debugPrint(
+            '♻️ [SwipeableBanner] Disposing existing banner ad for key: $adKey');
         await _swipeableBannerAds[adKey]?.dispose();
         _swipeableBannerAds.remove(adKey);
       }
-      
+
       _swipeableAdLoadedStates[adKey] = false;
       notifyListeners();
 
       // Get ad unit ID for AdMob
       final adUnitId = _getAdMobAdUnitId(screenId, 'banner');
       if (adUnitId.isEmpty) {
-        debugPrint('❌ [SwipeableBanner] Invalid AdMob banner ad unit ID for screen: $screenId');
+        debugPrint(
+            '❌ [SwipeableBanner] Invalid AdMob banner ad unit ID for screen: $screenId');
         return;
       }
 
-      debugPrint('🎯 [SwipeableBanner] Creating LARGE_BANNER ad with ID: $adUnitId');
-      
+      debugPrint(
+          '🎯 [SwipeableBanner] Creating LARGE_BANNER ad with ID: $adUnitId');
+
       // Create a new banner ad with LARGE_BANNER size for better visibility
       final bannerAd = BannerAd(
         adUnitId: adUnitId,
@@ -1999,36 +2037,45 @@ class AdService with ChangeNotifier {
         request: const AdRequest(),
         listener: BannerAdListener(
           onAdLoaded: (ad) {
-            debugPrint('✅ [SwipeableBanner] Banner ad loaded successfully for screen: $screenId');
+            debugPrint(
+                '✅ [SwipeableBanner] Banner ad loaded successfully for screen: $screenId');
             _swipeableAdLoadedStates[adKey] = true;
             notifyListeners();
           },
           onAdFailedToLoad: (ad, error) {
-            debugPrint('❌ [SwipeableBanner] Banner ad failed to load for screen: $screenId');
-            debugPrint('❌ [SwipeableBanner] Error code: ${error.code}, message: ${error.message}, domain: ${error.domain}');
-            
+            debugPrint(
+                '❌ [SwipeableBanner] Banner ad failed to load for screen: $screenId');
+            debugPrint(
+                '❌ [SwipeableBanner] Error code: ${error.code}, message: ${error.message}, domain: ${error.domain}');
+
             // Dispose the failed ad
             ad.dispose();
             _swipeableBannerAds.remove(adKey);
             _swipeableAdLoadedStates[adKey] = false;
             notifyListeners();
-            
+
             // Retry loading if we haven't exceeded max retries
             if (retryCount < maxRetries) {
               final retryDelay = Duration(seconds: (retryCount + 1) * 2);
-              debugPrint('⏳ [SwipeableBanner] Retrying in ${retryDelay.inSeconds} seconds...');
+              debugPrint(
+                  '⏳ [SwipeableBanner] Retrying in ${retryDelay.inSeconds} seconds...');
               Future.delayed(retryDelay, () {
                 loadSwipeableBannerAd(screenId, retryCount: retryCount + 1);
               });
             } else {
-              debugPrint('⚠️ [SwipeableBanner] Max retries ($maxRetries) reached for banner ad');
+              debugPrint(
+                  '⚠️ [SwipeableBanner] Max retries ($maxRetries) reached for banner ad');
             }
           },
-          onAdOpened: (ad) => debugPrint('ℹ️ [SwipeableBanner] Banner ad opened for screen: $screenId'),
-          onAdClosed: (ad) => debugPrint('ℹ️ [SwipeableBanner] Banner ad closed for screen: $screenId'),
-          onAdImpression: (ad) => debugPrint('📊 [SwipeableBanner] Banner ad impression for screen: $screenId'),
+          onAdOpened: (ad) => debugPrint(
+              'ℹ️ [SwipeableBanner] Banner ad opened for screen: $screenId'),
+          onAdClosed: (ad) => debugPrint(
+              'ℹ️ [SwipeableBanner] Banner ad closed for screen: $screenId'),
+          onAdImpression: (ad) => debugPrint(
+              '📊 [SwipeableBanner] Banner ad impression for screen: $screenId'),
           onPaidEvent: (ad, valueMicros, precision, currencyCode) {
-            debugPrint('💰 [SwipeableBanner] Ad paid event: ${valueMicros / 1000000} $currencyCode');
+            debugPrint(
+                '💰 [SwipeableBanner] Ad paid event: ${valueMicros / 1000000} $currencyCode');
           },
         ),
       );
@@ -2041,12 +2088,14 @@ class AdService with ChangeNotifier {
       await bannerAd.load().timeout(
         const Duration(seconds: 10),
         onTimeout: () {
-          debugPrint('⚠️ [SwipeableBanner] Banner ad load timed out for screen: $screenId');
+          debugPrint(
+              '⚠️ [SwipeableBanner] Banner ad load timed out for screen: $screenId');
           throw TimeoutException('Banner ad load timed out');
         },
       );
-      
-      debugPrint('✅ [SwipeableBanner] Banner ad load() completed for screen: $screenId');
+
+      debugPrint(
+          '✅ [SwipeableBanner] Banner ad load() completed for screen: $screenId');
     } catch (e, stackTrace) {
       debugPrint('❌ Exception in loadSwipeableBannerAd: $e');
       debugPrint('Stack trace: $stackTrace');
@@ -2060,36 +2109,39 @@ class AdService with ChangeNotifier {
     final adKey = '${screenId}_banner';
     final bannerAd = _swipeableBannerAds[adKey];
     final isLoaded = _swipeableAdLoadedStates[adKey] ?? false;
-    
+
     // Log the current state
     debugPrint('🔄 [SwipeableBanner] Getting banner ad for screen: $screenId');
     debugPrint('   - Banner ad instance: ${bannerAd != null}');
     debugPrint('   - Is loaded: $isLoaded');
-    
+
     // If no banner ad instance exists, try to load one and return a placeholder
     if (bannerAd == null) {
-      debugPrint('⚠️ [SwipeableBanner] No banner ad instance found for screen: $screenId, loading...');
+      debugPrint(
+          '⚠️ [SwipeableBanner] No banner ad instance found for screen: $screenId, loading...');
       // Schedule an ad load if not already loaded
       if (_swipeableAdLoadedStates[adKey] != true) {
         loadSwipeableBannerAd(screenId);
       }
       return _getBannerPlaceholder('Loading ad...');
     }
-    
+
     // If the banner ad is not loaded yet, return a loading placeholder
     if (!isLoaded) {
-      debugPrint('⏳ [SwipeableBanner] Banner ad not loaded yet for screen: $screenId');
+      debugPrint(
+          '⏳ [SwipeableBanner] Banner ad not loaded yet for screen: $screenId');
       return _getBannerPlaceholder('Loading ad...');
     }
-    
+
     try {
       // Get the banner ad size, default to largeBanner dimensions if not available
       final width = bannerAd.size.width.toDouble();
       final height = bannerAd.size.height.toDouble();
-      
-      debugPrint('✅ [SwipeableBanner] Returning banner ad widget for screen: $screenId');
+
+      debugPrint(
+          '✅ [SwipeableBanner] Returning banner ad widget for screen: $screenId');
       debugPrint('   - Size: ${width.toInt()}x${height.toInt()}');
-      
+
       return Container(
         width: width,
         height: height,
@@ -2098,15 +2150,17 @@ class AdService with ChangeNotifier {
         child: AdWidget(ad: bannerAd),
       );
     } catch (e, stackTrace) {
-      debugPrint('❌ [SwipeableBanner] Error getting banner ad widget for screen $screenId: $e');
+      debugPrint(
+          '❌ [SwipeableBanner] Error getting banner ad widget for screen $screenId: $e');
       debugPrint('Stack trace: $stackTrace');
-      
+
       // Try to reload the ad if it fails
       if (e is Exception) {
-        debugPrint('🔄 [SwipeableBanner] Platform error, attempting to reload banner ad...');
+        debugPrint(
+            '🔄 [SwipeableBanner] Platform error, attempting to reload banner ad...');
         loadSwipeableBannerAd(screenId);
       }
-      
+
       return _getBannerPlaceholder('Ad error');
     }
   }
@@ -2125,19 +2179,20 @@ class AdService with ChangeNotifier {
         _swipeableNativeAds[adKey]?.dispose();
         _swipeableNativeAds.remove(adKey);
       }
-      
+
       _swipeableAdLoadedStates[adKey] = false;
       notifyListeners();
 
       final adUnitId = _getAdMobAdUnitId(screenId, 'native');
       if (adUnitId.isEmpty) {
         debugPrint('❌ Invalid AdMob native ad unit ID for screen: $screenId');
-        _handleSwipeableNativeAdLoadFailure(adKey, Exception('Invalid ad unit ID'));
+        _handleSwipeableNativeAdLoadFailure(
+            adKey, Exception('Invalid ad unit ID'));
         return;
       }
 
       debugPrint('🆔 Using ad unit ID: $adUnitId');
-      
+
       final nativeAd = NativeAd(
         adUnitId: adUnitId,
         factoryId: 'adFactory',
@@ -2151,7 +2206,8 @@ class AdService with ChangeNotifier {
             notifyListeners();
           },
           onAdFailedToLoad: (ad, error) {
-            debugPrint('❌ Failed to load native ad for screen $screenId: $error');
+            debugPrint(
+                '❌ Failed to load native ad for screen $screenId: $error');
             _swipeableAdLoadedStates[adKey] = false;
             ad.dispose();
             _swipeableNativeAds.remove(adKey);
@@ -2173,7 +2229,8 @@ class AdService with ChangeNotifier {
         const Duration(seconds: 10),
         onTimeout: () {
           debugPrint('⏱️ Native ad load timed out for screen: $screenId');
-          _handleSwipeableNativeAdLoadFailure(adKey, TimeoutException('Native ad load timed out'));
+          _handleSwipeableNativeAdLoadFailure(
+              adKey, TimeoutException('Native ad load timed out'));
         },
       );
     } catch (e, stackTrace) {
@@ -2218,39 +2275,44 @@ class AdService with ChangeNotifier {
   void _handleSwipeableNativeAdLoadFailure(String adKey, dynamic error) {
     debugPrint('❌ Swipeable native ad load failed for key: $adKey');
     debugPrint('Error: $error');
-    
+
     // Check if we should retry
     final retryCount = _nativeAdRetryCounts[adKey] ?? 0;
     final maxRetryAttempts = 3; // Maximum number of retry attempts
-    
+
     if (retryCount < maxRetryAttempts) {
-      final retryDelay = Duration(seconds: 2 * (retryCount + 1)); // Exponential backoff
-      
-      debugPrint('🔄 Scheduling retry #${retryCount + 1} in ${retryDelay.inSeconds}s');
-      
+      final retryDelay =
+          Duration(seconds: 2 * (retryCount + 1)); // Exponential backoff
+
+      debugPrint(
+          '🔄 Scheduling retry #${retryCount + 1} in ${retryDelay.inSeconds}s');
+
       _nativeAdRetryCounts[adKey] = retryCount + 1;
-      
+
       // Schedule retry
       Future.delayed(retryDelay, () {
         if (_swipeableNativeAds.containsKey(adKey)) {
-          debugPrint('🔄 Retrying swipeable native ad load (attempt ${retryCount + 1}/$maxRetryAttempts)');
+          debugPrint(
+              '🔄 Retrying swipeable native ad load (attempt ${retryCount + 1}/$maxRetryAttempts)');
           final screenId = adKey.replaceAll('_native', '');
           loadSwipeableNativeAd(screenId);
         }
       });
     } else {
-      debugPrint('⚠️ Max retry attempts ($maxRetryAttempts) reached for swipeable native ad');
+      debugPrint(
+          '⚠️ Max retry attempts ($maxRetryAttempts) reached for swipeable native ad');
       _nativeAdRetryCounts.remove(adKey);
-      
+
       // If we have Unity Ads fallback enabled, try to use it
       if (_isUnityInitialized) {
         debugPrint('🔄 Attempting to fall back to Unity Ads');
         // Extract screen ID from adKey (e.g., 'home_native' -> 'home')
         final screenId = adKey.replaceAll('_native', '');
-        _scheduleFallback('${screenId}_native'); // Pass the correct ad ID format
+        _scheduleFallback(
+            '${screenId}_native'); // Pass the correct ad ID format
       }
     }
-    
+
     // Update metrics
     _adFailures['native'] = (_adFailures['native'] ?? 0) + 1;
     _nativeAdFailCount++;
@@ -2262,7 +2324,7 @@ class AdService with ChangeNotifier {
     if (kIsWeb) return '';
 
     final platform = Platform.isAndroid ? 'android' : 'ios';
-    
+
     // Production ad unit IDs
     final Map<String, Map<String, String>> productionAdUnitIds = {
       'android': {
@@ -2277,9 +2339,10 @@ class AdService with ChangeNotifier {
       },
     };
 
-    // In debug mode, use test ad unit IDs but log a warning
-    if (kDebugMode) {
-      debugPrint('⚠️ Using TEST ad unit IDs in debug mode');
+    // Use test ad unit IDs in debug mode or when forceTestMode is enabled
+    if (kDebugMode || forceTestMode) {
+      debugPrint(
+          '⚠️ Using TEST ad unit IDs (${forceTestMode ? "forced" : "debug"} mode)');
       if (platform == 'android') {
         if (adType == 'native') {
           return 'ca-app-pub-3940256099942544/2247696110';
@@ -2287,6 +2350,8 @@ class AdService with ChangeNotifier {
           return 'ca-app-pub-3940256099942544/6300978111';
         } else if (adType == 'rewarded') {
           return 'ca-app-pub-3940256099942544/5224354917';
+        } else if (adType == 'interstitial') {
+          return 'ca-app-pub-3940256099942544/1033173712';
         }
       } else if (platform == 'ios') {
         if (adType == 'native') {
@@ -2295,6 +2360,8 @@ class AdService with ChangeNotifier {
           return 'ca-app-pub-3940256099942544/2934735716';
         } else if (adType == 'rewarded') {
           return 'ca-app-pub-3940256099942544/1712485313';
+        } else if (adType == 'interstitial') {
+          return 'ca-app-pub-3940256099942544/4411468910';
         }
       }
     }
@@ -2308,7 +2375,13 @@ class AdService with ChangeNotifier {
   @override
   void dispose() {
     debugPrint('Disposing AdService resources');
+
+    // Set disposed flag first to prevent any further operations
+    _disposed = true;
+
     _bannerAdRefreshTimer?.cancel();
+    _bannerAdRefreshTimer = null;
+
     // Dispose AdMob banner ad (legacy)
     _admobBannerAd?.dispose();
     _admobBannerAd = null;
@@ -2346,6 +2419,10 @@ class AdService with ChangeNotifier {
       }
     }
     _nativeAdTimers.clear();
+
+    // Cancel native ad refresh timer
+    _nativeAdRefreshTimer?.cancel();
+    _nativeAdRefreshTimer = null;
 
     // Call super.dispose() to properly clean up ChangeNotifier
     super.dispose();

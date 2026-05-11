@@ -2,8 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:bitcoin_cloud_mining/utils/app_logger.dart';
 import 'package:http/http.dart' as http;
-import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:socket_io_client/socket_io_client.dart' as socket_io;
 
 import '../config/api_config.dart';
 import '../utils/error_handler.dart';
@@ -21,7 +22,7 @@ class ApiService {
 
   // Other instance variables
   bool _isConnected = false;
-  IO.Socket? _socket;
+  socket_io.Socket? _socket;
   static const int maxReconnectAttempts = 5;
   static const Duration reconnectDelay = Duration(seconds: 2);
   int _reconnectAttempts = 0;
@@ -93,7 +94,10 @@ class ApiService {
           onReconnected?.call();
           return;
         }
-      } catch (e) {}
+      } catch (e, stackTrace) {
+        AppLogger.error('Socket reconnect failed',
+            error: e, stackTrace: stackTrace);
+      }
 
       if (!_isConnected) {
         await Future.delayed(reconnectDelay * _reconnectAttempts);
@@ -918,9 +922,9 @@ class ApiService {
   }
 
   void initializeSocket(String userId) {
-    _socket = IO.io(
+    _socket = socket_io.io(
       ApiConfig.baseUrl,
-      IO.OptionBuilder()
+      socket_io.OptionBuilder()
           .setTransports(['websocket'])
           .setQuery({'userId': userId})
           .setReconnectionAttempts(maxReconnectAttempts)
@@ -1381,7 +1385,6 @@ class ApiService {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $authToken',
       };
-      print('postWithAuth: url=$url, headers=$headers, data=$data');
       final response = await http
           .post(
             Uri.parse(url),

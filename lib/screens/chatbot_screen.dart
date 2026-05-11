@@ -14,10 +14,10 @@ class ChatBotScreen extends StatefulWidget {
   const ChatBotScreen({super.key});
 
   @override
-  _ChatBotScreenState createState() => _ChatBotScreenState();
+  ChatBotScreenState createState() => ChatBotScreenState();
 }
 
-class _ChatBotScreenState extends State<ChatBotScreen> {
+class ChatBotScreenState extends State<ChatBotScreen> {
   final List<Map<String, String>> messages = [];
   final TextEditingController _controller = TextEditingController();
   bool _isTyping = false;

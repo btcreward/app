@@ -8,7 +8,6 @@ import '../services/sound_notification_service.dart';
 import 'wallet_provider.dart';
 
 class RewardProvider with ChangeNotifier {
-  final int _adsWatched = 0;
   double _pendingRewards = 0.0;
 
   bool followInstagram = false;
@@ -51,7 +50,7 @@ class RewardProvider with ChangeNotifier {
     },
     {
       'platform': 'whatsapp',
-      'handle': 'Bitcoin Cloud Mining',
+      'handle': 'Bitcoin Mining Pro',
       'url': 'https://chat.whatsapp.com/InL9NrT9gtuKpXRJ3Gu5A5',
       'rewardAmount': '0.000000000000010000'
     },
@@ -63,13 +62,13 @@ class RewardProvider with ChangeNotifier {
     },
     {
       'platform': 'facebook',
-      'handle': 'Bitcoin Cloud Mining',
+      'handle': 'Bitcoin Mining Pro',
       'url': 'https://www.facebook.com/groups/1743859249846928',
       'rewardAmount': '0.000000000000010000'
     },
     {
       'platform': 'youtube',
-      'handle': 'Bitcoin Cloud Mining',
+      'handle': 'Bitcoin Mining Pro',
       'url': 'https://www.youtube.com/channel/UC1V43aMm3KYUJu_J9Lx2DAw',
       'rewardAmount': '0.000000000000010000'
     },
@@ -85,10 +84,6 @@ class RewardProvider with ChangeNotifier {
 
   // Comment out API URL for now
   // static const String _baseUrl = 'YOUR_BACKEND_API_URL';
-
-  final bool _claimedStreakBonus = false;
-
-  bool get canClaimStreakBonus => !_claimedStreakBonus;
 
   // Add verification attempt tracking
   final Map<String, DateTime> _verificationAttempts = {};
@@ -327,19 +322,19 @@ class RewardProvider with ChangeNotifier {
       },
       {
         'platform': 'facebook',
-        'handle': 'Bitcoin Cloud Mining',
+        'handle': 'Bitcoin Mining Pro',
         'url': 'https://www.facebook.com/groups/1743859249846928',
         'rewardAmount': '0.000000000000010000'
       },
       {
         'platform': 'youtube',
-        'handle': 'Bitcoin Cloud Mining',
+        'handle': 'Bitcoin Mining Pro',
         'url': 'https://www.youtube.com/channel/UC1V43aMm3KYUJu_J9Lx2DAw',
         'rewardAmount': '0.000000000000010000'
       },
       {
         'platform': 'whatsapp',
-        'handle': 'Bitcoin Cloud Mining',
+        'handle': 'Bitcoin Mining Pro',
         'url': 'https://chat.whatsapp.com/InL9NrT9gtuKpXRJ3Gu5A5',
         'rewardAmount': '0.000000000000010000'
       }
@@ -410,7 +405,6 @@ class RewardProvider with ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setDouble('pendingRewards', _pendingRewards);
     await prefs.setDouble('balance', _balance);
-    await prefs.setInt('adsWatched', _adsWatched);
     await prefs.setBool('subscribeYouTube', _subscribeYouTube);
     // Save verification attempts
     for (var entry in _verificationAttempts.entries) {

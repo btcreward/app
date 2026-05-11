@@ -5,6 +5,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'services/audio_service.dart';
+import 'utils/app_logger.dart';
 
 class FcmService {
   static final FlutterLocalNotificationsPlugin _localNotifications =
@@ -21,8 +22,7 @@ class FcmService {
       await AudioService.initialize();
 
       // Get FCM token
-      final token = await getFcmToken();
-      if (token != null) {}
+      await getFcmToken();
 
       // Only set up background message handler if Firebase is available
       if (_isFirebaseInitialized) {
@@ -41,7 +41,9 @@ class FcmService {
       const android = AndroidInitializationSettings('@mipmap/ic_launcher');
       const initSettings = InitializationSettings(android: android);
       await _localNotifications.initialize(initSettings);
-    } catch (e) {}
+    } catch (e) {
+      AppLogger.error('FCM error', error: e);
+    }
   }
 
   static Future<void> requestPermission() async {
@@ -49,18 +51,17 @@ class FcmService {
       try {
         final FirebaseMessaging messaging = FirebaseMessaging.instance;
 
-        final NotificationSettings settings = await messaging.requestPermission(
+        await messaging.requestPermission(
           alert: true,
           badge: true,
           sound: true,
           provisional: false,
         );
 
-        if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-        } else if (settings.authorizationStatus ==
-            AuthorizationStatus.provisional) {
-        } else {}
-      } catch (e) {}
+        // Authorization status handled by Firebase
+      } catch (e) {
+        AppLogger.error('FCM error', error: e);
+      }
     }
   }
 
@@ -86,7 +87,9 @@ class FcmService {
         FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
           // Handle notification tap (background/terminated)
         });
-      } catch (e) {}
+      } catch (e) {
+        AppLogger.error('FCM error', error: e);
+      }
     }
   }
 
@@ -113,7 +116,9 @@ class FcmService {
         message.notification?.body,
         details,
       );
-    } catch (e) {}
+    } catch (e) {
+      AppLogger.error('FCM error', error: e);
+    }
   }
 }
 
@@ -122,5 +127,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     if (Firebase.apps.isEmpty) {
       await Firebase.initializeApp();
     }
-  } catch (e) {}
+  } catch (e) {
+    AppLogger.error('FCM error', error: e);
+  }
 }

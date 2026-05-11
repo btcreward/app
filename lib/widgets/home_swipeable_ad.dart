@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+
 import '../services/ad_service.dart';
 
 class HomeSwipeableAd extends StatefulWidget {
@@ -15,8 +16,10 @@ class HomeSwipeableAd extends StatefulWidget {
     super.key,
     required this.adService,
     required this.screenId,
-    this.refreshInterval = const Duration(seconds: 30), // Refresh banner ad every 30 seconds
-    this.autoSwipeInterval = const Duration(seconds: 15), // Auto-swipe every 15 seconds
+    this.refreshInterval =
+        const Duration(seconds: 30), // Refresh banner ad every 30 seconds
+    this.autoSwipeInterval =
+        const Duration(seconds: 15), // Auto-swipe every 15 seconds
     this.margin,
   }) : assert(screenId.isNotEmpty, 'screenId cannot be empty');
 
@@ -40,11 +43,11 @@ class _HomeSwipeableAdState extends State<HomeSwipeableAd> {
     super.initState();
     // Initialize page controller with initial page
     _pageController = PageController(initialPage: 0);
-    
+
     // Load ads
     _loadNativeAd();
     _loadBannerAd();
-    
+
     // Start timers
     _startAutoSwipe();
     _startRefreshTimer();
@@ -75,11 +78,11 @@ class _HomeSwipeableAdState extends State<HomeSwipeableAd> {
   Widget _buildBannerPlaceholder(String message) {
     final theme = Theme.of(context);
     final onSurfaceVariant = theme.colorScheme.onSurfaceVariant;
-    
+
     // Using withAlpha instead of withOpacity for better precision
     final iconColor = onSurfaceVariant.withAlpha((255 * 0.5).round());
     final textColor = onSurfaceVariant.withAlpha((255 * 0.7).round());
-    
+
     return Container(
       height: 360, // Match native ad height
       width: double.infinity,
@@ -131,7 +134,7 @@ class _HomeSwipeableAdState extends State<HomeSwipeableAd> {
     final onSurfaceVariant = theme.colorScheme.onSurfaceVariant;
     final iconColor = onSurfaceVariant.withAlpha((255 * 0.5).round());
     final textColor = onSurfaceVariant.withAlpha((255 * 0.7).round());
-    
+
     return Container(
       height: 360, // Match native ad height
       width: double.infinity,
@@ -192,7 +195,6 @@ class _HomeSwipeableAdState extends State<HomeSwipeableAd> {
         throw Exception('Native ad not loaded');
       }
     } catch (e) {
-      debugPrint('Failed to load native ad: $e');
       if (mounted) {
         setState(() {
           _nativeAdWidget = _buildFallbackNativeAd();
@@ -203,14 +205,14 @@ class _HomeSwipeableAdState extends State<HomeSwipeableAd> {
 
   Future<void> _loadBannerAd() async {
     if (_isBannerAdLoading || _isBannerAdLoaded) return;
-    
+
     _isBannerAdLoading = true;
     if (mounted) setState(() {});
 
     try {
       // Get the banner ad unit ID from AdService
-      final bannerAdUnitId = await widget.adService.getBannerAdUnitId();
-      
+      final bannerAdUnitId = widget.adService.getBannerAdUnitId();
+
       if (bannerAdUnitId == null || bannerAdUnitId.isEmpty) {
         throw Exception('Banner ad unit ID not available');
       }
@@ -222,12 +224,12 @@ class _HomeSwipeableAdState extends State<HomeSwipeableAd> {
         request: const AdRequest(),
         listener: BannerAdListener(
           onAdLoaded: (ad) {
-            debugPrint('AdMob banner ad loaded for ${widget.screenId}');
             if (mounted) {
               setState(() {
                 _bannerAdWidget = Container(
                   height: 390, // Height for banner container
-                  margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
                   child: AdWidget(ad: ad as BannerAd),
                 );
                 _isBannerAdLoaded = true;
@@ -236,7 +238,6 @@ class _HomeSwipeableAdState extends State<HomeSwipeableAd> {
             _startBannerAdAutoRefresh();
           },
           onAdFailedToLoad: (ad, error) {
-            debugPrint('AdMob banner ad failed to load: $error');
             ad.dispose();
             if (mounted) {
               setState(() {
@@ -246,16 +247,14 @@ class _HomeSwipeableAdState extends State<HomeSwipeableAd> {
             }
           },
           onAdImpression: (ad) {
-            debugPrint('AdMob banner ad impression for ${widget.screenId}');
+            // AdMob banner ad impression
           },
         ),
       );
 
-          // Load the ad
+      // Load the ad
       await bannerAd.load();
-      
     } catch (e) {
-      debugPrint('Error loading AdMob banner ad: $e');
       if (mounted) {
         setState(() {
           _bannerAdWidget = _buildBannerPlaceholder('Ad failed to load');
@@ -275,7 +274,8 @@ class _HomeSwipeableAdState extends State<HomeSwipeableAd> {
       (timer) {
         if (!mounted) return;
         if (_pageController.hasClients) {
-          final nextPage = (_currentPage + 1) % 2; // Only 2 pages: native and banner
+          final nextPage =
+              (_currentPage + 1) % 2; // Only 2 pages: native and banner
           _pageController.animateToPage(
             nextPage,
             duration: const Duration(milliseconds: 300),
@@ -296,7 +296,7 @@ class _HomeSwipeableAdState extends State<HomeSwipeableAd> {
     // Initial refresh
     _loadBannerAd();
     _loadNativeAd();
-    
+
     // Set up periodic refresh
     _refreshTimer = Timer.periodic(widget.refreshInterval, (timer) {
       if (mounted) {
@@ -305,7 +305,6 @@ class _HomeSwipeableAdState extends State<HomeSwipeableAd> {
       }
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -367,7 +366,8 @@ class _HomeSwipeableAdState extends State<HomeSwipeableAd> {
 
     return Container(
       width: double.infinity,
-      margin: widget.margin ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      margin: widget.margin ??
+          const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: Column(
         children: [
           SizedBox(
@@ -404,7 +404,8 @@ class _HomeSwipeableAdState extends State<HomeSwipeableAd> {
                       shape: BoxShape.circle,
                       color: _currentPage == index
                           ? theme.colorScheme.primary
-                          : theme.colorScheme.onSurfaceVariant.withAlpha(51), // 20% opacity
+                          : theme.colorScheme.onSurfaceVariant
+                              .withAlpha(51), // 20% opacity
                     ),
                   ),
                 ),

@@ -53,7 +53,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
               expandedHeight: 200,
               pinned: true,
               flexibleSpace: FlexibleSpaceBar(
-                title: const Text('📜 About Us – Bitcoin Cloud Mining 🚀'),
+                title: const Text('📜 About Us – Bitcoin Mining Pro 🚀'),
                 background: Container(
                   decoration: const BoxDecoration(
                     color:
@@ -80,7 +80,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                   child: Padding(
                     padding: EdgeInsets.all(16.0),
                     child: Text(
-                      'Introduction\nWelcome to Bitcoin Cloud Mining, your trusted platform for cloud-based cryptocurrency mining. We provide a secure, efficient, and user-friendly way to mine Bitcoin through our advanced cloud infrastructure.',
+                      'Introduction\nWelcome to Bitcoin Mining Pro, your trusted platform for cloud-based cryptocurrency mining. We provide a secure, efficient, and user-friendly way to mine Bitcoin through our advanced cloud infrastructure.',
                       style: textStyle,
                     ),
                   ),
@@ -96,7 +96,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                           TextSpan(text: '🌍 Our Mission\n'),
                           TextSpan(
                               text:
-                                  'At Bitcoin Cloud Mining, we are committed to making cryptocurrency mining accessible, efficient, and profitable for everyone.\n\n'),
+                                  'At Bitcoin Mining Pro, we are committed to making cryptocurrency mining accessible, efficient, and profitable for everyone.\n\n'),
                           TextSpan(
                               text:
                                   '💎 Provide reliable and efficient cloud mining solutions.\n'),
@@ -122,7 +122,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                   child: Padding(
                     padding: EdgeInsets.all(16.0),
                     child: Text(
-                      '🔥 Why Choose Bitcoin Cloud Mining?\n\n'
+                      '🔥 Why Choose Bitcoin Mining Pro?\n\n'
                       '⚡ State-of-the-Art Mining Facilities – Advanced ASIC miners maintained in professional data centers with optimal conditions.\n\n'
                       '🔐 Secure & Transparent Operations – Track your simulated hash rate and BTC earnings in real-time through our cloud mining interface.\n\n'
                       '🎮 Simulated Bitcoin mining experience – Enjoy a rewarding gameplay experience with engaging in-app rewards.\n\n'
@@ -337,7 +337,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                   padding:
                       EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                   child: Text(
-                    'Note: All earnings shown in this app are simulated and based on in-app gameplay. Bitcoin Cloud Mining is not a real mining operation. BTC rewards are virtual unless stated otherwise.',
+                    'Note: All earnings shown in this app are simulated and based on in-app gameplay. Bitcoin Mining Pro is not a real mining operation. BTC rewards are virtual unless stated otherwise.',
                     style: TextStyle(fontSize: 12, color: Colors.white54),
                     textAlign: TextAlign.center,
                   ),

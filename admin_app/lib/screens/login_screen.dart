@@ -47,12 +47,14 @@ class _LoginScreenState extends State<LoginScreen>
     );
     if (success) {
       // Navigate to home instead of admin-home route
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const ResponsiveWrapper(child: AdminHome()),
-        ),
-      );
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const ResponsiveWrapper(child: AdminHome()),
+          ),
+        );
+      }
     } else {
       // Error provider.error me hai, UI me show hoga
       if (adminProvider.error != null) {
@@ -93,7 +95,7 @@ class _LoginScreenState extends State<LoginScreen>
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.18),
+                          color: Colors.black.withValues(alpha: 0.18),
                           blurRadius: 24,
                           offset: const Offset(0, 8),
                         ),
@@ -101,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen>
                     ),
                     child: ClipOval(
                       child: Image.asset(
-                        'assets/Bitcoin Cloud Mining Logo.png',
+                        'assets/images/app_logo.png',
                         width: 96,
                         height: 96,
                         fit: BoxFit.cover,
@@ -112,17 +114,17 @@ class _LoginScreenState extends State<LoginScreen>
                 // Glassmorphism Card
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.08),
+                    color: Colors.white.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.12),
+                        color: Colors.black.withValues(alpha: 0.12),
                         blurRadius: 32,
                         offset: const Offset(0, 12),
                       ),
                     ],
                     border: Border.all(
-                      color: Colors.white.withOpacity(0.18),
+                      color: Colors.white.withValues(alpha: 0.18),
                       width: 1.2,
                     ),
                   ),
@@ -273,7 +275,7 @@ class _LoginScreenState extends State<LoginScreen>
                 ),
                 const SizedBox(height: 36),
                 Text(
-                  '© 2025 Bitcoin Cloud Mining Admin',
+                  '© 2025 Bitcoin Mining Pro Admin',
                   style: GoogleFonts.poppins(
                     color: Colors.white24,
                     fontSize: 13,

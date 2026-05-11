@@ -1,3 +1,4 @@
+import 'package:bitcoin_cloud_mining/utils/app_logger.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 
 class AnalyticsService {
@@ -7,17 +8,20 @@ class AnalyticsService {
   static Future<void> trackAppOpen() async {
     try {
       await _analytics.logAppOpen();
-    } catch (e) {}
+    } catch (e) {
+      AppLogger.warning('Analytics event failed', error: e);
+    }
   }
 
   /// 🎯 Track login event
   static Future<void> trackLogin({String? method}) async {
     try {
       await _analytics.logLogin(loginMethod: method ?? 'email');
-    } catch (e) {}
+    } catch (e) {
+      AppLogger.warning('Analytics trackLogin failed', error: e);
+    }
   }
 
-  /// 💰 Track wallet transaction
   static Future<void> trackTransaction({
     required String type,
     required double amount,
@@ -32,7 +36,9 @@ class AnalyticsService {
           'currency': currency,
         },
       );
-    } catch (e) {}
+    } catch (e) {
+      AppLogger.warning('Analytics event failed', error: e);
+    }
   }
 
   /// 🎮 Track game played
@@ -50,7 +56,9 @@ class AnalyticsService {
           'earnings': earnings,
         },
       );
-    } catch (e) {}
+    } catch (e) {
+      AppLogger.warning('Analytics event failed', error: e);
+    }
   }
 
   /// 🎁 Track reward claimed
@@ -66,7 +74,9 @@ class AnalyticsService {
           'amount': amount,
         },
       );
-    } catch (e) {}
+    } catch (e) {
+      AppLogger.warning('Analytics event failed', error: e);
+    }
   }
 
   /// 👥 Track referral event
@@ -82,7 +92,9 @@ class AnalyticsService {
           if (referralCode != null) 'referral_code': referralCode,
         },
       );
-    } catch (e) {}
+    } catch (e) {
+      AppLogger.warning('Analytics event failed', error: e);
+    }
   }
 
   /// 📱 Track notification interaction
@@ -98,7 +110,9 @@ class AnalyticsService {
           'action': action,
         },
       );
-    } catch (e) {}
+    } catch (e) {
+      AppLogger.warning('Analytics event failed', error: e);
+    }
   }
 
   /// 🎯 Track custom event
@@ -111,7 +125,9 @@ class AnalyticsService {
         name: eventName,
         parameters: parameters,
       );
-    } catch (e) {}
+    } catch (e) {
+      AppLogger.warning('Analytics event failed', error: e);
+    }
   }
 
   /// 👤 Set user properties
@@ -131,19 +147,17 @@ class AnalyticsService {
         await _analytics.setUserProperty(
             name: 'registration_date', value: registrationDate);
       }
-    } catch (e) {}
+    } catch (e) {
+      AppLogger.warning('Analytics event failed', error: e);
+    }
   }
 
   /// 🔄 Enable/disable analytics collection
   static Future<void> setAnalyticsCollectionEnabled(bool enabled) async {
     try {
       await _analytics.setAnalyticsCollectionEnabled(enabled);
-    } catch (e) {}
-  }
-
-  void logEvent(String name, {Map<String, dynamic>? parameters}) {
-    // Yahan aap FirebaseAnalytics ya custom logging laga sakte hain
-    // Example (agar FirebaseAnalytics use kar rahe ho):
-    // FirebaseAnalytics.instance.logEvent(name: name, parameters: parameters);
+    } catch (e) {
+      AppLogger.warning('Analytics event failed', error: e);
+    }
   }
 }

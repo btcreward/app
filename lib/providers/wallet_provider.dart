@@ -19,7 +19,6 @@ class WalletProvider extends ChangeNotifier {
   bool _isLoading = false;
   String? _error;
   List<Transaction> _transactions = [];
-  final List<Transaction> _pendingTransactions = [];
   double _btcPrice = 30000.0; // Default BTC price in USD
   double _totalEarned = 0.0;
   double _totalWithdrawn = 0.0;
@@ -58,8 +57,6 @@ class WalletProvider extends ChangeNotifier {
   String get formattedBtcBalance =>
       NumberFormatter.formatBTCAmount(_btcBalance);
   Set<String> get claimedTransactions => _claimedTransactions;
-  List<Transaction> get pendingTransactions =>
-      List.unmodifiable(_pendingTransactions);
   String get selectedCurrency => _selectedCurrency;
   bool get isSyncing => _isSyncing;
   double get totalEarned => _totalEarned;
@@ -92,7 +89,7 @@ class WalletProvider extends ChangeNotifier {
       if (data['balance'] != null) {
         _btcBalance = double.tryParse(data['balance'].toString()) ?? 0.0;
         _balance = _btcBalance;
-      } else {}
+      }
 
       // Save to local storage
       final formattedBalance = NumberFormatter.formatBTCAmount(_btcBalance);
@@ -192,11 +189,9 @@ class WalletProvider extends ChangeNotifier {
           }
         } else {
           // If server update fails, keep local balance (already updated)
-          print('Server balance update failed, keeping local balance');
         }
       }).catchError((e) {
         // If server update fails, keep local balance (already updated)
-        print('Server balance update error: $e');
       });
     } catch (e) {
       // Try to recover from local storage
@@ -289,8 +284,6 @@ class WalletProvider extends ChangeNotifier {
         _balance = currentBalance;
         updateTotalEarned(-amount); // Revert the addition
         notifyListeners();
-
-        print('Background earning update failed: $e');
       });
     } catch (e) {
       rethrow;
@@ -557,7 +550,6 @@ class WalletProvider extends ChangeNotifier {
     _btcBalance = 0.0;
     _balance = 0.0;
     _transactions = [];
-    _pendingTransactions.clear();
     _btcPrice = 0.0;
     _totalEarned = 0.0;
     _totalWithdrawn = 0.0;

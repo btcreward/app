@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bitcoin_cloud_mining/services/network_service.dart';
+import 'package:bitcoin_cloud_mining/utils/app_logger.dart';
 import 'package:flutter/foundation.dart';
 import 'package:geocoding/geocoding.dart';
 
@@ -44,14 +45,18 @@ class NetworkProvider extends ChangeNotifier {
 
       _isInitialized = true;
       notifyListeners();
-    } catch (e) {}
+    } catch (e) {
+      AppLogger.error('NetworkProvider error', error: e);
+    }
   }
 
   // Update connection type
   Future<void> _updateConnectionType() async {
     try {
       _connectionType = await _networkService.getConnectionType();
-    } catch (e) {}
+    } catch (e) {
+      AppLogger.error('NetworkProvider error', error: e);
+    }
   }
 
   // Force check connection

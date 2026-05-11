@@ -1,12 +1,13 @@
 import 'dart:async';
 
-import 'package:bitcoin_cloud_mining/constants/color_constants.dart';
 import 'package:bitcoin_cloud_mining/services/ad_service.dart';
 import 'package:bitcoin_cloud_mining/services/api_service.dart';
 import 'package:bitcoin_cloud_mining/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
+
+import '../utils/color_constants.dart';
 
 class ReferralScreen extends StatefulWidget {
   const ReferralScreen({super.key});
@@ -121,7 +122,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
   Future<void> _shareReferralCode() async {
     final referralCode = _referralStats['referralCode'] ?? '';
     final message =
-        'Join me on Bitcoin Cloud Mining! Use my referral code: $referralCode';
+        'Join me on Bitcoin Mining Pro! Use my referral code: $referralCode';
     try {
       await SharePlus.instance.share(
         ShareParams(
@@ -179,12 +180,14 @@ class _ReferralScreenState extends State<ReferralScreen> {
       },
     );
     if (!adSuccess) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to show ad. Please try again.'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      if (mounted && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to show ad. Please try again.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
       return;
     }
   }
@@ -222,13 +225,15 @@ class _ReferralScreenState extends State<ReferralScreen> {
         final nextClaim = _lastClaimDate!.add(const Duration(hours: 24));
         final nextClaimStr =
             '${nextClaim.hour.toString().padLeft(2, '0')}:${nextClaim.minute.toString().padLeft(2, '0')} on ${nextClaim.day}/${nextClaim.month}/${nextClaim.year}';
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                'You can only claim once every 24 hours or after 1 AM. Next claim: $nextClaimStr'),
-            backgroundColor: Colors.orange,
-          ),
-        );
+        if (mounted && context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                  'You can only claim once every 24 hours or after 1 AM. Next claim: $nextClaimStr'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
         return;
       }
     }
@@ -266,6 +271,12 @@ class _ReferralScreenState extends State<ReferralScreen> {
         ),
       );
     }
+  }
+
+  @override
+  void dispose() {
+    // Note: Don't dispose AdService here as it's a singleton shared across the app
+    super.dispose();
   }
 
   @override

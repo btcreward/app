@@ -12,10 +12,10 @@ class NavigationScreen extends StatefulWidget {
   const NavigationScreen({super.key});
 
   @override
-  _NavigationScreenState createState() => _NavigationScreenState();
+  NavigationScreenState createState() => NavigationScreenState();
 }
 
-class _NavigationScreenState extends State<NavigationScreen>
+class NavigationScreenState extends State<NavigationScreen>
     with SingleTickerProviderStateMixin {
   int _selectedIndex = 0;
   late AnimationController _rgbController;
@@ -30,8 +30,9 @@ class _NavigationScreenState extends State<NavigationScreen>
 
   // Get the actual screen index based on tab index
   int _getActualScreenIndex(int tabIndex) {
-    if (tabIndex == 2)
+    if (tabIndex == 2) {
       return _selectedIndex; // Network indicator - stay on current screen
+    }
     if (tabIndex > 2) return tabIndex - 1; // Adjust for network indicator
     return tabIndex; // Home and Contract tabs
   }
@@ -403,7 +404,7 @@ class _NavigationScreenState extends State<NavigationScreen>
                             Navigator.pop(context);
                             final isConnected =
                                 await networkProvider.checkConnection();
-                            if (isConnected && mounted) {
+                            if (isConnected && mounted && context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Row(

@@ -15,10 +15,10 @@ class RewardScreen extends StatefulWidget {
   const RewardScreen({super.key});
 
   @override
-  _RewardScreenState createState() => _RewardScreenState();
+  RewardScreenState createState() => RewardScreenState();
 }
 
-class _RewardScreenState extends State<RewardScreen>
+class RewardScreenState extends State<RewardScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final AdService _adService = AdService();
@@ -75,7 +75,7 @@ class _RewardScreenState extends State<RewardScreen>
   @override
   void dispose() {
     _tabController.dispose();
-    _adService.dispose();
+    // Note: Don't dispose AdService here as it's a singleton shared across the app
     _confettiController.dispose();
     _countdownTimer?.cancel();
     super.dispose();
@@ -214,12 +214,15 @@ class _RewardScreenState extends State<RewardScreen>
                               );
 
                               // Navigate to referral screen
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const ReferralScreen(),
-                                ),
-                              );
+                              if (mounted && context.mounted) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const ReferralScreen(),
+                                  ),
+                                );
+                              }
                             },
                             gradientStart: Color(0xFF11998e),
                             gradientEnd: Color(0xFF38ef7d),

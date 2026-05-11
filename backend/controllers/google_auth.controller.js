@@ -201,10 +201,16 @@ exports.googleSignIn = async (req, res) => {
         });
 
     } catch (error) {
-        logger.error('Google Sign-In error:', error);
+        logger.error('Google Sign-In error:', {
+            message: error.message,
+            stack: error.stack,
+            body: req.body,
+            hasAuthHeader: !!req.headers.authorization
+        });
         res.status(500).json({
             success: false,
-            message: 'Google Sign-In failed'
+            message: 'Google Sign-In failed: ' + error.message,
+            error: 'GOOGLE_SIGN_IN_ERROR'
         });
     }
 };

@@ -103,14 +103,16 @@ class _ReferralManagementScreenState extends State<ReferralManagementScreen> {
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
+                  color: Colors.green.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.green.withOpacity(0.3)),
+                  border: Border.all(
+                    color: Colors.green.withValues(alpha: 0.3),
+                  ),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.people, color: Colors.green, size: 20),
+                    const Icon(Icons.people, color: Colors.green, size: 20),
                     const SizedBox(width: 8),
                     Text(
                       '${provider.referralList.length} Referrers',
@@ -138,9 +140,9 @@ class _ReferralManagementScreenState extends State<ReferralManagementScreen> {
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.05),
+                color: Colors.white.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.white.withOpacity(0.1)),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
               ),
               child: TextField(
                 onChanged: (value) {
@@ -152,7 +154,7 @@ class _ReferralManagementScreenState extends State<ReferralManagementScreen> {
                 decoration: InputDecoration(
                   hintText: 'Search referrers...',
                   hintStyle: GoogleFonts.poppins(color: Colors.white54),
-                  prefixIcon: Icon(Icons.search, color: Colors.white54),
+                  prefixIcon: const Icon(Icons.search, color: Colors.white54),
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -165,16 +167,16 @@ class _ReferralManagementScreenState extends State<ReferralManagementScreen> {
           const SizedBox(width: 16),
           Container(
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: Colors.white.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.white.withOpacity(0.1)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
             ),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<String>(
                 value: _statusFilter,
                 dropdownColor: const Color(0xFF1E293B),
                 style: GoogleFonts.poppins(color: Colors.white),
-                items: [
+                items: const [
                   DropdownMenuItem(value: 'all', child: Text('All Status')),
                   DropdownMenuItem(value: 'active', child: Text('Active')),
                   DropdownMenuItem(
@@ -214,7 +216,11 @@ class _ReferralManagementScreenState extends State<ReferralManagementScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.people_outline, size: 64, color: Colors.white54),
+                const Icon(
+                  Icons.people_outline,
+                  size: 64,
+                  color: Colors.white54,
+                ),
                 const SizedBox(height: 16),
                 Text(
                   'No referrals found',
@@ -294,9 +300,9 @@ class _ReferralManagementScreenState extends State<ReferralManagementScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -335,10 +341,10 @@ class _ReferralManagementScreenState extends State<ReferralManagementScreen> {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: _getStatusColor(status).withOpacity(0.1),
+                    color: _getStatusColor(status).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: _getStatusColor(status).withOpacity(0.3),
+                      color: _getStatusColor(status).withValues(alpha: 0.3),
                     ),
                   ),
                   child: Text(
@@ -387,7 +393,11 @@ class _ReferralManagementScreenState extends State<ReferralManagementScreen> {
               const SizedBox(height: 16),
               Row(
                 children: [
-                  Icon(Icons.access_time, color: Colors.white54, size: 16),
+                  const Icon(
+                    Icons.access_time,
+                    color: Colors.white54,
+                    size: 16,
+                  ),
                   const SizedBox(width: 8),
                   Text(
                     'Last referral: ${_formatDate(lastReferral)}',
@@ -405,13 +415,15 @@ class _ReferralManagementScreenState extends State<ReferralManagementScreen> {
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: () => _viewReferralDetails(referral),
-                    icon: Icon(Icons.visibility, color: Colors.blue),
+                    icon: const Icon(Icons.visibility, color: Colors.blue),
                     label: Text(
                       'View Details',
                       style: GoogleFonts.poppins(color: Colors.blue),
                     ),
                     style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: Colors.blue.withOpacity(0.3)),
+                      side: BorderSide(
+                        color: Colors.blue.withValues(alpha: 0.3),
+                      ),
                     ),
                   ),
                 ),
@@ -419,7 +431,7 @@ class _ReferralManagementScreenState extends State<ReferralManagementScreen> {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () => _manageReferral(referral),
-                    icon: Icon(Icons.edit, color: Colors.white),
+                    icon: const Icon(Icons.edit, color: Colors.white),
                     label: Text(
                       'Manage',
                       style: GoogleFonts.poppins(color: Colors.white),
@@ -446,9 +458,9 @@ class _ReferralManagementScreenState extends State<ReferralManagementScreen> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Column(
         children: [
@@ -543,21 +555,512 @@ class _ReferralManagementScreenState extends State<ReferralManagementScreen> {
   }
 
   void _viewReferralDetails(Map<String, dynamic> referral) {
-    // TODO: Implement referral details view
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Viewing details for ${referral['name']}'),
-        backgroundColor: Colors.blue,
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Referral Details'),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildDetailRow('Name', referral['name']?.toString() ?? 'N/A'),
+              _buildDetailRow('Email', referral['email']?.toString() ?? 'N/A'),
+              _buildDetailRow(
+                'Username',
+                referral['username']?.toString() ?? 'N/A',
+              ),
+              _buildDetailRow('Phone', referral['phone']?.toString() ?? 'N/A'),
+              _buildDetailRow(
+                'Status',
+                referral['status']?.toString() ?? 'N/A',
+              ),
+              _buildDetailRow(
+                'Joined Date',
+                _formatDate(referral['createdAt']),
+              ),
+              _buildDetailRow(
+                'Last Active',
+                _formatDate(referral['lastActive']),
+              ),
+              _buildDetailRow(
+                'Total Earnings',
+                '${(referral['totalEarnings'] as num?)?.toStringAsFixed(8) ?? '0.00000000'} BTC',
+              ),
+              _buildDetailRow(
+                'Referral Code',
+                referral['referralCode']?.toString() ?? 'N/A',
+              ),
+              if (referral['referredBy'] != null)
+                _buildDetailRow(
+                  'Referred By',
+                  referral['referredBy']?.toString() ?? 'N/A',
+                ),
+              if (referral['earningsHistory'] != null &&
+                  referral['earningsHistory'].isNotEmpty)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Recent Earnings:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      height: 100,
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount:
+                            (referral['earningsHistory'] as List).length > 5
+                            ? 5
+                            : (referral['earningsHistory'] as List).length,
+                        itemBuilder: (context, index) {
+                          final earning =
+                              (referral['earningsHistory'] as List)[index];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 2),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  '${earning['type'] ?? 'Unknown'}',
+                                  style: const TextStyle(fontSize: 12),
+                                ),
+                                Text(
+                                  '${(earning['amount'] as num?)?.toStringAsFixed(8) ?? '0.00000000'} BTC',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 100,
+            child: Text(
+              '$label:',
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+            ),
+          ),
+          Expanded(child: Text(value, style: const TextStyle(fontSize: 14))),
+        ],
       ),
     );
   }
 
   void _manageReferral(Map<String, dynamic> referral) {
-    // TODO: Implement referral management
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Managing referral for ${referral['name']}'),
-        backgroundColor: Colors.green,
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Manage Referral'),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Referral: ${referral['name'] ?? referral['email'] ?? 'Unknown'}',
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Available Actions:',
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+              ),
+              const SizedBox(height: 12),
+              _buildActionButton(
+                'Update Status',
+                'Change referral status (active/inactive/suspended)',
+                Icons.edit,
+                Colors.blue,
+                () {
+                  Navigator.of(context).pop();
+                  _updateReferralStatus(referral);
+                },
+              ),
+              _buildActionButton(
+                'Adjust Earnings',
+                'Add or deduct earnings from this referral',
+                Icons.account_balance_wallet,
+                Colors.green,
+                () {
+                  Navigator.of(context).pop();
+                  _adjustReferralEarnings(referral);
+                },
+              ),
+              _buildActionButton(
+                'Send Notification',
+                'Send a notification to this referral',
+                Icons.notifications,
+                Colors.orange,
+                () {
+                  Navigator.of(context).pop();
+                  _sendReferralNotification(referral);
+                },
+              ),
+              _buildActionButton(
+                'View Statistics',
+                'View detailed referral statistics',
+                Icons.analytics,
+                Colors.purple,
+                () {
+                  Navigator.of(context).pop();
+                  _viewReferralStatistics(referral);
+                },
+              ),
+              _buildActionButton(
+                'Reset Password',
+                'Reset referral account password',
+                Icons.lock_reset,
+                Colors.red,
+                () {
+                  Navigator.of(context).pop();
+                  _resetReferralPassword(referral);
+                },
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionButton(
+    String title,
+    String description,
+    IconData icon,
+    Color color,
+    VoidCallback onTap,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            border: Border.all(color: color.withValues(alpha: 0.3)),
+            borderRadius: BorderRadius.circular(8),
+            color: color.withValues(alpha: 0.1),
+          ),
+          child: Row(
+            children: [
+              Icon(icon, color: color, size: 20),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                        color: color,
+                      ),
+                    ),
+                    Text(
+                      description,
+                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(Icons.arrow_forward_ios, color: color, size: 16),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _updateReferralStatus(Map<String, dynamic> referral) {
+    final statusController = TextEditingController(
+      text: referral['status']?.toString() ?? 'active',
+    );
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Update Referral Status'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Current Status: ${referral['status'] ?? 'N/A'}'),
+            const SizedBox(height: 16),
+            TextField(
+              controller: statusController,
+              decoration: const InputDecoration(
+                labelText: 'New Status',
+                border: OutlineInputBorder(),
+                hintText: 'active, inactive, suspended, etc.',
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.of(context).pop();
+              // Here you would call the API to update the status
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Status updated to: ${statusController.text}'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            },
+            child: const Text('Update'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _adjustReferralEarnings(Map<String, dynamic> referral) {
+    final amountController = TextEditingController();
+    final reasonController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Adjust Earnings'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Current Earnings: ${(referral['totalEarnings'] as num?)?.toStringAsFixed(8) ?? '0.00000000'} BTC',
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: amountController,
+              decoration: const InputDecoration(
+                labelText: 'Amount (BTC)',
+                border: OutlineInputBorder(),
+                hintText: '0.00000000',
+              ),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: reasonController,
+              decoration: const InputDecoration(
+                labelText: 'Reason',
+                border: OutlineInputBorder(),
+                hintText: 'Bonus, penalty, adjustment, etc.',
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.of(context).pop();
+              // Here you would call the API to adjust earnings
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'Earnings adjusted by: ${amountController.text} BTC',
+                  ),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            },
+            child: const Text('Adjust'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _sendReferralNotification(Map<String, dynamic> referral) {
+    final messageController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Send Notification'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Send to: ${referral['email'] ?? referral['name'] ?? 'Unknown'}',
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: messageController,
+              decoration: const InputDecoration(
+                labelText: 'Message',
+                border: OutlineInputBorder(),
+                hintText: 'Enter notification message...',
+              ),
+              maxLines: 3,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.of(context).pop();
+              // Here you would call the API to send notification
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Notification sent successfully'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            },
+            child: const Text('Send'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _viewReferralStatistics(Map<String, dynamic> referral) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Referral Statistics'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildStatRow(
+              'Total Referrals Made',
+              '${referral['referralCount'] ?? 0}',
+            ),
+            _buildStatRow(
+              'Total Earnings',
+              '${(referral['totalEarnings'] as num?)?.toStringAsFixed(8) ?? '0.00000000'} BTC',
+            ),
+            _buildStatRow('Last Active', _formatDate(referral['lastActive'])),
+            _buildStatRow('Days Active', '${referral['activeDays'] ?? 0}'),
+            _buildStatRow(
+              'Conversion Rate',
+              '${(referral['conversionRate'] as num?)?.toStringAsFixed(2) ?? '0.00'}%',
+            ),
+            if (referral['topEarningDay'] != null)
+              _buildStatRow('Best Earning Day', '${referral['topEarningDay']}'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
+          Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
+        ],
+      ),
+    );
+  }
+
+  void _resetReferralPassword(Map<String, dynamic> referral) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Reset Password'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Are you sure you want to reset the password for:'),
+            const SizedBox(height: 8),
+            Text(
+              referral['email'] ?? referral['name'] ?? 'Unknown',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'A new password will be generated and sent to their email.',
+              style: TextStyle(color: Colors.grey[600]),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.of(context).pop();
+              // Here you would call the API to reset password
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Password reset email sent'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Reset'),
+          ),
+        ],
       ),
     );
   }

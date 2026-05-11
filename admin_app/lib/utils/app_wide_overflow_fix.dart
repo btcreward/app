@@ -147,7 +147,9 @@ class AppWideOverflowFix {
             locale: locale,
             softWrap: softWrap ?? true,
             overflow: overflow ?? TextOverflow.ellipsis,
-            textScaleFactor: textScaleFactor,
+            textScaler: textScaleFactor != null
+                ? TextScaler.linear(textScaleFactor)
+                : TextScaler.noScaling,
             maxLines: maxLines,
             semanticsLabel: semanticsLabel,
             textWidthBasis: textWidthBasis,

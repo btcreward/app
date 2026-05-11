@@ -1,4 +1,4 @@
-import 'package:bitcoin_cloud_mining_admin/providers/wallet_provider.dart';
+import 'package:bitcoin_mining_pro_admin/providers/wallet_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -37,7 +37,11 @@ class _UserTransactionsScreenState extends State<UserTransactionsScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.receipt_long, color: Colors.white24, size: 64),
+                  const Icon(
+                    Icons.receipt_long,
+                    color: Colors.white24,
+                    size: 64,
+                  ),
                   const SizedBox(height: 16),
                   Text(
                     'No transactions found',
@@ -58,7 +62,7 @@ class _UserTransactionsScreenState extends State<UserTransactionsScreen> {
                   padding: const EdgeInsets.all(16),
                   itemCount: paginatedTxs.length,
                   separatorBuilder: (_, __) =>
-                      Divider(color: Colors.white24, height: 1),
+                      const Divider(color: Colors.white24, height: 1),
                   itemBuilder: (context, index) {
                     final tx = paginatedTxs[index];
                     final amount =
@@ -78,8 +82,8 @@ class _UserTransactionsScreenState extends State<UserTransactionsScreen> {
                         ),
                         leading: CircleAvatar(
                           backgroundColor: isPositive
-                              ? Colors.green.withOpacity(0.15)
-                              : Colors.red.withOpacity(0.15),
+                              ? Colors.green.withValues(alpha: 0.15)
+                              : Colors.red.withValues(alpha: 0.15),
                           child: Icon(
                             isPositive
                                 ? Icons.arrow_downward
@@ -115,8 +119,8 @@ class _UserTransactionsScreenState extends State<UserTransactionsScreen> {
                                   ),
                                   decoration: BoxDecoration(
                                     color: isCompleted
-                                        ? Colors.green.withOpacity(0.12)
-                                        : Colors.orange.withOpacity(0.12),
+                                        ? Colors.green.withValues(alpha: 0.12)
+                                        : Colors.orange.withValues(alpha: 0.12),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Text(
@@ -131,7 +135,7 @@ class _UserTransactionsScreenState extends State<UserTransactionsScreen> {
                                   ),
                                 ),
                                 const SizedBox(width: 12),
-                                Icon(
+                                const Icon(
                                   Icons.access_time,
                                   color: Colors.white24,
                                   size: 14,

@@ -20,10 +20,10 @@ class CryptoCrazeGameScreen extends StatefulWidget {
   });
 
   @override
-  _CryptoCrazeGameScreenState createState() => _CryptoCrazeGameScreenState();
+  CryptoCrazeGameScreenState createState() => CryptoCrazeGameScreenState();
 }
 
-class _CryptoCrazeGameScreenState extends State<CryptoCrazeGameScreen> {
+class CryptoCrazeGameScreenState extends State<CryptoCrazeGameScreen> {
   final Random _random = Random();
   final AdService _adService = AdService();
   List<Offset> _cryptoPositions = [];
@@ -49,7 +49,7 @@ class _CryptoCrazeGameScreenState extends State<CryptoCrazeGameScreen> {
     _loadGameData();
     _adService.loadBannerAd();
     _adService.loadInterstitialAd(); // Load interstitial ad on init
-    
+
     // Pending ad level load karo
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final prefs = await SharedPreferences.getInstance();
@@ -73,7 +73,7 @@ class _CryptoCrazeGameScreenState extends State<CryptoCrazeGameScreen> {
   void dispose() {
     _adTimer?.cancel();
     _doubleMiningTimer?.cancel();
-    _adService.dispose();
+    // Note: Don't dispose AdService here as it's a singleton shared across the app
 
     super.dispose();
   }
@@ -392,7 +392,7 @@ class _CryptoCrazeGameScreenState extends State<CryptoCrazeGameScreen> {
       final adShown = await _adService.showInterstitialAd(
         onAdDismissed: _exitAfterAd,
       );
-      
+
       // If ad wasn't shown (not loaded or error), exit immediately
       if (!adShown && mounted) {
         _exitAfterAd();
@@ -492,7 +492,7 @@ class _CryptoCrazeGameScreenState extends State<CryptoCrazeGameScreen> {
                   final prefs = await SharedPreferences.getInstance();
                   prefs.remove('pendingAdLevel');
                   // User ko reward message bhi dikha sakte hain
-                  if (mounted) {
+                  if (mounted && context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text(

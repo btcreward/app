@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/wallet_provider.dart';
 import '../services/ad_service.dart';
 import '../services/sound_notification_service.dart';
+import '../utils/app_logger.dart';
 import '../utils/color_constants.dart';
 import '../widgets/custom_app_bar.dart';
 
@@ -58,9 +59,10 @@ class _FlipCoinGameScreenState extends State<FlipCoinGameScreen>
   void _loadBannerAd() {
     // Dispose the existing banner ad if it exists
     _bannerAd?.dispose();
-    
+
     _bannerAd = BannerAd(
-      adUnitId: 'ca-app-pub-3537329799200606/2028008282', // Same as hash rush screen
+      adUnitId:
+          'ca-app-pub-3537329799200606/2028008282', // Same as hash rush screen
       size: AdSize.mediumRectangle, // 300x250 banner ad
       request: const AdRequest(),
       listener: BannerAdListener(
@@ -86,7 +88,7 @@ class _FlipCoinGameScreenState extends State<FlipCoinGameScreen>
         },
       ),
     );
-    
+
     _bannerAd?.load();
   }
 
@@ -867,7 +869,9 @@ class _FlipCoinGameScreenState extends State<FlipCoinGameScreen>
           type: 'game',
           description: 'Flip Coin Game Earnings (Auto-saved)',
         );
-      } catch (e) {}
+      } catch (e) {
+        AppLogger.error('FlipCoin error', error: e);
+      }
     }
     _saveAdRequiredState(_isRewardedAdRequired);
     _bannerAd?.dispose();

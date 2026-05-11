@@ -12,10 +12,10 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../constants/color_constants.dart';
 import '../providers/auth_provider.dart';
 import '../providers/wallet_provider.dart';
 import '../screens/notification_screen.dart';
+import '../utils/color_constants.dart';
 import '../utils/number_formatter.dart';
 
 // Define your premium colors.
@@ -154,8 +154,14 @@ class _SettingScreenState extends State<SettingScreen> {
 
     if (shouldLogout == true) {
       try {
+        // Capture providers before async operations
+        if (!context.mounted) return;
+        final walletProvider =
+            Provider.of<WalletProvider>(context, listen: false);
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
         // Show loading indicator
-        if (mounted) {
+        if (context.mounted) {
           showDialog(
             context: context,
             barrierDismissible: false,
@@ -167,9 +173,6 @@ class _SettingScreenState extends State<SettingScreen> {
           );
         }
 
-        final walletProvider =
-            Provider.of<WalletProvider>(context, listen: false);
-
         // Step 1: Get current balance and token
         final currentBalance = walletProvider.btcBalance;
         final formattedBalance =
@@ -178,11 +181,7 @@ class _SettingScreenState extends State<SettingScreen> {
         var userId = await StorageUtils.getUserId();
 
         // Agar storage se userId null hai to provider se lo
-        if (userId == null) {
-          final authProvider =
-              Provider.of<AuthProvider>(context, listen: false);
-          userId = authProvider.userId;
-        }
+        userId ??= authProvider.userId;
 
         if (token == null || userId == null) {
           throw Exception('Authentication data not found');
@@ -207,7 +206,7 @@ class _SettingScreenState extends State<SettingScreen> {
         }
 
         // Close loading indicator
-        if (mounted) {
+        if (context.mounted) {
           Navigator.of(context).pop();
         }
 
@@ -220,7 +219,7 @@ class _SettingScreenState extends State<SettingScreen> {
         ]);
 
         // Step 4: Show success message
-        if (mounted) {
+        if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Logged out successfully'),
@@ -233,16 +232,18 @@ class _SettingScreenState extends State<SettingScreen> {
           await Future.delayed(const Duration(seconds: 1));
 
           // Logout ke baad sida launch screen pe bhejo, aur purana stack hata do
-          Navigator.of(context)
-              .pushNamedAndRemoveUntil('/launch', (route) => false);
+          if (context.mounted) {
+            Navigator.of(context)
+                .pushNamedAndRemoveUntil('/launch', (route) => false);
+          }
         }
       } catch (e) {
         // Close loading indicator if open
-        if (mounted) {
+        if (context.mounted) {
           Navigator.of(context).pop();
         }
 
-        if (mounted) {
+        if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Logout failed: ${e.toString()}'),
@@ -789,10 +790,12 @@ class _SettingScreenState extends State<SettingScreen> {
               if (await canLaunchUrl(url)) {
                 await launchUrl(url);
               } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                      content: Text('Could not open Privacy Policy')),
-                );
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text('Could not open Privacy Policy')),
+                  );
+                }
               }
             },
           ),

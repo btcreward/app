@@ -27,8 +27,8 @@ class SoundNotificationService {
 
       // Create notification channels
       await _createNotificationChannels();
-
     } catch (e) {
+      // Ignore notification errors
     }
   }
 
@@ -130,6 +130,7 @@ class SoundNotificationService {
 
       await _audioPlayer.play(AssetSource(soundPath));
     } catch (e) {
+      // Ignore notification errors
     }
   }
 
@@ -142,6 +143,7 @@ class SoundNotificationService {
       try {
         await _audioPlayer.play(AssetSource('sounds/success_chime.mp3'));
       } catch (e2) {
+        // Ignore fallback errors
       }
     }
   }
@@ -156,6 +158,7 @@ class SoundNotificationService {
       try {
         await _audioPlayer.play(AssetSource('sounds/success_chime.mp3'));
       } catch (e2) {
+        // Ignore fallback errors
       }
     }
   }
@@ -170,6 +173,7 @@ class SoundNotificationService {
       try {
         await _audioPlayer.play(AssetSource('sounds/success_chime.mp3'));
       } catch (e2) {
+        // Ignore fallback errors
       }
     }
   }
@@ -179,6 +183,7 @@ class SoundNotificationService {
     try {
       await _audioPlayer.play(AssetSource('sounds/success_chime.mp3'));
     } catch (e) {
+      // Ignore notification errors
     }
   }
 
@@ -209,7 +214,7 @@ class SoundNotificationService {
         styleInformation: BigTextStyleInformation(
           body,
           contentTitle: title,
-          summaryText: 'Bitcoin Cloud Mining',
+          summaryText: 'Bitcoin Mining Pro',
         ),
         category: AndroidNotificationCategory.message,
         visibility: NotificationVisibility.public,
@@ -224,8 +229,8 @@ class SoundNotificationService {
         notificationDetails,
         payload: payload?.toString(),
       );
-
     } catch (e) {
+      // Ignore notification errors
     }
   }
 
@@ -337,7 +342,7 @@ class SoundNotificationService {
   // Show welcome notification
   static Future<void> showWelcomeNotification() async {
     await showNotification(
-      title: '🚀 Welcome to Bitcoin Cloud Mining!',
+      title: '🚀 Welcome to Bitcoin Mining Pro!',
       body:
           'Start mining and earn Bitcoin rewards. Your journey to crypto wealth begins now!',
       soundType: 'alert',
@@ -436,6 +441,7 @@ class SoundNotificationService {
     try {
       await _notifications.cancelAll();
     } catch (e) {
+      // Ignore notification errors
     }
   }
 
@@ -444,6 +450,7 @@ class SoundNotificationService {
     try {
       await _notifications.cancel(id);
     } catch (e) {
+      // Ignore notification errors
     }
   }
 

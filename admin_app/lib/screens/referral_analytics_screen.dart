@@ -34,10 +34,13 @@ class _ReferralAnalyticsScreenState extends State<ReferralAnalyticsScreen>
     );
 
     Future.delayed(Duration.zero, () async {
+      if (!mounted) return;
       final provider = Provider.of<AdminApiProvider>(context, listen: false);
       await provider.fetchReferralStats();
       await provider.fetchReferralList();
       await provider.fetchReferralSettings();
+      await provider.fetchRewardsHistory();
+      if (!mounted) return;
       setState(() {
         _percent =
             provider.referralSettings['referralDailyPercent']?.toDouble() ??
@@ -146,14 +149,20 @@ class _ReferralAnalyticsScreenState extends State<ReferralAnalyticsScreen>
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
+                  color: Colors.green.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.green.withOpacity(0.3)),
+                  border: Border.all(
+                    color: Colors.green.withValues(alpha: 0.3),
+                  ),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.trending_up, color: Colors.green, size: 20),
+                    const Icon(
+                      Icons.trending_up,
+                      color: Colors.green,
+                      size: 20,
+                    ),
                     const SizedBox(width: 8),
                     Text(
                       '+${stats['weeklyGrowth']?.toStringAsFixed(1) ?? '0'}% This Week',
@@ -254,15 +263,15 @@ class _ReferralAnalyticsScreenState extends State<ReferralAnalyticsScreen>
           scale: 0.8 + (0.2 * _animationController.value),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: Colors.white.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
                 width: 1,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.1),
                   blurRadius: 20,
                   offset: const Offset(0, 8),
                 ),
@@ -280,7 +289,7 @@ class _ReferralAnalyticsScreenState extends State<ReferralAnalyticsScreen>
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: color.withOpacity(0.1),
+                          color: color.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(icon, color: color, size: 20),
@@ -292,8 +301,8 @@ class _ReferralAnalyticsScreenState extends State<ReferralAnalyticsScreen>
                         ),
                         decoration: BoxDecoration(
                           color: trendUp
-                              ? Colors.green.withOpacity(0.1)
-                              : Colors.red.withOpacity(0.1),
+                              ? Colors.green.withValues(alpha: 0.1)
+                              : Colors.red.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Row(
@@ -410,9 +419,9 @@ class _ReferralAnalyticsScreenState extends State<ReferralAnalyticsScreen>
           height: 300,
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
+            color: Colors.white.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
           ),
           child: _buildReferralChart(),
         ),
@@ -430,12 +439,12 @@ class _ReferralAnalyticsScreenState extends State<ReferralAnalyticsScreen>
       margin: const EdgeInsets.symmetric(horizontal: 2),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.07),
+        color: Colors.white.withValues(alpha: 0.07),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.white.withOpacity(0.13)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.13)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -483,7 +492,7 @@ class _ReferralAnalyticsScreenState extends State<ReferralAnalyticsScreen>
     // Check if all values are zero or list is empty
     final bool isEmpty = values.isEmpty || values.every((v) => v == 0);
     if (isEmpty) {
-      return Center(
+      return const Center(
         child: Text(
           'No data available',
           style: TextStyle(fontSize: 16, color: Colors.white54),
@@ -505,16 +514,20 @@ class _ReferralAnalyticsScreenState extends State<ReferralAnalyticsScreen>
           horizontalInterval: maxY / 5 == 0 ? 1 : maxY / 5,
           verticalInterval: 1,
           getDrawingHorizontalLine: (value) {
-            return FlLine(color: Colors.white.withOpacity(0.1), strokeWidth: 1);
+            return const FlLine(color: Colors.white, strokeWidth: 1);
           },
           getDrawingVerticalLine: (value) {
-            return FlLine(color: Colors.white.withOpacity(0.1), strokeWidth: 1);
+            return const FlLine(color: Colors.white, strokeWidth: 1);
           },
         ),
         titlesData: FlTitlesData(
           show: true,
-          rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          rightTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          topTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
@@ -560,7 +573,7 @@ class _ReferralAnalyticsScreenState extends State<ReferralAnalyticsScreen>
         ),
         borderData: FlBorderData(
           show: true,
-          border: Border.all(color: Colors.white.withOpacity(0.1)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
         ),
         minX: 0,
         maxX: (spots.isNotEmpty ? spots.length - 1 : 6).toDouble(),
@@ -570,8 +583,8 @@ class _ReferralAnalyticsScreenState extends State<ReferralAnalyticsScreen>
           LineChartBarData(
             spots: spots,
             isCurved: true,
-            gradient: LinearGradient(
-              colors: [const Color(0xFF3B82F6), const Color(0xFF8B5CF6)],
+            gradient: const LinearGradient(
+              colors: [Color(0xFF3B82F6), Color(0xFF8B5CF6)],
             ),
             barWidth: 3,
             isStrokeCapRound: true,
@@ -588,11 +601,8 @@ class _ReferralAnalyticsScreenState extends State<ReferralAnalyticsScreen>
             ),
             belowBarData: BarAreaData(
               show: true,
-              gradient: LinearGradient(
-                colors: [
-                  const Color(0xFF3B82F6).withOpacity(0.3),
-                  const Color(0xFF8B5CF6).withOpacity(0.1),
-                ],
+              gradient: const LinearGradient(
+                colors: [Color(0xFF3B82F6), Color(0xFF8B5CF6)],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
@@ -645,9 +655,9 @@ class _ReferralAnalyticsScreenState extends State<ReferralAnalyticsScreen>
             const SizedBox(height: 16),
             Container(
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.05),
+                color: Colors.white.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withOpacity(0.1)),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
               ),
               child: referrals.isEmpty
                   ? Padding(
@@ -668,7 +678,7 @@ class _ReferralAnalyticsScreenState extends State<ReferralAnalyticsScreen>
                       itemCount: displayCount,
                       separatorBuilder: (_, __) => Divider(
                         height: 1,
-                        color: Colors.white.withOpacity(0.1),
+                        color: Colors.white.withValues(alpha: 0.1),
                       ),
                       itemBuilder: (context, index) {
                         return _buildReferrerItem(index + 1, referrals[index]);
@@ -689,8 +699,8 @@ class _ReferralAnalyticsScreenState extends State<ReferralAnalyticsScreen>
         height: 40,
         decoration: BoxDecoration(
           color: rank <= 3
-              ? Colors.amber.withOpacity(0.1)
-              : Colors.white.withOpacity(0.1),
+              ? Colors.amber.withValues(alpha: 0.1)
+              : Colors.white.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Center(
@@ -741,7 +751,9 @@ class _ReferralAnalyticsScreenState extends State<ReferralAnalyticsScreen>
   }
 
   Widget _buildRewardsHistory() {
-    // TODO: Real rewards history API integration
+    final provider = Provider.of<AdminApiProvider>(context);
+    final rewardsHistory = provider.rewardsHistory;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -754,22 +766,144 @@ class _ReferralAnalyticsScreenState extends State<ReferralAnalyticsScreen>
           ),
         ),
         const SizedBox(height: 16),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(32),
-            child: Center(
-              child: Text(
-                'No rewards history found',
-                style: GoogleFonts.poppins(color: Colors.white54, fontSize: 16),
+        if (provider.isLoading)
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+            ),
+            child: const Padding(
+              padding: EdgeInsets.all(32),
+              child: Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
               ),
             ),
+          )
+        else if (rewardsHistory.isEmpty)
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(32),
+              child: Center(
+                child: Text(
+                  'No rewards history found',
+                  style: GoogleFonts.poppins(
+                    color: Colors.white54,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ),
+          )
+        else
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+            ),
+            child: ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: rewardsHistory.length,
+              separatorBuilder: (context, index) => Divider(
+                color: Colors.white.withValues(alpha: 0.1),
+                height: 1,
+              ),
+              itemBuilder: (context, index) {
+                final reward = rewardsHistory[index];
+                final timestamp = DateTime.tryParse(
+                  reward['timestamp'].toString(),
+                );
+                final formattedDate = timestamp != null
+                    ? '${timestamp.day.toString().padLeft(2, '0')}/${timestamp.month.toString().padLeft(2, '0')}/${timestamp.year} ${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}'
+                    : 'Unknown';
+
+                return Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              reward['referralUsername']?.toString() ??
+                                  'Unknown User',
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              reward['referralEmail']?.toString() ??
+                                  'Unknown Email',
+                              style: GoogleFonts.poppins(
+                                color: Colors.white70,
+                                fontSize: 12,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              formattedDate,
+                              style: GoogleFonts.poppins(
+                                color: Colors.white54,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            '${(reward['amount'] as num).toStringAsFixed(8)} BTC',
+                            style: GoogleFonts.poppins(
+                              color: Colors.green,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.green.withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              reward['status']?.toString() ?? 'completed',
+                              style: GoogleFonts.poppins(
+                                color: Colors.green,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
           ),
-        ),
       ],
     );
   }
@@ -839,16 +973,16 @@ class _ReferralAnalyticsScreenState extends State<ReferralAnalyticsScreen>
         child: Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
+            color: Colors.white.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
           ),
           child: Column(
             children: [
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(icon, color: color, size: 32),
@@ -901,7 +1035,7 @@ class _ReferralAnalyticsScreenState extends State<ReferralAnalyticsScreen>
             onPressed: () {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
+                const SnackBar(
                   content: Text('Payouts triggered successfully'),
                   backgroundColor: Colors.green,
                 ),
@@ -920,7 +1054,7 @@ class _ReferralAnalyticsScreenState extends State<ReferralAnalyticsScreen>
 
   void _exportData() {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+      const SnackBar(
         content: Text('Exporting referral data...'),
         backgroundColor: Colors.blue,
       ),
@@ -929,7 +1063,7 @@ class _ReferralAnalyticsScreenState extends State<ReferralAnalyticsScreen>
 
   void _openSettings() {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+      const SnackBar(
         content: Text('Opening referral settings...'),
         backgroundColor: Colors.orange,
       ),
@@ -945,9 +1079,9 @@ class _ReferralAnalyticsScreenState extends State<ReferralAnalyticsScreen>
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: Form(
         key: _settingsFormKey,
@@ -1029,6 +1163,7 @@ class _ReferralAnalyticsScreenState extends State<ReferralAnalyticsScreen>
                             _days ?? 30,
                           );
                           setState(() => _settingsLoading = false);
+                          if (!mounted) return;
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text('Referral settings updated!'),

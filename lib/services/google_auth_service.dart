@@ -1,14 +1,13 @@
 import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/widgets.dart'; // Added for BuildContext
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/widgets.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
-import 'package:provider/provider.dart'; // Added for Provider
 
 import '../config/api_config.dart';
-import '../providers/auth_provider.dart'
-    as my_auth; // Added for AuthProvider with alias
+import '../utils/app_logger.dart';
 import '../utils/storage_utils.dart';
 
 class GoogleAuthService {
@@ -17,9 +16,68 @@ class GoogleAuthService {
   GoogleAuthService._internal();
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  // GoogleSignIn for mobile only (web uses Firebase Auth directly)
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   Future<Map<String, dynamic>> signInWithGoogle(BuildContext context) async {
+    // WEB: Use Firebase Auth signInWithPopup directly
+    // This avoids gapi.auth2 double-initialization conflict
+    if (kIsWeb) {
+      return _signInWithGoogleWeb();
+    }
+    // MOBILE: Use GoogleSignIn package
+    return _signInWithGoogleMobile(context);
+  }
+
+  /// Web-specific Google Sign-In using Firebase Auth popup
+  /// Avoids gapi.auth2 init conflict by not using google_sign_in package on web
+  Future<Map<String, dynamic>> _signInWithGoogleWeb() async {
+    try {
+      // Create Google Auth Provider
+      final googleProvider = GoogleAuthProvider();
+
+      // Sign in with popup (Firebase handles everything on web)
+      final UserCredential userCredential =
+          await _auth.signInWithPopup(googleProvider);
+      final User? user = userCredential.user;
+
+      if (user == null) {
+        return {
+          'success': false,
+          'message': 'Firebase user not found after Google Sign-In',
+          'error': 'FIREBASE_USER_NULL'
+        };
+      }
+
+      // Send to backend
+      final String? firebaseIdToken = await user.getIdToken();
+      if (firebaseIdToken == null) {
+        await _auth.signOut();
+        return {
+          'success': false,
+          'message': 'Failed to get Firebase ID token',
+          'error': 'ID_TOKEN_NULL'
+        };
+      }
+
+      final backendResponse = await _sendToBackend(user, firebaseIdToken);
+      return await _handleBackendResponse(backendResponse, isWeb: true);
+    } catch (e, stackTrace) {
+      AppLogger.authError('Web Google Sign-In failed',
+          error: e, stackTrace: stackTrace);
+      await _auth.signOut();
+      return {
+        'success': false,
+        'message': 'Google Sign-In failed: ${e.toString()}',
+        'error': 'GOOGLE_SIGN_IN_ERROR'
+      };
+    }
+  }
+
+  /// Mobile-specific Google Sign-In using google_sign_in package
+  Future<Map<String, dynamic>> _signInWithGoogleMobile(
+      BuildContext context) async {
     try {
       // Step 1: Google account select karen
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
@@ -36,6 +94,18 @@ class GoogleAuthService {
           await googleUser.authentication;
       final String? accessToken = googleAuth.accessToken;
       final String? idToken = googleAuth.idToken;
+
+      if (accessToken == null && idToken == null) {
+        AppLogger.authError('Google auth tokens missing',
+            error: 'Both accessToken and idToken are null');
+        await _auth.signOut();
+        await _googleSignIn.signOut();
+        return {
+          'success': false,
+          'message': 'Google authentication failed: missing tokens',
+          'error': 'GOOGLE_AUTH_TOKENS_MISSING'
+        };
+      }
 
       // Step 3: Firebase credential banayein
       final credential = GoogleAuthProvider.credential(
@@ -59,52 +129,58 @@ class GoogleAuthService {
       // Step 5: Backend ko call karein
       final String? firebaseIdToken = await user.getIdToken();
       final backendResponse = await _sendToBackend(user, firebaseIdToken!);
-
-      if (backendResponse['success']) {
-        // Save token
-        final token = backendResponse['data']['token'];
-        print('Google sign-in ke baad backend se mila token: $token');
-        await StorageUtils.saveToken(token);
-        final verifiedToken = await StorageUtils.getToken();
-        print('Verified token after save: $verifiedToken');
-        // Save user data
-        if (backendResponse['data']['user'] != null) {
-          await StorageUtils.saveUserData(backendResponse['data']['user']);
-          // Try to save userId from userId or id
-          final userObj = backendResponse['data']['user'];
-          if (userObj['userId'] != null) {
-            await StorageUtils.saveUserId(userObj['userId']);
-          } else if (userObj['id'] != null) {
-            await StorageUtils.saveUserId(userObj['id']);
-          }
-          // AuthProvider update
-          final authProvider =
-              Provider.of<my_auth.AuthProvider>(context, listen: false);
-          await authProvider.updateUserData(userObj);
-        }
-
-        return {
-          'success': true,
-          'message': 'Google Sign-In successful',
-          'data': backendResponse['data']
-        };
-      } else {
-        await _auth.signOut();
-        await _googleSignIn.signOut();
-        return {
-          'success': false,
-          'message':
-              backendResponse['message'] ?? 'Backend authentication failed',
-          'error': 'BACKEND_AUTH_FAILED'
-        };
-      }
-    } catch (e) {
+      return await _handleBackendResponse(backendResponse, isWeb: false);
+    } catch (e, stackTrace) {
+      AppLogger.authError('Mobile Google Sign-In failed',
+          error: e, stackTrace: stackTrace);
       await _auth.signOut();
       await _googleSignIn.signOut();
       return {
         'success': false,
         'message': 'Google Sign-In failed: ${e.toString()}',
         'error': 'GOOGLE_SIGN_IN_ERROR'
+      };
+    }
+  }
+
+  /// Handle backend response - shared between web and mobile
+  Future<Map<String, dynamic>> _handleBackendResponse(
+    Map<String, dynamic> backendResponse, {
+    required bool isWeb,
+  }) async {
+    if (backendResponse['success']) {
+      // Save token
+      final token = backendResponse['data']['token'];
+      await StorageUtils.saveToken(token);
+
+      // Save user data
+      if (backendResponse['data']['user'] != null) {
+        await StorageUtils.saveUserData(backendResponse['data']['user']);
+        final userObj = backendResponse['data']['user'];
+        if (userObj['userId'] != null) {
+          await StorageUtils.saveUserId(userObj['userId']);
+        } else if (userObj['id'] != null) {
+          await StorageUtils.saveUserId(userObj['id']);
+        }
+        // Note: AuthProvider update should be handled by the calling widget
+        // to avoid BuildContext usage across async gaps in service layer
+      }
+
+      return {
+        'success': true,
+        'message': 'Google Sign-In successful',
+        'data': backendResponse['data']
+      };
+    } else {
+      await _auth.signOut();
+      if (!isWeb) {
+        await _googleSignIn.signOut();
+      }
+      return {
+        'success': false,
+        'message':
+            backendResponse['message'] ?? 'Backend authentication failed',
+        'error': 'BACKEND_AUTH_FAILED'
       };
     }
   }
@@ -133,13 +209,18 @@ class GoogleAuthService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         return {'success': true, 'data': responseData['data']};
       } else {
+        AppLogger.apiError('/api/auth/google-signin',
+            statusCode: response.statusCode, responseBody: response.body);
         return {
           'success': false,
-          'message': responseData['message'] ?? 'Backend authentication failed',
+          'message': responseData['message'] ??
+              'Backend authentication failed (Status: ${response.statusCode})',
           'error': 'BACKEND_ERROR'
         };
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      AppLogger.apiError('/api/auth/google-signin',
+          error: e, stackTrace: stackTrace);
       return {
         'success': false,
         'message': 'Network error: ${e.toString()}',
@@ -151,9 +232,14 @@ class GoogleAuthService {
   Future<void> signOut() async {
     try {
       await _auth.signOut();
-      await _googleSignIn.signOut();
+      if (!kIsWeb) {
+        await _googleSignIn.signOut();
+      }
       await StorageUtils.clearAll();
-    } catch (e) {}
+    } catch (e, stackTrace) {
+      AppLogger.authError('Google signOut failed',
+          error: e, stackTrace: stackTrace);
+    }
   }
 
   bool get isSignedIn => _auth.currentUser != null;

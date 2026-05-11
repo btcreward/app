@@ -65,6 +65,7 @@ class _CryptoRunnerGameScreenState extends State<CryptoRunnerGameScreen>
       await audioPlayer.setSource(AssetSource('sounds/beep.mp3'));
       await audioPlayer.setVolume(0.5);
     } catch (e) {
+      // Audio initialization failed, continue without sound
     }
   }
 
@@ -280,7 +281,7 @@ class _CryptoRunnerGameScreenState extends State<CryptoRunnerGameScreen>
       final adShown = await _adService.showInterstitialAd(
         onAdDismissed: _exitAfterAd,
       );
-      
+
       // If ad wasn't shown (not loaded or error), exit immediately
       if (!adShown && mounted) {
         _exitAfterAd();
@@ -339,6 +340,7 @@ class _CryptoRunnerGameScreenState extends State<CryptoRunnerGameScreen>
         await audioPlayer.seek(Duration.zero);
         await audioPlayer.resume();
       } catch (e) {
+        // Audio playback failed, continue without sound
       }
     }
   }
@@ -347,239 +349,239 @@ class _CryptoRunnerGameScreenState extends State<CryptoRunnerGameScreen>
   Widget build(BuildContext context) {
     // Handle back button press with PopScope
     return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) async {
-        if (didPop) return;
-        
-        // If game is active, show confirmation dialog
-        if (isGameActive) {
-          final shouldExit = await showDialog<bool>(
-            context: context,
-            barrierDismissible: false,
-            builder: (context) => AlertDialog(
-              title: const Text('Exit Game?'),
-              content: const Text('Are you sure you want to exit the game?'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  child: const Text('Cancel'),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(true),
-                  child: const Text('Exit'),
-                ),
-              ],
-            ),
-          );
-          
-          if (shouldExit == true) {
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) async {
+          if (didPop) return;
+
+          // If game is active, show confirmation dialog
+          if (isGameActive) {
+            final shouldExit = await showDialog<bool>(
+              context: context,
+              barrierDismissible: false,
+              builder: (context) => AlertDialog(
+                title: const Text('Exit Game?'),
+                content: const Text('Are you sure you want to exit the game?'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: const Text('Cancel'),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(true),
+                    child: const Text('Exit'),
+                  ),
+                ],
+              ),
+            );
+
+            if (shouldExit == true) {
+              _showExitConfirmation();
+            }
+          } else {
+            // If game is not active, just show the exit confirmation
             _showExitConfirmation();
           }
-        } else {
-          // If game is not active, just show the exit confirmation
-          _showExitConfirmation();
-        }
-      },
-      child: Scaffold(
-        appBar: const CustomAppBar(
-        title: 'Crypto Runner',
-        titleTextStyle: TextStyle(
-          fontFamily: 'Poppins',
-          fontSize: 24,
-          fontWeight: FontWeight.w700,
-          color: Colors.white,
-        ),
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              ColorConstants.primaryColor,
-              ColorConstants.secondaryColor,
-            ],
+        },
+        child: Scaffold(
+          appBar: const CustomAppBar(
+            title: 'Crypto Runner',
+            titleTextStyle: TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 24,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+            ),
           ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Score: $score',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: ColorConstants.primaryTextColor,
-                          ),
-                        ),
-                        Text(
-                          'Level: $level',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: ColorConstants.primaryTextColor,
-                          ),
-                        ),
-                        if (hasDoublePoints)
-                          Text(
-                            '2x Points Active!',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: ColorConstants.successColor,
-                            ),
-                          ),
-                      ],
-                    ),
-                    if (isGameActive)
-                      GameTimerWidget(
-                        remainingTime: remainingTime,
-                        totalTime: 180,
-                      ),
-                  ],
-                ),
+          body: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  ColorConstants.primaryColor,
+                  ColorConstants.secondaryColor,
+                ],
               ),
-              if (isGameActive) ...[
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            ),
+            child: SafeArea(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _buildPowerUpButton(
-                          PowerUpType.shield,
-                          'Shield',
-                          Icons.shield,
-                          Colors.blue,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Score: $score',
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: ColorConstants.primaryTextColor,
+                              ),
+                            ),
+                            Text(
+                              'Level: $level',
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: ColorConstants.primaryTextColor,
+                              ),
+                            ),
+                            if (hasDoublePoints)
+                              Text(
+                                '2x Points Active!',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: ColorConstants.successColor,
+                                ),
+                              ),
+                          ],
                         ),
-                        const SizedBox(width: 8),
-                        _buildPowerUpButton(
-                          PowerUpType.doublePoints,
-                          '2x Points',
-                          Icons.stars,
-                          Colors.amber,
-                        ),
-                        const SizedBox(width: 8),
-                        _buildPowerUpButton(
-                          PowerUpType.magnet,
-                          'Magnet',
-                          Icons.attractions,
-                          Colors.purple,
-                        ),
+                        if (isGameActive)
+                          GameTimerWidget(
+                            remainingTime: remainingTime,
+                            totalTime: 180,
+                          ),
                       ],
                     ),
                   ),
-                ),
-                const SizedBox(height: 16),
-              ],
-              Expanded(
-                child: GestureDetector(
-                  onTap: isGameActive ? _jump : null,
-                  child: Stack(
-                    children: [
-                      // Player
-                      Positioned(
-                        left: MediaQuery.of(context).size.width / 4,
-                        top: playerY,
-                        child: Container(
-                          width: playerSize,
-                          height: playerSize,
-                          decoration: BoxDecoration(
-                            color: hasShield ? Colors.blue : Colors.white,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.white.withAlpha(77),
-                                blurRadius: 8,
-                                spreadRadius: 2,
-                              ),
-                            ],
-                          ),
-                          child: Icon(
-                            Icons.rocket,
-                            color: hasShield ? Colors.white : Colors.blue,
-                            size: 30,
-                          ),
+                  if (isGameActive) ...[
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Row(
+                          children: [
+                            _buildPowerUpButton(
+                              PowerUpType.shield,
+                              'Shield',
+                              Icons.shield,
+                              Colors.blue,
+                            ),
+                            const SizedBox(width: 8),
+                            _buildPowerUpButton(
+                              PowerUpType.doublePoints,
+                              '2x Points',
+                              Icons.stars,
+                              Colors.amber,
+                            ),
+                            const SizedBox(width: 8),
+                            _buildPowerUpButton(
+                              PowerUpType.magnet,
+                              'Magnet',
+                              Icons.attractions,
+                              Colors.purple,
+                            ),
+                          ],
                         ),
                       ),
-
-                      // Game objects
-                      ...gameObjects.map((object) {
-                        return Positioned(
-                          left: object.x,
-                          top: object.y,
-                          child: Container(
-                            width: object.width,
-                            height: object.height,
-                            decoration: BoxDecoration(
-                              color: object.type == GameObjectType.coin
-                                  ? Colors.amber
-                                  : Colors.red,
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: (object.type == GameObjectType.coin
-                                          ? Colors.amber
-                                          : Colors.red)
-                                      .withAlpha(77),
-                                  blurRadius: 8,
-                                  spreadRadius: 2,
-                                ),
-                              ],
-                            ),
-                            child: Icon(
-                              object.type == GameObjectType.coin
-                                  ? Icons.monetization_on
-                                  : Icons.warning,
-                              color: Colors.white,
-                              size: 20,
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: isGameActive ? _jump : null,
+                      child: Stack(
+                        children: [
+                          // Player
+                          Positioned(
+                            left: MediaQuery.of(context).size.width / 4,
+                            top: playerY,
+                            child: Container(
+                              width: playerSize,
+                              height: playerSize,
+                              decoration: BoxDecoration(
+                                color: hasShield ? Colors.blue : Colors.white,
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.white.withAlpha(77),
+                                    blurRadius: 8,
+                                    spreadRadius: 2,
+                                  ),
+                                ],
+                              ),
+                              child: Icon(
+                                Icons.rocket,
+                                color: hasShield ? Colors.white : Colors.blue,
+                                size: 30,
+                              ),
                             ),
                           ),
-                        );
-                      }).toList(),
-                    ],
-                  ),
-                ),
-              ),
-              if (isGameActive)
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    'Tap to jump! Collect coins and avoid obstacles!',
-                    style: TextStyle(
-                      color: ColorConstants.primaryTextColor,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-              if (!isGameActive && !isGameOver)
-                Center(
-                  child: ElevatedButton(
-                    onPressed: startGame,
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 32,
-                        vertical: 16,
+
+                          // Game objects
+                          ...gameObjects.map((object) {
+                            return Positioned(
+                              left: object.x,
+                              top: object.y,
+                              child: Container(
+                                width: object.width,
+                                height: object.height,
+                                decoration: BoxDecoration(
+                                  color: object.type == GameObjectType.coin
+                                      ? Colors.amber
+                                      : Colors.red,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: (object.type == GameObjectType.coin
+                                              ? Colors.amber
+                                              : Colors.red)
+                                          .withAlpha(77),
+                                      blurRadius: 8,
+                                      spreadRadius: 2,
+                                    ),
+                                  ],
+                                ),
+                                child: Icon(
+                                  object.type == GameObjectType.coin
+                                      ? Icons.monetization_on
+                                      : Icons.warning,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                              ),
+                            );
+                          }),
+                        ],
                       ),
-                      backgroundColor: ColorConstants.accentColor,
-                    ),
-                    child: const Text(
-                      'Start Game',
-                      style: TextStyle(fontSize: 24),
                     ),
                   ),
-                ),
-            ],
+                  if (isGameActive)
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text(
+                        'Tap to jump! Collect coins and avoid obstacles!',
+                        style: TextStyle(
+                          color: ColorConstants.primaryTextColor,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  if (!isGameActive && !isGameOver)
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: startGame,
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 32,
+                            vertical: 16,
+                          ),
+                          backgroundColor: ColorConstants.accentColor,
+                        ),
+                        child: const Text(
+                          'Start Game',
+                          style: TextStyle(fontSize: 24),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
           ),
-        ),
-      ),
-    ));
+        ));
   }
 
   Widget _buildPowerUpButton(

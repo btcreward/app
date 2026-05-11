@@ -18,10 +18,10 @@ class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
 
   @override
-  _GameScreenState createState() => _GameScreenState();
+  GameScreenState createState() => GameScreenState();
 }
 
-class _GameScreenState extends State<GameScreen> {
+class GameScreenState extends State<GameScreen> {
   final AdService _adService = AdService();
   bool isAdLoaded = false;
 
@@ -62,18 +62,6 @@ class _GameScreenState extends State<GameScreen> {
       'winAmount': 0.000000000000001000,
       'color': Colors.blue
     },
-    {
-      'title': 'Crypto Clash',
-      'icon': '🎮',
-      'winAmount': 0.006,
-      'color': Colors.pink
-    },
-    {
-      'title': 'Coin Quest',
-      'icon': '💰',
-      'winAmount': 0.009,
-      'color': Colors.amber
-    },
   ];
 
   @override
@@ -98,6 +86,7 @@ class _GameScreenState extends State<GameScreen> {
     final hasSeenDisclaimer = prefs.getBool(disclaimerKey) ?? false;
 
     if (!hasSeenDisclaimer) {
+      if (!mounted || !context.mounted) return;
       final accepted = await showDialog<bool>(
         context: context,
         barrierDismissible: false,
@@ -144,23 +133,26 @@ class _GameScreenState extends State<GameScreen> {
           HashRushGameScreen(gameTitle: title, baseWinAmount: winAmount);
     }
 
+    if (!mounted || !context.mounted) return;
     final result = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => targetScreen),
     );
 
     if (result != null && result is double) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(
-                'Congratulations! You earned ${result.toStringAsFixed(18)} BTC!')),
-      );
+      if (mounted && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text(
+                  'Congratulations! You earned ${result.toStringAsFixed(18)} BTC!')),
+        );
+      }
     }
   }
 
   @override
   void dispose() {
-    _adService.dispose();
+    // Note: Don't dispose AdService here as it's a singleton shared across the app
     super.dispose();
   }
 

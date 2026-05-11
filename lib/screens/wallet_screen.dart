@@ -5,6 +5,7 @@ import 'package:bitcoin_cloud_mining/providers/auth_provider.dart';
 import 'package:bitcoin_cloud_mining/providers/wallet_provider.dart';
 import 'package:bitcoin_cloud_mining/services/ad_service.dart';
 import 'package:bitcoin_cloud_mining/services/api_service.dart';
+import 'package:bitcoin_cloud_mining/utils/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
@@ -20,10 +21,10 @@ class WalletScreen extends StatefulWidget {
   const WalletScreen({super.key});
 
   @override
-  _WalletScreenState createState() => _WalletScreenState();
+  WalletScreenState createState() => WalletScreenState();
 }
 
-class _WalletScreenState extends State<WalletScreen>
+class WalletScreenState extends State<WalletScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   final TextEditingController amountController = TextEditingController();
@@ -92,7 +93,7 @@ class _WalletScreenState extends State<WalletScreen>
     _currencyUpdateTimer?.cancel();
     _refreshTimer?.cancel();
     _walletProvider.stopLivePriceUpdates();
-    _adService.dispose();
+    // Note: Don't dispose AdService here as it's a singleton shared across the app
     super.dispose();
   }
 
@@ -194,8 +195,9 @@ class _WalletScreenState extends State<WalletScreen>
           }
 
           if (message.isNotEmpty && mounted && !_isDisposed) {
+            final scaffoldMessenger = ScaffoldMessenger.of(context);
             await _showNotification(title, message);
-            ScaffoldMessenger.of(context).showSnackBar(
+            scaffoldMessenger.showSnackBar(
               SnackBar(
                 content: Text(message),
                 backgroundColor: tx.status.toLowerCase() == 'rejected'
@@ -216,7 +218,9 @@ class _WalletScreenState extends State<WalletScreen>
           }
         }
       }
-    } catch (e) {}
+    } catch (e) {
+      AppLogger.error('WalletScreen error', error: e);
+    }
   }
 
   Future<void> _loadWallet() async {
@@ -262,7 +266,9 @@ class _WalletScreenState extends State<WalletScreen>
           _btcAmount = _walletProvider.btcBalance;
         });
       }
-    } catch (e) {}
+    } catch (e) {
+      AppLogger.error('WalletScreen error', error: e);
+    }
   }
 
   Future<void> _syncWalletBalance() async {
@@ -281,7 +287,9 @@ class _WalletScreenState extends State<WalletScreen>
           _btcAmount = _walletProvider.btcBalance;
         });
       }
-    } catch (e) {}
+    } catch (e) {
+      AppLogger.error('WalletScreen error', error: e);
+    }
   }
 
   String formatBTCAmount(double amount) {
@@ -1374,43 +1382,51 @@ class _WalletScreenState extends State<WalletScreen>
     }
 
     if (amountController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter amount'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Please enter amount'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
       return;
     }
 
     if (_selectedMethod == 'Bitcoin' && _addressController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter Bitcoin address'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Please enter Bitcoin address'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
       return;
     }
 
     if (_selectedMethod == 'Bitcoin' &&
         !_isValidBitcoinAddress(_addressController.text)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter valid Bitcoin address'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Please enter valid Bitcoin address'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
       return;
     }
 
     if (_selectedMethod != 'Bitcoin' && _destinationController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter destination'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Please enter destination'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
       return;
     }
 
@@ -1420,6 +1436,10 @@ class _WalletScreenState extends State<WalletScreen>
     });
 
     try {
+      // Capture context references before async operation
+      final navigator = Navigator.of(context);
+      final scaffoldMessenger = ScaffoldMessenger.of(context);
+
       // Show processing popup
       showDialog(
         context: context,
@@ -1464,6 +1484,11 @@ class _WalletScreenState extends State<WalletScreen>
         throw Exception('Insufficient balance after wallet sync');
       }
 
+      // Capture context references before async operation
+      if (!mounted) return;
+      final withdrawalNavigator = Navigator.of(context);
+      final withdrawalScaffoldMessenger = ScaffoldMessenger.of(context);
+
       final success = await _walletProvider.withdrawFunds(
         method: paymentMethod,
         destination: destination,
@@ -1477,11 +1502,11 @@ class _WalletScreenState extends State<WalletScreen>
       );
 
       // Close processing popup
-      Navigator.of(context).pop();
+      withdrawalNavigator.pop();
 
       if (success) {
         // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
+        withdrawalScaffoldMessenger.showSnackBar(
           SnackBar(
             content: const Row(
               children: [
@@ -1528,8 +1553,10 @@ class _WalletScreenState extends State<WalletScreen>
                   ),
                 );
 
-                Navigator.push(
-                  context,
+                // Capture navigator reference before async operation
+                if (!mounted) return;
+                final detailsNavigator = Navigator.of(context);
+                detailsNavigator.push(
                   MaterialPageRoute(
                     builder: (context) => TransactionDetailsScreen(
                       transaction: latestTransaction,
@@ -1551,7 +1578,7 @@ class _WalletScreenState extends State<WalletScreen>
         });
 
         // Close withdrawal dialog
-        Navigator.of(context).pop();
+        navigator.pop();
 
         // Refresh wallet balance and transactions
         await _walletProvider.loadWallet();
@@ -1562,7 +1589,7 @@ class _WalletScreenState extends State<WalletScreen>
         setState(() {
           _errorMessage = 'Withdrawal request failed';
         });
-        ScaffoldMessenger.of(context).showSnackBar(
+        scaffoldMessenger.showSnackBar(
           SnackBar(
             content: Row(
               children: [
@@ -1579,15 +1606,20 @@ class _WalletScreenState extends State<WalletScreen>
         );
       }
     } catch (e) {
+      // Capture context references before async operation
+      if (!mounted) return;
+      final catchNavigator = Navigator.of(context);
+      final catchScaffoldMessenger = ScaffoldMessenger.of(context);
+
       // Close processing popup if open
-      if (Navigator.canPop(context)) {
-        Navigator.of(context).pop();
+      if (mounted && Navigator.canPop(context)) {
+        catchNavigator.pop();
       }
 
       setState(() {
         _errorMessage = e.toString();
       });
-      ScaffoldMessenger.of(context).showSnackBar(
+      catchScaffoldMessenger.showSnackBar(
         SnackBar(
           content: Row(
             children: [
@@ -1742,7 +1774,9 @@ class _WalletScreenState extends State<WalletScreen>
       if (mounted && !_isDisposed) {
         setState(() {});
       }
-    } catch (e) {}
+    } catch (e) {
+      AppLogger.error('WalletScreen error', error: e);
+    }
   }
 
   IconData _getTransactionIcon(String type) {
@@ -1790,8 +1824,8 @@ class _WalletScreenState extends State<WalletScreen>
       await _adService.loadRewardedAd();
 
       // Close loading dialog
-      if (context.mounted) {
-        Navigator.of(context).pop();
+      if (mounted) {
+        Navigator.pop(context);
       }
 
       // Show rewarded ad
@@ -1799,6 +1833,8 @@ class _WalletScreenState extends State<WalletScreen>
         onRewarded: (double rewardAmount) async {
           try {
             // Show claiming progress
+            final claimNavigator = Navigator.of(context);
+            final claimScaffoldMessenger = ScaffoldMessenger.of(context);
             showDialog(
               context: context,
               barrierDismissible: false,
@@ -1811,13 +1847,13 @@ class _WalletScreenState extends State<WalletScreen>
             await _walletProvider.claimRejectedTransaction(transaction.id);
 
             // Close processing dialog
-            if (context.mounted) {
-              Navigator.of(context).pop();
+            if (claimNavigator.mounted && claimNavigator.canPop()) {
+              claimNavigator.pop();
             }
 
             // Show success message
-            if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
+            if (mounted) {
+              claimScaffoldMessenger.showSnackBar(
                 const SnackBar(
                   content: Text(
                       'Transaction claimed successfully! Reward added to your balance.'),
@@ -1830,24 +1866,32 @@ class _WalletScreenState extends State<WalletScreen>
             await _loadData();
           } catch (e) {
             // Close processing dialog if open
-            if (context.mounted && Navigator.canPop(context)) {
-              Navigator.of(context).pop();
+            if (mounted) {
+              final closeNavigator = Navigator.of(context);
+              if (closeNavigator.mounted && closeNavigator.canPop()) {
+                closeNavigator.pop();
+              }
             }
 
-            if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Failed to claim transaction: ${e.toString()}'),
-                  backgroundColor: Colors.red,
-                ),
-              );
+            // Show error message
+            if (mounted) {
+              final errorScaffoldMessenger = ScaffoldMessenger.of(context);
+              if (errorScaffoldMessenger.mounted) {
+                errorScaffoldMessenger.showSnackBar(
+                  SnackBar(
+                    content:
+                        Text('Failed to claim transaction: ${e.toString()}'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
             }
           }
         },
         onAdDismissed: _adService.loadRewardedAd,
       );
 
-      if (!adShown && context.mounted) {
+      if (!adShown && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content:
@@ -1858,17 +1902,24 @@ class _WalletScreenState extends State<WalletScreen>
       }
     } catch (e) {
       // Close any open dialogs
-      if (context.mounted && Navigator.canPop(context)) {
-        Navigator.of(context).pop();
+      if (mounted) {
+        final closeNavigator = Navigator.of(context);
+        if (closeNavigator.mounted && closeNavigator.canPop()) {
+          closeNavigator.pop();
+        }
       }
 
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
+      // Show error message
+      if (mounted) {
+        final errorScaffoldMessenger = ScaffoldMessenger.of(context);
+        if (errorScaffoldMessenger.mounted) {
+          errorScaffoldMessenger.showSnackBar(
+            SnackBar(
+              content: Text('Error: ${e.toString()}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
     }
   }

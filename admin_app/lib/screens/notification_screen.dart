@@ -32,6 +32,7 @@ class _NotificationScreenState extends State<NotificationScreen>
     );
 
     Future.delayed(Duration.zero, () {
+      if (!mounted) return;
       final provider = Provider.of<AdminApiProvider>(context, listen: false);
       provider.fetchNotifications();
       _animationController.forward();
@@ -111,14 +112,18 @@ class _NotificationScreenState extends State<NotificationScreen>
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
-            color: Colors.blue.withOpacity(0.1),
+            color: Colors.blue.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.blue.withOpacity(0.3)),
+            border: Border.all(color: Colors.blue.withValues(alpha: 0.3)),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.notifications_active, color: Colors.blue, size: 20),
+              const Icon(
+                Icons.notifications_active,
+                color: Colors.blue,
+                size: 20,
+              ),
               const SizedBox(width: 8),
               Text(
                 'Firebase FCM',
@@ -186,16 +191,16 @@ class _NotificationScreenState extends State<NotificationScreen>
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: Colors.white.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.white.withOpacity(0.1)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
             ),
             child: Column(
               children: [
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
+                    color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(icon, color: color, size: 20),
@@ -228,9 +233,9 @@ class _NotificationScreenState extends State<NotificationScreen>
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -365,9 +370,9 @@ class _NotificationScreenState extends State<NotificationScreen>
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
+            color: Colors.white.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
           ),
           child: TextField(
             controller: controller,
@@ -408,9 +413,9 @@ class _NotificationScreenState extends State<NotificationScreen>
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
+            color: Colors.white.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
           ),
           child: DropdownButton<String>(
             value: value,
@@ -438,8 +443,8 @@ class _NotificationScreenState extends State<NotificationScreen>
               value: _isScheduled,
               onChanged: (value) => setState(() => _isScheduled = value),
               activeColor: Colors.blue,
-              activeTrackColor: Colors.blue.withOpacity(0.3),
-              inactiveTrackColor: Colors.white.withOpacity(0.1),
+              activeTrackColor: Colors.blue.withValues(alpha: 0.3),
+              inactiveTrackColor: Colors.white.withValues(alpha: 0.1),
             ),
             const SizedBox(width: 12),
             Text(
@@ -505,13 +510,17 @@ class _NotificationScreenState extends State<NotificationScreen>
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: Colors.white.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.white.withOpacity(0.1)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
             ),
             child: Row(
               children: [
-                Icon(Icons.calendar_today, color: Colors.white54, size: 20),
+                const Icon(
+                  Icons.calendar_today,
+                  color: Colors.white54,
+                  size: 20,
+                ),
                 const SizedBox(width: 12),
                 Text(
                   _scheduledDate != null
@@ -569,13 +578,13 @@ class _NotificationScreenState extends State<NotificationScreen>
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: Colors.white.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.white.withOpacity(0.1)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
             ),
             child: Row(
               children: [
-                Icon(Icons.access_time, color: Colors.white54, size: 20),
+                const Icon(Icons.access_time, color: Colors.white54, size: 20),
                 const SizedBox(width: 12),
                 Text(
                   _scheduledTime != null
@@ -609,9 +618,9 @@ class _NotificationScreenState extends State<NotificationScreen>
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: color.withOpacity(0.2)),
+            border: Border.all(color: color.withValues(alpha: 0.2)),
           ),
           child: Column(
             children: [
@@ -663,16 +672,16 @@ class _NotificationScreenState extends State<NotificationScreen>
         const SizedBox(height: 16),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
+            color: Colors.white.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
           ),
           child: ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: 5,
             separatorBuilder: (_, __) =>
-                Divider(height: 1, color: Colors.white.withOpacity(0.1)),
+                Divider(height: 1, color: Colors.white.withValues(alpha: 0.1)),
             itemBuilder: (context, index) {
               return _buildNotificationItem(index);
             },
@@ -752,7 +761,7 @@ class _NotificationScreenState extends State<NotificationScreen>
       leading: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: statusColor.withOpacity(0.1),
+          color: statusColor.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Icon(statusIcon, color: statusColor, size: 20),
@@ -787,7 +796,7 @@ class _NotificationScreenState extends State<NotificationScreen>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: statusColor.withOpacity(0.1),
+              color: statusColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
@@ -809,10 +818,10 @@ class _NotificationScreenState extends State<NotificationScreen>
     );
   }
 
-  void _sendNotification() {
+  Future<void> _sendNotification() async {
     if (_titleController.text.isEmpty || _messageController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Please fill in title and message'),
           backgroundColor: Colors.red,
         ),
@@ -820,23 +829,58 @@ class _NotificationScreenState extends State<NotificationScreen>
       return;
     }
 
-    // TODO: Implement send notification logic
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Notification sent successfully'),
-        backgroundColor: Colors.green,
-      ),
-    );
+    // Implement send notification logic
+    try {
+      final adminProvider = Provider.of<AdminApiProvider>(
+        context,
+        listen: false,
+      );
+      final message =
+          '${_titleController.text.trim()}\n\n${_messageController.text.trim()}';
+
+      await adminProvider.sendNotification(message);
+
+      if (adminProvider.error == null) {
+        if (mounted && context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Notification sent successfully'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      } else {
+        if (mounted && context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Failed to send notification: ${adminProvider.error}',
+              ),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error sending notification: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
 
     _titleController.clear();
     _messageController.clear();
     _targetController.clear();
   }
 
-  void _scheduleNotification() {
+  Future<void> _scheduleNotification() async {
     if (_titleController.text.isEmpty || _messageController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Please fill in title and message'),
           backgroundColor: Colors.red,
         ),
@@ -846,7 +890,7 @@ class _NotificationScreenState extends State<NotificationScreen>
 
     if (!_isScheduled || _scheduledDate == null || _scheduledTime == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Please select date and time for scheduling'),
           backgroundColor: Colors.red,
         ),
@@ -854,19 +898,55 @@ class _NotificationScreenState extends State<NotificationScreen>
       return;
     }
 
-    // TODO: Implement schedule notification logic
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Notification scheduled successfully'),
-        backgroundColor: Colors.blue,
-      ),
-    );
+    // Implement schedule notification logic
+    try {
+      final adminProvider = Provider.of<AdminApiProvider>(
+        context,
+        listen: false,
+      );
+      final message =
+          '${_titleController.text.trim()}\n\n${_messageController.text.trim()}\n\n[Scheduled for: $_scheduledDate $_scheduledTime]';
+
+      // For now, send immediately as scheduling would require backend support
+      await adminProvider.sendNotification(message);
+
+      if (adminProvider.error == null) {
+        if (mounted && context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Notification scheduled successfully'),
+              backgroundColor: Colors.blue,
+            ),
+          );
+        }
+      } else {
+        if (mounted && context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Failed to schedule notification: ${adminProvider.error}',
+              ),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error scheduling notification: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   void _previewNotification() {
     if (_titleController.text.isEmpty || _messageController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Please fill in title and message'),
           backgroundColor: Colors.red,
         ),

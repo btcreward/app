@@ -1,6 +1,8 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+
 import '../services/ad_service.dart';
 
 /// A swipeable carousel that displays native and banner ads with consistent styling
@@ -76,9 +78,9 @@ class _SwipeableAdCarouselState extends State<SwipeableAdCarousel> {
 
     try {
       await widget.adService.loadNativeAd().timeout(
-        const Duration(seconds: 5),
-        onTimeout: () => throw Exception('Native ad loading timeout'),
-      );
+            const Duration(seconds: 5),
+            onTimeout: () => throw Exception('Native ad loading timeout'),
+          );
 
       if (widget.adService.isNativeAdLoaded && mounted) {
         setState(() {
@@ -89,7 +91,6 @@ class _SwipeableAdCarouselState extends State<SwipeableAdCarousel> {
         throw Exception('Failed to load native ad');
       }
     } catch (e) {
-      debugPrint('Error loading native ad: $e');
       if (mounted) {
         setState(() {
           _nativeAdWidget = _buildFallbackNativeAd();
@@ -114,7 +115,7 @@ class _SwipeableAdCarouselState extends State<SwipeableAdCarousel> {
 
     try {
       final bannerAdUnitId = widget.adService.getBannerAdUnitId();
-      
+
       if (bannerAdUnitId == null || bannerAdUnitId.isEmpty) {
         throw Exception('Banner ad unit ID not available');
       }
@@ -133,7 +134,6 @@ class _SwipeableAdCarouselState extends State<SwipeableAdCarousel> {
             _startBannerAdAutoRefresh();
           },
           onAdFailedToLoad: (ad, error) {
-            debugPrint('Banner ad failed to load: $error');
             ad.dispose();
             if (mounted) {
               setState(() {
@@ -143,14 +143,13 @@ class _SwipeableAdCarouselState extends State<SwipeableAdCarousel> {
             }
           },
           onAdImpression: (ad) {
-            debugPrint('Banner ad impression for ${widget.screenId}');
+            // Banner ad impression
           },
         ),
       );
 
       await _bannerAd?.load();
     } catch (e) {
-      debugPrint('Error loading banner ad: $e');
       if (mounted) {
         setState(() {
           _bannerAd = null;
@@ -227,7 +226,7 @@ class _SwipeableAdCarouselState extends State<SwipeableAdCarousel> {
     final onSurfaceVariant = theme.colorScheme.onSurfaceVariant;
     final iconColor = onSurfaceVariant.withAlpha((255 * 0.5).round());
     final textColor = onSurfaceVariant.withAlpha((255 * 0.7).round());
-    
+
     return Container(
       height: 360,
       width: double.infinity,
@@ -280,7 +279,7 @@ class _SwipeableAdCarouselState extends State<SwipeableAdCarousel> {
     final onSurfaceVariant = theme.colorScheme.onSurfaceVariant;
     final iconColor = onSurfaceVariant.withAlpha((255 * 0.5).round());
     final textColor = onSurfaceVariant.withAlpha((255 * 0.7).round());
-    
+
     return Container(
       height: 360,
       width: double.infinity,
@@ -329,7 +328,7 @@ class _SwipeableAdCarouselState extends State<SwipeableAdCarousel> {
   @override
   Widget build(BuildContext context) {
     final List<Widget> pages = [];
-    
+
     // Add native ad if available or loading
     if (_isNativeAdLoaded || _isNativeAdLoading) {
       pages.add(
@@ -352,7 +351,7 @@ class _SwipeableAdCarouselState extends State<SwipeableAdCarousel> {
         ),
       );
     }
-    
+
     // Add banner ad if available or loading
     if (_isBannerAdLoaded || _isBannerAdLoading) {
       pages.add(
@@ -385,7 +384,8 @@ class _SwipeableAdCarouselState extends State<SwipeableAdCarousel> {
 
     return Container(
       width: double.infinity,
-      margin: widget.margin ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      margin: widget.margin ??
+          const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

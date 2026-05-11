@@ -18,6 +18,7 @@ class AdminApiProvider extends ChangeNotifier {
   Map<String, dynamic> _withdrawalStats = {};
   List<dynamic> _referralList = [];
   Map<String, dynamic> _referralStats = {};
+  List<dynamic> _rewardsHistory = [];
   Map<String, dynamic> _adStats = {};
   List<dynamic> _adList = [];
   List<dynamic> _notifications = [];
@@ -72,6 +73,7 @@ class AdminApiProvider extends ChangeNotifier {
   Map<String, dynamic> get withdrawalStats => _withdrawalStats;
   List<dynamic> get referralList => _referralList;
   Map<String, dynamic> get referralStats => _referralStats;
+  List<dynamic> get rewardsHistory => _rewardsHistory;
   Map<String, dynamic> get adStats => _adStats;
   List<dynamic> get adList => _adList;
   List<dynamic> get notifications => _notifications;
@@ -147,18 +149,20 @@ class AdminApiProvider extends ChangeNotifier {
           _apiService.setToken(savedToken);
           _lastActivity = lastActivityTime;
           _startSessionTimer();
-          print('Token restored from storage: ${_token?.substring(0, 20)}...');
+          debugPrint(
+            'Token restored from storage: ${_token?.substring(0, 20)}...',
+          );
         } else {
           // Session expired, clear saved data
           await _clearSavedData();
         }
       }
     } catch (e) {
-      print('Error initializing provider: $e');
+      debugPrint('Error initializing provider: $e');
       // Don't fail initialization if shared_preferences is not available
       // Just continue without persistent storage
       if (e.toString().contains('MissingPluginException')) {
-        print(
+        debugPrint(
           'SharedPreferences plugin not available, continuing without persistence',
         );
         _usePersistence = false;
@@ -171,7 +175,9 @@ class AdminApiProvider extends ChangeNotifier {
             _apiService.setToken(_inMemoryToken!);
             _lastActivity = _inMemoryLastActivity;
             _startSessionTimer();
-            print('Token restored from memory: ${_token?.substring(0, 20)}...');
+            debugPrint(
+              'Token restored from memory: ${_token?.substring(0, 20)}...',
+            );
           }
         }
       } else {
@@ -200,7 +206,7 @@ class AdminApiProvider extends ChangeNotifier {
 
     // Warn 5 minutes before session expires (23 hours)
     if (timeSinceLastActivity.inHours >= 23) {
-      print(
+      debugPrint(
         'Session timeout warning: ${timeSinceLastActivity.inHours} hours since last activity',
       );
       // You can show a dialog here to warn the user
@@ -208,7 +214,7 @@ class AdminApiProvider extends ChangeNotifier {
 
     // Auto logout after 24 hours
     if (timeSinceLastActivity.inHours >= 24) {
-      print('Session expired, auto logging out...');
+      debugPrint('Session expired, auto logging out...');
       logout();
     }
   }
@@ -234,9 +240,9 @@ class AdminApiProvider extends ChangeNotifier {
       );
       _lastActivity = DateTime.now();
       _startSessionTimer();
-      print('Token saved to storage');
+      debugPrint('Token saved to storage');
     } catch (e) {
-      print('Error saving token: $e');
+      debugPrint('Error saving token: $e');
       // Continue without persistence if plugin is not available
       if (e.toString().contains('MissingPluginException')) {
         _usePersistence = false;
@@ -262,9 +268,9 @@ class AdminApiProvider extends ChangeNotifier {
       await prefsInstance.remove('admin_token');
       await prefsInstance.remove('last_activity');
       _sessionTimer?.cancel();
-      print('Saved data cleared');
+      debugPrint('Saved data cleared');
     } catch (e) {
-      print('Error clearing saved data: $e');
+      debugPrint('Error clearing saved data: $e');
       // Continue even if clearing fails
       _sessionTimer?.cancel();
       if (e.toString().contains('MissingPluginException')) {
@@ -291,7 +297,7 @@ class AdminApiProvider extends ChangeNotifier {
       );
       _lastActivity = DateTime.now();
     } catch (e) {
-      print('Error updating last activity: $e');
+      debugPrint('Error updating last activity: $e');
       // Continue without persistence if plugin is not available
       if (e.toString().contains('MissingPluginException')) {
         _usePersistence = false;
@@ -306,19 +312,19 @@ class AdminApiProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      print('Attempting login for email: $email');
+      debugPrint('Attempting login for email: $email');
       final response = await _apiService.post('/admin/login', {
         'email': email,
         'password': password,
       });
 
-      print('Login response status: ${response.statusCode}');
-      print('Login response body: ${response.body}');
+      debugPrint('Login response status: ${response.statusCode}');
+      debugPrint('Login response body: ${response.body}');
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final token = data['token'];
-        print(
+        debugPrint(
           'Parsed token: ${token != null ? token.substring(0, 20) + "..." : "null"}',
         );
 
@@ -327,23 +333,23 @@ class AdminApiProvider extends ChangeNotifier {
           _apiService.setToken(token);
           await _saveToken(token);
           await _updateLastActivity();
-          print('Login successful! Token set in ApiService');
+          debugPrint('Login successful! Token set in ApiService');
           _isLoading = false;
           notifyListeners();
           return true;
         } else {
-          print('Token not found in login response!');
+          debugPrint('Token not found in login response!');
           _error = 'Server error: Token not received';
         }
       } else if (response.statusCode == 401) {
-        print('Login failed: Invalid credentials');
+        debugPrint('Login failed: Invalid credentials');
         _error = 'Invalid email or password';
       } else {
-        print('Login failed: HTTP ${response.statusCode}');
+        debugPrint('Login failed: HTTP ${response.statusCode}');
         _error = 'Server error: HTTP ${response.statusCode}';
       }
     } catch (e) {
-      print('Login exception: $e');
+      debugPrint('Login exception: $e');
 
       // Better error messages for different types of errors
       if (e.toString().contains('SocketException') ||
@@ -406,13 +412,13 @@ class AdminApiProvider extends ChangeNotifier {
     try {
       return await apiCall();
     } catch (e) {
-      print('API call error: $e');
+      debugPrint('API call error: $e');
 
       // Check if it's an authentication error
       if (e.toString().contains('401') ||
           e.toString().contains('Unauthorized') ||
           e.toString().contains('Token expired')) {
-        print('Authentication error detected, logging out...');
+        debugPrint('Authentication error detected, logging out...');
         logout();
         _error = 'Session expired. Please login again.';
       } else {
@@ -430,7 +436,7 @@ class AdminApiProvider extends ChangeNotifier {
     if (users != null) {
       _users = users;
       _totalUserCount = users.length; // Update total user count from users list
-      print(
+      debugPrint(
         'Users fetched: ${users.length}, Total user count: $_totalUserCount',
       );
       notifyListeners();
@@ -439,10 +445,10 @@ class AdminApiProvider extends ChangeNotifier {
       try {
         final count = await _apiService.fetchTotalUserCount();
         _totalUserCount = count;
-        print('Fallback: Total user count from API: $_totalUserCount');
+        debugPrint('Fallback: Total user count from API: $_totalUserCount');
         notifyListeners();
       } catch (e) {
-        print('Failed to fetch user count: $e');
+        debugPrint('Failed to fetch user count: $e');
       }
     }
   }
@@ -687,9 +693,11 @@ class AdminApiProvider extends ChangeNotifier {
       );
       if (stats != null) {
         _referralStats = stats;
-        print('Referral stats fetched successfully: ${stats.length} items');
+        debugPrint(
+          'Referral stats fetched successfully: ${stats.length} items',
+        );
       } else {
-        print('Referral stats returned null, using empty data');
+        debugPrint('Referral stats returned null, using empty data');
         _referralStats = {
           'totalReferrals': 0,
           'totalRewards': 0,
@@ -704,7 +712,7 @@ class AdminApiProvider extends ChangeNotifier {
       }
       notifyListeners();
     } catch (e) {
-      print('Error fetching referral stats: $e');
+      debugPrint('Error fetching referral stats: $e');
       _referralStats = {
         'totalReferrals': 0,
         'totalRewards': 0,
@@ -725,14 +733,14 @@ class AdminApiProvider extends ChangeNotifier {
       final list = await _handleApiCall(() => _apiService.fetchReferralList());
       if (list != null) {
         _referralList = list;
-        print('Referral list fetched successfully: ${list.length} items');
+        debugPrint('Referral list fetched successfully: ${list.length} items');
       } else {
-        print('Referral list returned null, using empty list');
+        debugPrint('Referral list returned null, using empty list');
         _referralList = [];
       }
       notifyListeners();
     } catch (e) {
-      print('Error fetching referral list: $e');
+      debugPrint('Error fetching referral list: $e');
       _referralList = [];
       notifyListeners();
     }
@@ -754,6 +762,57 @@ class AdminApiProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> fetchRewardsHistory() async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      // Extract rewards history from existing referral data
+      final rewardsHistory = <Map<String, dynamic>>[];
+
+      for (final referral in _referralList) {
+        if (referral['earningsHistory'] is List) {
+          for (final earning in referral['earningsHistory']) {
+            if (earning['type'] == 'daily_reward' &&
+                earning['timestamp'] != null &&
+                earning['amount'] != null) {
+              rewardsHistory.add({
+                'referralId': referral['id'] ?? referral['_id'],
+                'referralEmail': referral['email'] ?? 'Unknown',
+                'referralUsername':
+                    referral['username'] ?? referral['email'] ?? 'Unknown',
+                'amount': earning['amount'],
+                'timestamp': earning['timestamp'],
+                'type': earning['type'],
+                'status': 'completed',
+              });
+            }
+          }
+        }
+      }
+
+      // Sort by timestamp (most recent first)
+      rewardsHistory.sort((a, b) {
+        final aTime =
+            DateTime.tryParse(a['timestamp'].toString()) ?? DateTime.now();
+        final bTime =
+            DateTime.tryParse(b['timestamp'].toString()) ?? DateTime.now();
+        return bTime.compareTo(aTime);
+      });
+
+      // Limit to last 50 entries
+      _rewardsHistory = rewardsHistory.take(50).toList();
+    } catch (e) {
+      debugPrint('Error fetching rewards history: $e');
+      _rewardsHistory = [];
+      _error = 'Failed to load rewards history';
+    }
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
   Future<void> fetchNotifications() async {
     final list = await _handleApiCall(() => _apiService.fetchNotifications());
     if (list != null) {
@@ -766,7 +825,7 @@ class AdminApiProvider extends ChangeNotifier {
     final response = await _handleApiCall(() => _apiService.exportUsers());
     if (response != null && response.statusCode == 200) {
       // Handle successful export
-      print('Users exported successfully');
+      debugPrint('Users exported successfully');
     } else {
       _error = 'Failed to export users';
     }
@@ -776,7 +835,7 @@ class AdminApiProvider extends ChangeNotifier {
     final response = await _handleApiCall(() => _apiService.exportWallets());
     if (response != null && response.statusCode == 200) {
       // Handle successful export
-      print('Wallets exported successfully');
+      debugPrint('Wallets exported successfully');
     } else {
       _error = 'Failed to export wallets';
     }
@@ -788,7 +847,7 @@ class AdminApiProvider extends ChangeNotifier {
     );
     if (response != null && response.statusCode == 200) {
       // Handle successful export
-      print('Transactions exported successfully');
+      debugPrint('Transactions exported successfully');
     } else {
       _error = 'Failed to export transactions';
     }
@@ -860,7 +919,7 @@ class AdminApiProvider extends ChangeNotifier {
     final count = await _handleApiCall(() => _apiService.fetchTotalUserCount());
     if (count != null) {
       _totalUserCount = count;
-      print('Total user count updated: $_totalUserCount');
+      debugPrint('Total user count updated: $_totalUserCount');
       notifyListeners();
     }
   }
@@ -881,7 +940,7 @@ class AdminApiProvider extends ChangeNotifier {
       _platformUserActiveHours = hours;
       notifyListeners();
     } catch (e) {
-      print('Failed to fetch platform user activity hours: $e');
+      debugPrint('Failed to fetch platform user activity hours: $e');
       // Set default empty array if API fails
       _platformUserActiveHours = List.filled(24, 0);
       notifyListeners();
@@ -903,7 +962,23 @@ class AdminApiProvider extends ChangeNotifier {
         0.0,
         (sum, wallet) => sum + (wallet['balance'] ?? 0.0),
       );
-      _dailyWalletGrowth = 12.5; // TODO: calculate from backend if available
+      // Calculate daily wallet growth from backend data
+      try {
+        final dashboardStats = await _apiService.fetchDashboardStats();
+        final walletGrowthData = dashboardStats['walletGrowth'];
+
+        if (walletGrowthData != null) {
+          // Use backend-provided daily growth percentage
+          _dailyWalletGrowth = (walletGrowthData['dailyGrowth'] ?? 0.0)
+              .toDouble();
+        } else {
+          // Fallback: Calculate based on wallet creation dates
+          _dailyWalletGrowth = _calculateDailyWalletGrowth();
+        }
+      } catch (e) {
+        // Fallback calculation if backend stats fail
+        _dailyWalletGrowth = _calculateDailyWalletGrowth();
+      }
       _totalTransactions = _wallets
           .fold(
             0,
@@ -1039,7 +1114,7 @@ class AdminApiProvider extends ChangeNotifier {
       );
       notifyListeners();
     } catch (e) {
-      print('Failed to fetch market rates: $e');
+      debugPrint('Failed to fetch market rates: $e');
     }
   }
 
@@ -1056,7 +1131,7 @@ class AdminApiProvider extends ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      print('Error fetching referral settings: $e');
+      debugPrint('Error fetching referral settings: $e');
     }
   }
 
@@ -1068,7 +1143,7 @@ class AdminApiProvider extends ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      print('Error updating referral settings: $e');
+      debugPrint('Error updating referral settings: $e');
     }
   }
 
@@ -1127,5 +1202,45 @@ class AdminApiProvider extends ChangeNotifier {
       values.add(double.parse(value.toStringAsFixed(8)));
     }
     return {'labels': labels, 'values': values};
+  }
+
+  /// Calculate daily wallet growth based on wallet creation dates
+  /// Fallback method when backend data is not available
+  double _calculateDailyWalletGrowth() {
+    if (_wallets.isEmpty) return 0.0;
+
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = today.subtract(const Duration(days: 1));
+
+    int todayWallets = 0;
+    int yesterdayWallets = 0;
+
+    for (final wallet in _wallets) {
+      if (wallet['createdAt'] != null) {
+        final created = DateTime.tryParse(wallet['createdAt'].toString());
+        if (created != null) {
+          final createdDate = DateTime(
+            created.year,
+            created.month,
+            created.day,
+          );
+          if (createdDate == today) {
+            todayWallets++;
+          } else if (createdDate == yesterday) {
+            yesterdayWallets++;
+          }
+        }
+      }
+    }
+
+    if (yesterdayWallets == 0) {
+      // If no wallets yesterday, calculate growth as percentage of today's wallets
+      return todayWallets > 0 ? 100.0 : 0.0;
+    }
+
+    // Calculate growth percentage
+    final growth = ((todayWallets - yesterdayWallets) / yesterdayWallets) * 100;
+    return growth.isNaN ? 0.0 : growth;
   }
 }

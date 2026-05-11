@@ -1,6 +1,6 @@
 const Referral = require('../models/referral.model');
 const User = require('../models/user.model');
-const Wallet = require('../models/wallet.model');
+const { Wallet } = require('../models/wallet.model');
 const logger = require('../utils/logger');
 
 exports.validateReferralCode = async (req, res) => {
@@ -235,7 +235,6 @@ exports.claimReferralRewards = async (req, res) => {
     }
 
     // Update user's wallet balance (not User model)
-    const Wallet = require('../models/wallet.model');
     const userWallet = await Wallet.findOne({ userId: user.userId });
     const txnId = 'TXN-' + Date.now(); // Generate a unique transactionId
     if (userWallet) {

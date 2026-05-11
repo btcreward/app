@@ -27,6 +27,7 @@ class _UserListScreenState extends State<UserListScreen> {
   void initState() {
     super.initState();
     Future.delayed(Duration.zero, () {
+      if (!mounted) return;
       final provider = Provider.of<AdminApiProvider>(context, listen: false);
       provider.fetchUsers(); // Fetch real user data
     });
@@ -100,9 +101,9 @@ class _UserListScreenState extends State<UserListScreen> {
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.05),
+                color: Colors.white.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.white.withOpacity(0.1)),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
               ),
               child: TextField(
                 controller: _searchController,
@@ -153,9 +154,9 @@ class _UserListScreenState extends State<UserListScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: DropdownButton<String>(
         value: value,
@@ -260,9 +261,9 @@ class _UserListScreenState extends State<UserListScreen> {
       child: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.05),
+          color: Colors.white.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.white.withOpacity(0.1)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -271,7 +272,7 @@ class _UserListScreenState extends State<UserListScreen> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(icon, color: color, size: 22),
@@ -384,9 +385,9 @@ class _UserListScreenState extends State<UserListScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       constraints: const BoxConstraints(minHeight: 100, maxHeight: 140),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -398,8 +399,8 @@ class _UserListScreenState extends State<UserListScreen> {
               height: 50,
               decoration: BoxDecoration(
                 color: isActive
-                    ? Colors.green.withOpacity(0.1)
-                    : Colors.red.withOpacity(0.1),
+                    ? Colors.green.withValues(alpha: 0.1)
+                    : Colors.red.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(25),
               ),
               child: imageUrl != null
@@ -478,7 +479,7 @@ class _UserListScreenState extends State<UserListScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         decoration: BoxDecoration(
-                          color: Colors.blue.withOpacity(0.1),
+                          color: Colors.blue.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
@@ -495,8 +496,8 @@ class _UserListScreenState extends State<UserListScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         decoration: BoxDecoration(
                           color: isActive
-                              ? Colors.green.withOpacity(0.1)
-                              : Colors.red.withOpacity(0.1),
+                              ? Colors.green.withValues(alpha: 0.1)
+                              : Colors.red.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
@@ -591,9 +592,9 @@ class _UserListScreenState extends State<UserListScreen> {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: color.withOpacity(0.2)),
+            border: Border.all(color: color.withValues(alpha: 0.2)),
           ),
           child: Row(
             children: [
@@ -614,14 +615,48 @@ class _UserListScreenState extends State<UserListScreen> {
     );
   }
 
-  void _toggleUserStatus(Map<String, dynamic> user) {
-    // TODO: Implement user status toggle
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('User status updated'),
-        backgroundColor: Colors.green,
-      ),
-    );
+  void _toggleUserStatus(Map<String, dynamic> user) async {
+    try {
+      final userId = user['userId'] ?? user['id'] ?? user['_id'] ?? '';
+      final newStatus = user['status'] == 'active' ? 'suspended' : 'active';
+
+      final response = await ApiService().put('/admin/users/$userId/status', {
+        'status': newStatus,
+      }, auth: true);
+
+      if (response.statusCode == 200) {
+        // Update local state
+        if (mounted) {
+          Provider.of<AdminApiProvider>(
+            context,
+            listen: false,
+          ).fetchUsers(); // Refresh user list
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'User ${newStatus == 'active' ? 'activated' : 'suspended'} successfully',
+              ),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Failed to update user status'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
   }
 
   void _showBalanceUpdateDialog(Map<String, dynamic> user) {
@@ -672,14 +707,25 @@ class _UserListScreenState extends State<UserListScreen> {
             onPressed: () async {
               final amount = double.tryParse(controller.text.trim()) ?? 0;
               if (amount == 0) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Please enter a valid amount'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Please enter a valid amount'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
                 return;
               }
+
+              // Capture context references before async operation
+              final navigator = Navigator.of(context);
+              final scaffoldMessenger = ScaffoldMessenger.of(context);
+              final provider = Provider.of<AdminApiProvider>(
+                context,
+                listen: false,
+              );
+
               final userId = user['userId'] ?? user['id'] ?? user['_id'] ?? '';
               final success = await ApiService().adjustWallet(
                 userId: userId,
@@ -689,25 +735,26 @@ class _UserListScreenState extends State<UserListScreen> {
                     ? notesController.text.trim()
                     : 'Admin adjustment',
               );
-              Navigator.pop(context);
-              if (success) {
-                await Provider.of<AdminApiProvider>(
-                  context,
-                  listen: false,
-                ).fetchUsers();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Balance updated successfully'),
-                    backgroundColor: Colors.green,
-                  ),
-                );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Failed to update balance'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
+
+              navigator.pop();
+
+              if (mounted) {
+                if (success) {
+                  await provider.fetchUsers();
+                  scaffoldMessenger.showSnackBar(
+                    const SnackBar(
+                      content: Text('Balance updated successfully'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                } else {
+                  scaffoldMessenger.showSnackBar(
+                    const SnackBar(
+                      content: Text('Failed to update balance'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
               }
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
@@ -722,6 +769,7 @@ class _UserListScreenState extends State<UserListScreen> {
   }
 
   void _viewUserDetails(Map<String, dynamic> user) {
+    if (!mounted) return;
     Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => UserDetailScreen(user: user)),

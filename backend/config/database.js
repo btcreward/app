@@ -110,43 +110,20 @@ const connectDB = async () => {
     // MongoDB Atlas optimized connection options for production stability
     const connectionOptions = {
       // Connection timeouts - increased for Atlas stability
-      serverSelectionTimeoutMS: 90000,  // 90 seconds for Atlas
-      socketTimeoutMS: 90000,           // 90 seconds socket timeout
-      connectTimeoutMS: 90000,          // 90 seconds connection timeout
+      serverSelectionTimeoutMS: 30000,  // 30 seconds for Atlas
+      socketTimeoutMS: 45000,           // 45 seconds socket timeout
+      connectTimeoutMS: 30000,          // 30 seconds connection timeout
 
       // Connection pool settings - optimized for Atlas
-      maxPoolSize: 15,                  // Increased pool size for better performance
-      minPoolSize: 3,                   // Keep more minimum connections
-      maxIdleTimeMS: 600000,            // 10 minutes idle time
+      maxPoolSize: 10,                  // Pool size for better performance
+      minPoolSize: 2,                   // Keep minimum connections
+      maxIdleTimeMS: 60000,             // 1 minute idle time
 
       // Retry settings - more aggressive for Atlas
       retryWrites: true,
-      retryReads: true,
-
-      // Write concern - ensure data durability
-      w: 'majority',
-      journal: true,                    // Journal write concern (updated from 'j')
 
       // Read preference - optimize for Atlas
       readPreference: 'primary',
-
-      // Server API version
-      serverApi: {
-        version: '1',
-        strict: true,
-        deprecationErrors: true,
-      },
-
-      // Heartbeat settings - more frequent for Atlas
-      heartbeatFrequencyMS: 10000,      // 10 seconds heartbeat
-
-      // Compression - enable for better performance
-      compressors: ['zlib'],
-
-      // TLS settings for Atlas
-      tls: true,
-      tlsAllowInvalidCertificates: false,
-      tlsAllowInvalidHostnames: false,
     };
 
     // Connect to MongoDB
@@ -171,13 +148,9 @@ const connectDB = async () => {
     console.error('Stack:', error.stack);
     console.log('----------------------------------------\n');
 
-    // Don't exit in production, let the monitor handle reconnection
-    if (process.env.NODE_ENV === 'production') {
-      logger.error('MongoDB connection failed, will retry:', error);
-      return null;
-    } else {
-      process.exit(1);
-    }
+    // Don't exit - let the health check monitor handle reconnection
+    logger.error('MongoDB connection failed, will retry via health check:', error.message);
+    return null;
   }
 };
 

@@ -28,7 +28,6 @@ const proxyRoutes = require('./routes/proxy.routes');
 const { authenticate } = require('./middleware/auth.middleware');
 const nodemailer = require('nodemailer');
 const mongoSanitize = require('express-mongo-sanitize');
-const xss = require('xss-clean');
 const { connectDB } = require('./config/database');
 const { initializeFirebase } = require('./config/firebase.config');
 
@@ -73,6 +72,7 @@ const allowedOrigins = [
   'https://bitcoincloudmining.onrender.com',
   'http://localhost:3000',
   'http://localhost:5000',
+  'http://localhost:51581',
   'http://127.0.0.1:3000',
   'http://127.0.0.1:5000'
 ];
@@ -81,17 +81,25 @@ app.use(cors({
   origin: function (origin, callback) {
     // allow requests with no origin (like mobile apps, curl, etc.)
     if (!origin) return callback(null, true);
+
+    // Allow all localhost ports for development
     if (
       origin?.includes('localhost') ||
       origin?.includes('127.0.0.1') ||
-      origin?.includes('[::1]') ||
-      process.env.NODE_ENV === 'development'
+      origin?.includes('[::1]')
     ) {
       return callback(null, true);
     }
+
+    // Allow all Render URLs
+    if (origin?.includes('onrender.com') || origin?.includes('web.app') || origin?.includes('firebaseapp.com')) {
+      return callback(null, true);
+    }
+
     if (allowedOrigins.indexOf(origin) !== -1) {
       return callback(null, true);
     } else {
+      console.log('CORS blocked origin:', origin);
       return callback(new Error('Not allowed by CORS'));
     }
   },
@@ -115,19 +123,27 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: false, // Disable CSP for API server - not needed and blocks web clients
+  crossOriginEmbedderPolicy: false, // Allow cross-origin embedding
+  crossOriginOpenerPolicy: false, // Allow cross-origin access
+  crossOriginResourcePolicy: false, // Allow cross-origin resources
+}));
 app.use(compression());
-app.use(mongoSanitize()); // This will now work
-app.use(xss());
+app.use(mongoSanitize());
+// xss-clean removed - it modifies JSON request bodies and can break API calls
+// API servers don't need HTML XSS protection on JSON payloads
 
 // Debug middleware to log all requests
 app.use((req, res, next) => {
+  // Skip logging for health checks to reduce noise
+  if (req.url === '/health' || req.url === '/') {
+    return next();
+  }
   logger.info(`Incoming request: ${req.method} ${req.url}`, {
     body: req.body,
     query: req.query,
-    params: req.params,
     path: req.path,
-    userAgent: req.get('User-Agent'),
     origin: req.get('Origin'),
     ip: req.ip || req.connection.remoteAddress
   });
@@ -136,12 +152,14 @@ app.use((req, res, next) => {
 
 // Add request timeout middleware
 app.use((req, res, next) => {
-  req.setTimeout(30000, () => {
-    logger.error('Request timeout');
-    res.status(408).json({
-      success: false,
-      message: 'Request timeout'
-    });
+  req.setTimeout(60000, () => {
+    logger.error('Request timeout for:', req.method, req.url);
+    if (!res.headersSent) {
+      res.status(408).json({
+        success: false,
+        message: 'Request timeout'
+      });
+    }
   });
   next();
 });
@@ -198,7 +216,7 @@ app.use('/api/transactions', transactionRoutes);  // Handle other transaction ro
 app.get('/', (req, res) => {
   res.status(200).json({
     status: 'ok',
-    message: 'Bitcoin Cloud Mining API is running',
+    message: 'Bitcoin Mining Pro API is running',
     version: '1.0.6'
   });
 });
@@ -318,10 +336,29 @@ try {
   console.error('❌ Firebase initialization failed:', error);
 }
 
-// Connect to MongoDB
-connectDB();
+// Connect to MongoDB - await before starting server
+const startServer = async () => {
+  try {
+    await connectDB();
+    console.log('✅ MongoDB connected, starting server...');
+  } catch (error) {
+    console.error('❌ MongoDB connection failed:', error.message);
+    console.log('⚠️  Starting server anyway - DB will reconnect automatically...');
+  }
 
-// MongoDB connection events are handled in config/database.js
+  // Start server
+  const PORT = process.env.PORT || 5000;
+  server.listen(PORT, () => {
+    logger.info(`Server running on port ${PORT}`);
+    console.log('\n\x1b[32m%s\x1b[0m', '🚀 Server is running on port:', PORT);
+    console.log('\x1b[36m%s\x1b[0m', '🌐 Environment:', process.env.NODE_ENV || 'development');
+    console.log('\x1b[33m%s\x1b[0m', '🔗 Base URL:', `https://bitcoincloudmining.onrender.com`);
+    console.log('\x1b[35m%s\x1b[0m', '📊 Health Check:', `https://bitcoincloudmining.onrender.com/health`);
+    console.log('----------------------------------------\n');
+  });
+};
+
+startServer();
 
 // Register endpoint
 app.post('/auth/register', async (req, res) => {
@@ -426,35 +463,20 @@ app.get('/api/referral/earnings', authenticate, referralController.getReferralEa
 // Static folder for images
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
-// Start server
-const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
-  logger.info(`Server running on port ${PORT}`);
-  console.log('\n\x1b[32m%s\x1b[0m', '🚀 Server is running on port:', PORT);
-  console.log('\x1b[36m%s\x1b[0m', '🌐 Environment:', process.env.NODE_ENV || 'development');
-  console.log('\x1b[33m%s\x1b[0m', '🔗 Base URL:', `https://bitcoincloudmining.onrender.com`);
-  console.log('\x1b[35m%s\x1b[0m', '📊 Health Check:', `https://bitcoincloudmining.onrender.com/health`);
-  console.log('----------------------------------------\n');
-});
+// Server is started by startServer() function above
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {
   logger.error('Unhandled Rejection:', err);
   console.error('❌ Unhandled Promise Rejection:', err);
-  // Don't exit in production, just log the error
-  if (process.env.NODE_ENV === 'development') {
-    process.exit(1);
-  }
+  // Don't exit - just log the error
 });
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (err) => {
   logger.error('Uncaught Exception:', err);
   console.error('❌ Uncaught Exception:', err);
-  // Don't exit in production, just log the error
-  if (process.env.NODE_ENV === 'development') {
-    process.exit(1);
-  }
+  // Don't exit - just log the error
 });
 
 // Graceful shutdown

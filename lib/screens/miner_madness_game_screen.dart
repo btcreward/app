@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:bitcoin_cloud_mining/utils/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -51,21 +52,20 @@ class _MinerMadnessGameScreenState extends State<MinerMadnessGameScreen>
 
   // Add these variables to the state class
   int _spinCount = 0;
-  static const int SPINS_FOR_BONUS = 1000;
+  static const int spinsForBonus = 1000;
   int _cooldownSeconds = 0;
   Timer? _cooldownTimer;
 
   // Ad service
   final AdService _adService = AdService();
-  bool _isAdLoaded = false;
   bool _isAdLoading = false;
   bool _isInterstitialAdLoaded = false;
   String? _adError;
-  
+
   // AdMob banner ad
   BannerAd? _bannerAd;
   bool _isBannerAdLoaded = false;
-  
+
   // Banner ad size - will be set adaptively
   AdSize? _bannerSize;
 
@@ -138,7 +138,8 @@ class _MinerMadnessGameScreenState extends State<MinerMadnessGameScreen>
             onPressed: () {
               Navigator.of(context).pop(true);
             },
-            child: const Text('EXIT', style: TextStyle(color: Colors.greenAccent)),
+            child:
+                const Text('EXIT', style: TextStyle(color: Colors.greenAccent)),
           ),
         ],
       ),
@@ -172,7 +173,7 @@ class _MinerMadnessGameScreenState extends State<MinerMadnessGameScreen>
     _confettiController.dispose();
     _audioPlayer.dispose();
     _bannerAd?.dispose();
-    _adService.dispose();
+    // Note: Don't dispose AdService here as it's a singleton shared across the app
     _cooldownTimer?.cancel();
     super.dispose();
   }
@@ -181,7 +182,9 @@ class _MinerMadnessGameScreenState extends State<MinerMadnessGameScreen>
     try {
       await _audioPlayer.setReleaseMode(ReleaseMode.stop);
       await _audioPlayer.setVolume(_isMuted ? 0.0 : 1.0);
-    } catch (e) {}
+    } catch (e) {
+      AppLogger.error('MinerMadness error', error: e);
+    }
   }
 
   // Load banner ad with adaptive sizing
@@ -197,24 +200,23 @@ class _MinerMadnessGameScreenState extends State<MinerMadnessGameScreen>
     try {
       // Get the screen width to determine the best ad size
       final screenWidth = MediaQuery.of(context).size.width.toInt();
-      
+
       // Try to get the adaptive banner size for the current orientation
-      _bannerSize = AdSize.getCurrentOrientationInlineAdaptiveBannerAdSize(screenWidth);
-      
+      _bannerSize =
+          AdSize.getCurrentOrientationInlineAdaptiveBannerAdSize(screenWidth);
+
       // If adaptive size is not available, use a standard banner size
       _bannerSize ??= const AdSize(width: 320, height: 100);
-      
+
       _bannerAd = BannerAd(
         adUnitId: 'ca-app-pub-3537329799200606/2028008282',
         size: _bannerSize!,
         request: const AdRequest(),
         listener: BannerAdListener(
           onAdLoaded: (ad) async {
-            debugPrint('🎯 Miner Madness: Adaptive Banner ad loaded');
             // Get the actual platform ad size after loading
-            final platformAdSize = await (ad as BannerAd).getPlatformAdSize();
-            debugPrint('📏 Miner Madness: Ad size: ${platformAdSize?.width}x${platformAdSize?.height}');
-            
+            await (ad as BannerAd).getPlatformAdSize();
+
             if (mounted) {
               setState(() {
                 _isBannerAdLoaded = true;
@@ -226,7 +228,6 @@ class _MinerMadnessGameScreenState extends State<MinerMadnessGameScreen>
             }
           },
           onAdFailedToLoad: (ad, error) {
-            debugPrint('❌ Miner Madness: Failed to load adaptive banner ad: $error');
             ad.dispose();
             // Retry with fallback size after a delay
             Future.delayed(const Duration(seconds: 5), () {
@@ -238,7 +239,6 @@ class _MinerMadnessGameScreenState extends State<MinerMadnessGameScreen>
 
       await _bannerAd!.load();
     } catch (e) {
-      debugPrint('❌ Error initializing banner ad: $e');
       // Fallback to a standard banner ad if adaptive loading fails
       await _loadFallbackBannerAd();
     }
@@ -249,11 +249,11 @@ class _MinerMadnessGameScreenState extends State<MinerMadnessGameScreen>
     try {
       _bannerAd = BannerAd(
         adUnitId: 'ca-app-pub-3537329799200606/2028008282',
-        size: const AdSize(width: 320, height: 50), // Standard banner size as fallback
+        size: const AdSize(
+            width: 320, height: 50), // Standard banner size as fallback
         request: const AdRequest(),
         listener: BannerAdListener(
           onAdLoaded: (ad) {
-            debugPrint('✅ Fallback Banner ad loaded');
             if (mounted) {
               setState(() {
                 _isBannerAdLoaded = true;
@@ -261,7 +261,6 @@ class _MinerMadnessGameScreenState extends State<MinerMadnessGameScreen>
             }
           },
           onAdFailedToLoad: (ad, error) {
-            debugPrint('❌ Fallback Banner ad failed to load: $error');
             ad.dispose();
             // Don't retry again to avoid infinite loop
           },
@@ -269,7 +268,7 @@ class _MinerMadnessGameScreenState extends State<MinerMadnessGameScreen>
       );
       await _bannerAd!.load();
     } catch (e) {
-      debugPrint('❌ Error loading fallback banner ad: $e');
+      // Handle banner ad loading error silently
     }
   }
 
@@ -283,32 +282,24 @@ class _MinerMadnessGameScreenState extends State<MinerMadnessGameScreen>
       await _adService.initialize();
       // Load rewarded ad
       await _adService.loadRewardedAd();
-      debugPrint('🎯 Miner Madness: Rewarded ad loaded: ${_adService.isRewardedAdLoaded}');
-      
+
       // Load banner ad
       await _loadBannerAd();
-      
+
       // Load interstitial ad for exit
       await _loadInterstitialAd();
-      debugPrint('🎯 Miner Madness: Interstitial ad loaded: $_isInterstitialAdLoaded');
 
       if (mounted) {
         setState(() {
-          _isAdLoaded = _adService.isBannerAdLoaded || 
-                      _adService.isRewardedAdLoaded || 
-                      _isInterstitialAdLoaded;
           _isAdLoading = false;
         });
-        
-        debugPrint('🎯 Miner Madness: All ads initialized. Status: $_isAdLoaded');
       }
     } catch (e) {
-      debugPrint('❌ Miner Madness: Ad initialization failed: $e');
       if (mounted) {
         setState(() {
-          _isAdLoaded = false;
           _isAdLoading = false;
-          _adError = 'Failed to load ads. Please check your internet connection.';
+          _adError =
+              'Failed to load ads. Please check your internet connection.';
         });
       }
     }
@@ -462,7 +453,7 @@ class _MinerMadnessGameScreenState extends State<MinerMadnessGameScreen>
     // Handle spin count and bonus
     SharedPreferences.getInstance().then((preferences) {
       preferences.setInt('wheelSpinCount', _spinCount);
-      if (_spinCount >= SPINS_FOR_BONUS) {
+      if (_spinCount >= spinsForBonus) {
         _awardBaseBonus();
         setState(() => _spinCount = 0);
         preferences.setInt('wheelSpinCount', 0);
@@ -496,14 +487,14 @@ class _MinerMadnessGameScreenState extends State<MinerMadnessGameScreen>
         });
       }
     } catch (e) {
-      debugPrint('Error loading spin count: $e');
+      // Handle spin count loading error silently
     }
   }
 
   // Add method to award base bonus
   Future<void> _awardBaseBonus() async {
     if (!mounted) return;
-    
+
     final walletProvider = Provider.of<WalletProvider>(context, listen: false);
     try {
       await walletProvider.addEarning(widget.baseWinAmount,
@@ -527,7 +518,7 @@ class _MinerMadnessGameScreenState extends State<MinerMadnessGameScreen>
         }
       }
     } catch (e) {
-      debugPrint('Error awarding base bonus: $e');
+      // Handle bonus award error silently
     }
   }
 
@@ -537,7 +528,6 @@ class _MinerMadnessGameScreenState extends State<MinerMadnessGameScreen>
       canPop: false, // Prevent default back behavior
       onPopInvokedWithResult: (didPop, result) async {
         if (!didPop) {
-          debugPrint('👆 Miner Madness: Android back button pressed');
           _showExitConfirmation();
         }
       },
@@ -548,10 +538,7 @@ class _MinerMadnessGameScreenState extends State<MinerMadnessGameScreen>
           elevation: 0,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-            onPressed: () {
-              debugPrint('👆 Miner Madness: AppBar back button pressed');
-              _showExitConfirmation();
-            },
+            onPressed: _showExitConfirmation,
           ),
         ),
         body: Container(
@@ -568,112 +555,112 @@ class _MinerMadnessGameScreenState extends State<MinerMadnessGameScreen>
           child: SafeArea(
             child: Stack(
               children: [
-              SingleChildScrollView(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: MediaQuery.of(context).size.height -
-                        AppBar().preferredSize.height -
-                        MediaQuery.of(context).padding.top,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildWalletBalance(),
-                      const SizedBox(height: 20),
-                      Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          _buildSpinningWheel(),
-                          if (_showReward)
-                            Positioned(
-                              top: 0,
-                              child: _buildWinDisplay(),
-                            ),
-                        ],
-                      ),
-                      const SizedBox(height: 30),
-                      _buildSpinButton(),
-                      const SizedBox(height: 20),
-                      _buildGameInstructions(),
-                      const SizedBox(height: 20),
-                    ],
-                  ),
-                ),
-              ),
-              // Banner Ad at the bottom of the screen (320x100)
-              if (_isBannerAdLoaded && _bannerAd != null)
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    color: Colors.transparent,
-                    width: 320,
-                    height: 100,
-                    alignment: Alignment.center,
-                    margin: const EdgeInsets.only(bottom: 4),
-                    child: AdWidget(ad: _bannerAd!),
-                  ),
-                ),
-              if (_isAdLoading)
-                Container(
-                  color: Colors.black.withAlpha(128),
-                  child: Center(
+                SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: MediaQuery.of(context).size.height -
+                          AppBar().preferredSize.height -
+                          MediaQuery.of(context).padding.top,
+                    ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const CircularProgressIndicator(
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(Colors.orange),
+                        _buildWalletBalance(),
+                        const SizedBox(height: 20),
+                        Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            _buildSpinningWheel(),
+                            if (_showReward)
+                              Positioned(
+                                top: 0,
+                                child: _buildWinDisplay(),
+                              ),
+                          ],
                         ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Loading ad...',
-                          style: GoogleFonts.poppins(
-                            color: Colors.white,
-                            fontSize: 16,
-                          ),
-                        ),
+                        const SizedBox(height: 30),
+                        _buildSpinButton(),
+                        const SizedBox(height: 20),
+                        _buildGameInstructions(),
+                        const SizedBox(height: 20),
                       ],
                     ),
                   ),
                 ),
-              if (_adError != null)
-                Positioned(
-                  top: 100,
-                  left: 20,
-                  right: 20,
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.red.withAlpha(200),
-                      borderRadius: BorderRadius.circular(8),
+                // Banner Ad at the bottom of the screen (320x100)
+                if (_isBannerAdLoaded && _bannerAd != null)
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      color: Colors.transparent,
+                      width: 320,
+                      height: 100,
+                      alignment: Alignment.center,
+                      margin: const EdgeInsets.only(bottom: 4),
+                      child: AdWidget(ad: _bannerAd!),
                     ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.error_outline, color: Colors.white),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            _adError!,
+                  ),
+                if (_isAdLoading)
+                  Container(
+                    color: Colors.black.withAlpha(128),
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const CircularProgressIndicator(
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.orange),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Loading ad...',
                             style: GoogleFonts.poppins(
                               color: Colors.white,
-                              fontSize: 14,
+                              fontSize: 16,
                             ),
                           ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.close, color: Colors.white),
-                          onPressed: () {
-                            setState(() {
-                              _adError = null;
-                            });
-                          },
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
+                if (_adError != null)
+                  Positioned(
+                    top: 100,
+                    left: 20,
+                    right: 20,
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withAlpha(200),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.error_outline, color: Colors.white),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              _adError!,
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.close, color: Colors.white),
+                            onPressed: () {
+                              setState(() {
+                                _adError = null;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -706,7 +693,7 @@ class _MinerMadnessGameScreenState extends State<MinerMadnessGameScreen>
           ),
           const SizedBox(height: 8),
           Text(
-            'Spins until bonus: ${SPINS_FOR_BONUS - _spinCount}',
+            'Spins until bonus: ${spinsForBonus - _spinCount}',
             style: TextStyle(
               color: Colors.green.shade300,
               fontSize: 12,
@@ -735,7 +722,6 @@ class _MinerMadnessGameScreenState extends State<MinerMadnessGameScreen>
           });
         },
         onAdFailedToLoad: (ad, error) {
-          debugPrint('Failed to load banner ad: $error');
           ad.dispose();
           _bannerAd = null;
         },
@@ -1018,36 +1004,41 @@ class _MinerMadnessGameScreenState extends State<MinerMadnessGameScreen>
                                 });
                               }
 
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Row(
-                                    children: [
-                                      const Icon(Icons.check_circle,
-                                          color: Colors.white, size: 18),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        'Added ${_wonAmount.toStringAsFixed(18)} BTC to wallet',
-                                        style: const TextStyle(
-                                            color: Colors.white, fontSize: 13),
-                                      ),
-                                    ],
+                              if (mounted && context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Row(
+                                      children: [
+                                        const Icon(Icons.check_circle,
+                                            color: Colors.white, size: 18),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          'Added ${_wonAmount.toStringAsFixed(18)} BTC to wallet',
+                                          style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 13),
+                                        ),
+                                      ],
+                                    ),
+                                    backgroundColor: Colors.green,
+                                    duration: const Duration(seconds: 3),
                                   ),
-                                  backgroundColor: Colors.green,
-                                  duration: const Duration(seconds: 3),
-                                ),
-                              );
+                                );
+                              }
                             } catch (e) {
                               if (mounted) {
                                 setState(() {
                                   _isCollecting = false;
                                 });
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content:
-                                        Text('Failed to add reward to wallet'),
-                                    backgroundColor: Colors.red,
-                                  ),
-                                );
+                                if (mounted && context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                          'Failed to add reward to wallet'),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                }
                               }
                             }
                           });

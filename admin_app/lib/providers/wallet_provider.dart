@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:flutter/material.dart';
 
 import '../services/api_service.dart';
@@ -32,15 +34,25 @@ class WalletProvider extends ChangeNotifier {
   Future<void> loadWalletData(String userId) async {
     try {
       final wallet = await _apiService.fetchUserWallet(userId);
-      print('Wallet API response: $wallet');
-      print(
+      developer.log(
+        'Wallet API response: $wallet',
+        level: 800,
+        name: 'WalletProvider',
+      );
+      developer.log(
         'Transactions from API: ${wallet['transactions']?.toString() ?? 'null'}',
+        level: 800,
+        name: 'WalletProvider',
       );
       _walletData = wallet;
       _transactions = List<Map<String, dynamic>>.from(
         wallet['transactions'] ?? [],
       );
-      print('Transactions in provider: $_transactions');
+      developer.log(
+        'Transactions in provider: $_transactions',
+        level: 800,
+        name: 'WalletProvider',
+      );
     } catch (e) {
       _walletData = null;
       _transactions = [];

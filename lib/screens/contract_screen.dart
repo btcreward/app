@@ -7,16 +7,17 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workmanager/workmanager.dart';
 
+import '../utils/app_logger.dart';
 import '../widgets/swipeable_ad_carousel.dart';
 
 class ContractScreen extends StatefulWidget {
   const ContractScreen({super.key});
 
   @override
-  _ContractScreenState createState() => _ContractScreenState();
+  ContractScreenState createState() => ContractScreenState();
 }
 
-class _ContractScreenState extends State<ContractScreen>
+class ContractScreenState extends State<ContractScreen>
     with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late TabController _tabController;
   // AdService को singleton instance से initialize करें
@@ -283,8 +284,10 @@ class _ContractScreenState extends State<ContractScreen>
     _tabController.dispose();
     _saveEarnings();
     try {
-      _adService.dispose();
-    } catch (e) {}
+      // Note: Don't dispose AdService here as it's a singleton shared across the app
+    } catch (e) {
+      AppLogger.error('ContractScreen error', error: e);
+    }
     super.dispose();
   }
 
@@ -425,7 +428,9 @@ class _ContractScreenState extends State<ContractScreen>
         await prefs.remove('contract_current_earnings_$index');
         await prefs.remove('contract_is_mining_$index');
       }
-    } catch (e) {}
+    } catch (e) {
+      AppLogger.error('ContractScreen error', error: e);
+    }
   }
 
   Future<void> _completeContract(int index) async {
@@ -466,7 +471,9 @@ class _ContractScreenState extends State<ContractScreen>
           );
         }
       }
-    } catch (e) {}
+    } catch (e) {
+      AppLogger.error('ContractScreen error', error: e);
+    }
   }
 
   void _startContractMining(int index) {
@@ -569,12 +576,14 @@ class _ContractScreenState extends State<ContractScreen>
         },
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to show ad. Please try again.'),
-          duration: Duration(seconds: 2),
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to show ad. Please try again.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
     }
   }
 
@@ -636,7 +645,8 @@ class _ContractScreenState extends State<ContractScreen>
     return StatefulBuilder(
       builder: (context, setState) {
         // 1 native ad position: after 1st contract
-        final nativeAdPositions = <int>{}; // Removing fixed position since we'll handle it manually
+        final nativeAdPositions =
+            <int>{}; // Removing fixed position since we'll handle it manually
         // 1 banner ad position: top
         final bannerAdPositions = <int>{};
 
@@ -652,7 +662,7 @@ class _ContractScreenState extends State<ContractScreen>
           itemBuilder: (context, index) {
             // Adjust contract index since we removed the top banner ad
             int adjustedIndex = index;
-            
+
             // Show swipeable ad after the first contract (index 0)
             if (index == 1) {
               return Container(
@@ -665,16 +675,16 @@ class _ContractScreenState extends State<ContractScreen>
                 ),
               );
             }
-            
+
             // Adjust index for the swipeable ad we just added
             if (adjustedIndex > 1) {
               adjustedIndex--; // Decrement by 1 to account for the swipeable ad
             }
-            
+
             if (adjustedIndex >= contracts.length) {
               return const SizedBox.shrink();
             }
-            
+
             final contract = contracts[adjustedIndex];
             final bool isCompleted = contract['isCompleted'] ?? false;
             final bool canWatchAd = _canWatchAd() && _isAdInitialized;
@@ -986,10 +996,10 @@ class MiningBackground extends StatefulWidget {
   const MiningBackground({super.key});
 
   @override
-  _MiningBackgroundState createState() => _MiningBackgroundState();
+  MiningBackgroundState createState() => MiningBackgroundState();
 }
 
-class _MiningBackgroundState extends State<MiningBackground>
+class MiningBackgroundState extends State<MiningBackground>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 

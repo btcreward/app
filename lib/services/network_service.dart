@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:bitcoin_cloud_mining/utils/app_logger.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -39,7 +40,10 @@ class NetworkService {
 
       // Start periodic connection check
       _startPeriodicConnectionCheck();
-    } catch (e) {}
+    } catch (e, stackTrace) {
+      AppLogger.error('NetworkService initialization failed',
+          error: e, stackTrace: stackTrace);
+    }
   }
 
   // Check current connection status

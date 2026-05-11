@@ -121,11 +121,13 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) {
           await Future.delayed(Duration(milliseconds: 100));
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (context) => const ResetPasswordScreen(),
-            ),
-          );
+          if (mounted && context.mounted) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (context) => const ResetPasswordScreen(),
+              ),
+            );
+          }
         }
       },
       child: Scaffold(

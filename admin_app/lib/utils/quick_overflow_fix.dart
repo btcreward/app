@@ -2,12 +2,12 @@
 // यह script सभी overflow errors को एक साथ fix करता है
 
 import 'package:flutter/material.dart';
+
 import '../widgets/overflow_safe_container.dart';
 
 /// Universal Overflow Fix Class
 /// किसी भी screen में overflow errors को fix करने के लिए
 class QuickOverflowFix {
-  
   /// किसी भी Column को safe बनाने के लिए
   static Widget fixColumn({
     required List<Widget> children,
@@ -18,12 +18,12 @@ class QuickOverflowFix {
     EdgeInsetsGeometry? padding,
   }) {
     return OverflowSafeColumn(
-      children: children,
       mainAxisAlignment: mainAxisAlignment,
       crossAxisAlignment: crossAxisAlignment,
       mainAxisSize: mainAxisSize,
       enableScroll: enableScroll,
       padding: padding,
+      children: children,
     );
   }
 
@@ -37,12 +37,12 @@ class QuickOverflowFix {
     EdgeInsetsGeometry? padding,
   }) {
     return OverflowSafeRow(
-      children: children,
       mainAxisAlignment: mainAxisAlignment,
       crossAxisAlignment: crossAxisAlignment,
       mainAxisSize: mainAxisSize,
       enableScroll: enableScroll,
       padding: padding,
+      children: children,
     );
   }
 
@@ -58,7 +58,6 @@ class QuickOverflowFix {
     bool enableScroll = true,
   }) {
     return OverflowSafeContainer(
-      child: child,
       padding: padding,
       margin: margin,
       width: width,
@@ -66,6 +65,7 @@ class QuickOverflowFix {
       backgroundColor: backgroundColor,
       borderRadius: borderRadius,
       enableScroll: enableScroll,
+      child: child,
     );
   }
 
@@ -98,12 +98,12 @@ class QuickOverflowFix {
     bool enableScroll = false,
   }) {
     return OverflowSafeCard(
-      child: child,
       color: color,
       elevation: elevation,
       margin: margin,
       padding: padding,
       enableScroll: enableScroll,
+      child: child,
     );
   }
 
@@ -169,9 +169,9 @@ class QuickOverflowFix {
       backgroundColor: backgroundColor,
       body: SafeArea(
         child: OverflowSafeContainer(
-          child: child,
           padding: padding,
           enableScroll: enableScroll,
+          child: child,
         ),
       ),
     );
@@ -180,7 +180,6 @@ class QuickOverflowFix {
 
 /// Common Overflow Error Patterns and Solutions
 class OverflowPatterns {
-  
   /// Pattern 1: Column overflow by X pixels on the bottom
   static Widget fixColumnOverflow(List<Widget> children) {
     return QuickOverflowFix.fixColumn(
@@ -201,27 +200,17 @@ class OverflowPatterns {
 
   /// Pattern 3: Text overflow
   static Widget fixTextOverflow(String text, {TextStyle? style}) {
-    return QuickOverflowFix.fixText(
-      text,
-      style: style,
-      maxLines: 2,
-    );
+    return QuickOverflowFix.fixText(text, style: style, maxLines: 2);
   }
 
   /// Pattern 4: Container overflow
   static Widget fixContainerOverflow(Widget child) {
-    return QuickOverflowFix.fixContainer(
-      child: child,
-      enableScroll: true,
-    );
+    return QuickOverflowFix.fixContainer(child: child, enableScroll: true);
   }
 
   /// Pattern 5: Card overflow
   static Widget fixCardOverflow(Widget child) {
-    return QuickOverflowFix.fixCard(
-      child: child,
-      enableScroll: true,
-    );
+    return QuickOverflowFix.fixCard(child: child, enableScroll: true);
   }
 }
 
@@ -248,4 +237,4 @@ OverflowPatterns.fixColumnOverflow([
   Text('Hello'),
   Text('World'),
 ])
-*/ 
+*/

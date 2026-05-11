@@ -89,8 +89,8 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(50),
                 color: isActive
-                    ? Colors.green.withOpacity(0.1)
-                    : Colors.red.withOpacity(0.1),
+                    ? Colors.green.withValues(alpha: 0.1)
+                    : Colors.red.withValues(alpha: 0.1),
               ),
               child: imageUrl != null
                   ? ClipRRect(
@@ -99,7 +99,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                         imageUrl: imageUrl,
                         fit: BoxFit.cover,
                         placeholder: (context, url) =>
-                            Center(child: CircularProgressIndicator()),
+                            const Center(child: CircularProgressIndicator()),
                         errorWidget: (context, url, error) => Center(
                           child: Icon(
                             Icons.person,
@@ -133,8 +133,8 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               decoration: BoxDecoration(
                 color: isActive
-                    ? Colors.green.withOpacity(0.1)
-                    : Colors.red.withOpacity(0.1),
+                    ? Colors.green.withValues(alpha: 0.1)
+                    : Colors.red.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
@@ -159,9 +159,9 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
               ),
             ),
             const SizedBox(height: 8),
-            if (loadingWallet) Center(child: CircularProgressIndicator()),
+            if (loadingWallet) const Center(child: CircularProgressIndicator()),
             if (walletError != null)
-              Text(walletError!, style: TextStyle(color: Colors.red)),
+              Text(walletError!, style: const TextStyle(color: Colors.red)),
             if (wallet != null) ...[
               _buildDetailRow('Wallet ID', wallet!['walletId'] ?? ''),
               _buildDetailRow(
@@ -186,7 +186,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                         wallet!['transactions'].isNotEmpty)
                     ? () => _showTransactions(context, wallet!['transactions'])
                     : null,
-                child: Text('View Transactions'),
+                child: const Text('View Transactions'),
               ),
             ] else if (!loadingWallet && walletError == null) ...[
               _buildDetailRow('Wallet Balance', '$balance BTC'),
@@ -211,7 +211,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
   }
 
   Widget _buildDetailRow(String label, String value) {
-    if (value.isEmpty) return SizedBox.shrink();
+    if (value.isEmpty) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
@@ -289,7 +289,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                 ),
                 Expanded(
                   child: transactions.isEmpty
-                      ? Center(
+                      ? const Center(
                           child: Text(
                             'No transactions found',
                             style: TextStyle(color: Colors.white70),
@@ -316,7 +316,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                                   children: [
                                     Text(
                                       '${tx['type'] ?? ''} - ${tx['amount'] ?? ''}',
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -324,7 +324,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                                     const SizedBox(height: 4),
                                     Row(
                                       children: [
-                                        Text(
+                                        const Text(
                                           'Status:',
                                           style: TextStyle(
                                             color: Colors.white70,
@@ -333,15 +333,19 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                                         const SizedBox(width: 8),
                                         DropdownButton<String>(
                                           value: selectedStatuses[index],
-                                          dropdownColor: Color(0xFF1E293B),
-                                          style: TextStyle(color: Colors.white),
+                                          dropdownColor: const Color(
+                                            0xFF1E293B,
+                                          ),
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                          ),
                                           items: statuses
                                               .map(
                                                 (s) => DropdownMenuItem(
                                                   value: s,
                                                   child: Text(
                                                     s,
-                                                    style: TextStyle(
+                                                    style: const TextStyle(
                                                       color: Colors.white,
                                                     ),
                                                   ),
@@ -361,7 +365,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                                         ),
                                         const SizedBox(width: 8),
                                         if (isSaving[index])
-                                          SizedBox(
+                                          const SizedBox(
                                             width: 18,
                                             height: 18,
                                             child: CircularProgressIndicator(
@@ -369,19 +373,19 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                                             ),
                                           ),
                                         if (isSuccess[index])
-                                          Icon(
+                                          const Icon(
                                             Icons.check_circle,
                                             color: Colors.green,
                                             size: 18,
                                           ),
                                         if (isError[index])
-                                          Icon(
+                                          const Icon(
                                             Icons.error,
                                             color: Colors.red,
                                             size: 18,
                                           ),
                                         IconButton(
-                                          icon: Icon(
+                                          icon: const Icon(
                                             Icons.save,
                                             color: Colors.blue,
                                             size: 20,
@@ -442,7 +446,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                                     const SizedBox(height: 2),
                                     Text(
                                       '${tx['timestamp'] ?? ''}',
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         color: Colors.white70,
                                         fontSize: 12,
                                       ),

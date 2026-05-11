@@ -25,10 +25,11 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:unity_ads_plugin/unity_ads_plugin.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:unity_ads_plugin/unity_ads_plugin.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:workmanager/workmanager.dart';
 
@@ -36,16 +37,86 @@ import 'config/mediation_config.dart';
 import 'fcm_service.dart';
 import 'services/audio_service.dart';
 import 'services/sound_notification_service.dart';
+import 'utils/app_logger.dart';
 import 'utils/storage_utils.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 // Background message handler
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // Firebase is already initialized in main(), but check for safety
   if (Firebase.apps.isEmpty) {
     await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform);
+  }
+}
+
+/// Initialize mobile-only services in parallel - non-critical, don't block startup
+void _initMobileServices() {
+  // Unity Ads
+  try {
+    final gameId = Platform.isAndroid ? '5916099' : '5916098';
+    UnityAds.init(
+      gameId: gameId,
+      testMode: false,
+      onComplete: () {},
+      onFailed: (error, message) {},
+    );
+  } catch (e) {
+    AppLogger.error('Unity Ads init failed', error: e);
+  }
+
+  // AdMob + mediation
+  try {
+    MobileAds.instance.initialize();
+    MobileAds.instance
+        .updateRequestConfiguration(
+          RequestConfiguration(
+            maxAdContentRating: MaxAdContentRating.pg,
+            tagForChildDirectedTreatment:
+                TagForChildDirectedTreatment.unspecified,
+            tagForUnderAgeOfConsent: TagForUnderAgeOfConsent.unspecified,
+            testDeviceIds: MediationConfig.enableTestDevices
+                ? MediationConfig.testDeviceIds
+                : null,
+          ),
+        )
+        .catchError((_) {});
+  } catch (e) {
+    AppLogger.error('AdMob init failed', error: e);
+  }
+
+  // Workmanager
+  try {
+    Workmanager().initialize(
+      callbackDispatcher,
+      isInDebugMode: kDebugMode,
+    );
+  } catch (e, stackTrace) {
+    AppLogger.error('Workmanager init failed',
+        error: e, stackTrace: stackTrace);
+  }
+
+  // Window manager (desktop only)
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    try {
+      windowManager.ensureInitialized().then((_) {
+        const windowOptions = WindowOptions(
+          size: Size(800, 600),
+          minimumSize: Size(800, 600),
+          backgroundColor: Colors.transparent,
+          title: 'Bitcoin Mining Pro',
+          titleBarStyle: TitleBarStyle.normal,
+        );
+        windowManager.waitUntilReadyToShow(windowOptions).then((_) {
+          windowManager.show();
+          windowManager.focus();
+          windowManager.setPreventClose(true);
+        });
+      });
+    } catch (e, stackTrace) {
+      AppLogger.error('Window manager init failed',
+          error: e, stackTrace: stackTrace);
+    }
   }
 }
 
@@ -56,120 +127,60 @@ void main() async {
   // Ensure Flutter bindings are initialized first
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Preload fonts to prevent font loading issues
+  await GoogleFonts.pendingFonts([
+    GoogleFonts.notoSans(),
+    GoogleFonts.poppins(),
+  ]);
+
   // Initialize Firebase with proper configuration
   try {
     if (Firebase.apps.isEmpty) {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
-    } else {}
-    // Initialize Firebase Analytics
-    await FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
+    }
 
-    // Track app open event
-    await AnalyticsService.trackAppOpen();
-
-    // Set up background message handler
+    // Set up background message handler (non-blocking)
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-    // Initialize FCM after Firebase is ready
-    await FcmService.initializeFCM();
+    // Run non-critical Firebase services in parallel (don't block startup)
+    Future.wait([
+      FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true),
+      AnalyticsService.trackAppOpen(),
+      FcmService.initializeFCM(),
+    ]).catchError((e) {
+      AppLogger.error('Non-critical Firebase services init failed', error: e);
+      return <Future>[];
+    });
 
     // Crashlytics initialization
-    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
-  } catch (e) {
-    // App initialization failed, ignore for now
-  }
-
-  // Initialize Unity Ads in main() - CRITICAL for proper initialization
-  try {
-    if (!kIsWeb) {
-      final gameId = Platform.isAndroid ? '5916099' : '5916098';
-      final testMode = false; // Disable test mode for production
-      
-      print('=== UNITY ADS INITIALIZATION IN MAIN() ===');
-      print('🎮 Game ID: $gameId');
-      print('🧪 Test Mode: $testMode');
-      print('🚀 Starting Unity Ads initialization...');
-      
-      await UnityAds.init(
-        gameId: gameId,
-        testMode: testMode,
-        onComplete: () {
-          print('✅ Unity Ads initialized successfully in main()!');
-        },
-        onFailed: (error, message) {
-          print('❌ Unity Ads initialization failed in main(): $error - $message');
-        },
-      );
+    try {
+      // Check if Crashlytics is available before initializing
+      await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+      FlutterError.onError = (errorDetails) {
+        FirebaseCrashlytics.instance.recordFlutterError(errorDetails);
+      };
+      AppLogger.info('Crashlytics initialized successfully');
+    } catch (e, stackTrace) {
+      AppLogger.error('Crashlytics initialization failed',
+          error: e, stackTrace: stackTrace);
+      // Continue without crashlytics if it fails
+      FlutterError.onError = (errorDetails) {
+        // Fallback error logging
+        AppLogger.error('Flutter error',
+            error: errorDetails.exception, stackTrace: errorDetails.stack);
+      };
     }
-  } catch (e) {
-    print('❌ Unity Ads initialization exception in main(): $e');
+  } catch (e, stackTrace) {
+    AppLogger.error('Firebase initialization failed',
+        error: e, stackTrace: stackTrace);
   }
 
-  // Only initialize window_manager on desktop platforms
-  if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
-    try {
-      windowManager.ensureInitialized().then((_) {
-        const WindowOptions windowOptions = WindowOptions(
-          size: Size(800, 600),
-          minimumSize: Size(800, 600),
-          backgroundColor: Colors.transparent,
-          title: 'Bitcoin Cloud Mining',
-          titleBarStyle: TitleBarStyle.normal,
-        );
-        windowManager.waitUntilReadyToShow(windowOptions).then((_) {
-          windowManager.show();
-          windowManager.focus();
-          windowManager.setPreventClose(true);
-        });
-      });
-    } catch (e) {}
-  }
-
-  // Always initialize mobile ads on supported platforms (not web)
+  // Initialize ad SDKs and background tasks in parallel (non-blocking)
   if (!kIsWeb) {
-    try {
-      MobileAds.instance.initialize();
-
-      // Configure mediation settings
-      await MobileAds.instance.updateRequestConfiguration(
-        RequestConfiguration(
-          maxAdContentRating: MaxAdContentRating.pg,
-          tagForChildDirectedTreatment:
-              TagForChildDirectedTreatment.unspecified,
-          tagForUnderAgeOfConsent: TagForUnderAgeOfConsent.unspecified,
-          testDeviceIds: MediationConfig.enableTestDevices
-              ? MediationConfig.testDeviceIds
-              : null,
-        ),
-      );
-
-      if (kDebugMode) {
-        print('✅ AdMob and mediation initialized successfully');
-      }
-
-      // Register native ad factory only on Android/iOS, and only if implemented natively
-      if (Platform.isAndroid || Platform.isIOS) {
-        // MobileAds.instance.registerNativeAdFactory('listTile', ...);
-        // Register your native ad factory in native code, not Dart.
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('❌ AdMob initialization failed: $e');
-      }
-    }
-  }
-
-  // Initialize background tasks if not on web
-  if (!kIsWeb) {
-    try {
-      Workmanager().initialize(
-        callbackDispatcher,
-        isInDebugMode: kDebugMode,
-      );
-      // Removed periodic mining and cloud mining task registration for manual mining only
-    } catch (e) {}
+    // All these are independent - run them without awaiting
+    _initMobileServices();
   }
 
   // Initialize services
@@ -184,7 +195,9 @@ void main() async {
       apiService: apiService,
       notificationService: notificationService,
     ));
-  } catch (e) {}
+  } catch (e, stackTrace) {
+    AppLogger.error('App runApp failed', error: e, stackTrace: stackTrace);
+  }
 }
 
 class MyApp extends StatefulWidget {
@@ -208,24 +221,27 @@ class _MyAppState extends State<MyApp>
     super.initState();
     windowManager.addListener(this);
     WidgetsBinding.instance.addObserver(this);
+    // Run FCM setup in background - don't block UI
     _setupFCM();
     _setupNotificationListeners();
   }
 
   Future<void> _setupFCM() async {
     try {
-      final token = await FcmService.getFcmToken();
-      if (token != null) {
-        await sendTokenToBackend(token);
-      }
+      // Get token without blocking - fire and forget
+      FcmService.getFcmToken().then((token) {
+        if (token != null) {
+          sendTokenToBackend(token);
+        }
+      });
       FcmService.listenFCM();
 
-      // Initialize mining notification service
-      await MiningNotificationService.initialize();
-
-      // Initialize sound notification service
-      await SoundNotificationService.initialize();
-    } catch (e) {}
+      // Initialize mining and sound notification services (non-blocking)
+      MiningNotificationService.initialize().catchError((_) {});
+      SoundNotificationService.initialize().catchError((_) {});
+    } catch (e, stackTrace) {
+      AppLogger.error('FCM setup failed', error: e, stackTrace: stackTrace);
+    }
   }
 
   void _setupNotificationListeners() {
@@ -256,7 +272,7 @@ class _MyAppState extends State<MyApp>
     try {
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
         final context = navigatorKey.currentContext;
-        if (context != null) {
+        if (context != null && context.mounted) {
           // Navigate to notification screen for FCM messages too
           Navigator.of(context).pushNamed('/notifications');
 
@@ -275,7 +291,10 @@ class _MyAppState extends State<MyApp>
           provider.addNotificationFromLocal(notification);
         }
       });
-    } catch (e) {}
+    } catch (e, stackTrace) {
+      AppLogger.error('FCM foreground message listener failed',
+          error: e, stackTrace: stackTrace);
+    }
   }
 
   Future<void> sendTokenToBackend(String token) async {
@@ -284,7 +303,6 @@ class _MyAppState extends State<MyApp>
 
       // Only send FCM token if user is logged in
       if (jwtToken == null || jwtToken.isEmpty) {
-        print('User not logged in, skipping FCM token update');
         return;
       }
 
@@ -298,12 +316,12 @@ class _MyAppState extends State<MyApp>
       );
 
       if (response.statusCode == 200) {
-        print('FCM token updated successfully');
+        // FCM token updated successfully
       } else {
-        print('Failed to update FCM token: ${response.statusCode}');
+        // Failed to update FCM token
       }
     } catch (e) {
-      print('Error updating FCM token: $e');
+      // Error updating FCM token
     }
   }
 
@@ -341,6 +359,7 @@ class _MyAppState extends State<MyApp>
   void onWindowClose() async {
     final bool isPreventClose = await windowManager.isPreventClose();
     if (isPreventClose) {
+      if (!mounted) return;
       final bool? shouldClose = await showDialog<bool>(
         context: context,
         builder: (context) {
@@ -391,11 +410,29 @@ class _MyAppState extends State<MyApp>
       ],
       child: MaterialApp(
         navigatorKey: navigatorKey,
-        title: 'Bitcoin Cloud Mining',
+        title: 'Bitcoin Mining Pro',
         theme: ThemeData(
           primarySwatch: Colors.blue,
           visualDensity: VisualDensity.adaptivePlatformDensity,
           useMaterial3: true,
+          textTheme: GoogleFonts.notoSansTextTheme().merge(
+            TextTheme(
+              bodyLarge: TextStyle(fontFamily: 'Poppins'),
+              bodyMedium: TextStyle(fontFamily: 'Poppins'),
+              displayLarge: TextStyle(fontFamily: 'Poppins'),
+              displayMedium: TextStyle(fontFamily: 'Poppins'),
+              displaySmall: TextStyle(fontFamily: 'Poppins'),
+              headlineLarge: TextStyle(fontFamily: 'Poppins'),
+              headlineMedium: TextStyle(fontFamily: 'Poppins'),
+              headlineSmall: TextStyle(fontFamily: 'Poppins'),
+              titleLarge: TextStyle(fontFamily: 'Poppins'),
+              titleMedium: TextStyle(fontFamily: 'Poppins'),
+              titleSmall: TextStyle(fontFamily: 'Poppins'),
+              labelLarge: TextStyle(fontFamily: 'Poppins'),
+              labelMedium: TextStyle(fontFamily: 'Poppins'),
+              labelSmall: TextStyle(fontFamily: 'Poppins'),
+            ),
+          ),
         ),
         initialRoute: '/launch',
         debugShowCheckedModeBanner: false,

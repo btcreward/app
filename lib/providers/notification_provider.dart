@@ -109,6 +109,7 @@ class NotificationProvider with ChangeNotifier {
       _unreadCount++;
       notifyListeners();
     } catch (e) {
+      // Error saving notification, continue without saving
     }
   }
 
@@ -131,6 +132,7 @@ class NotificationProvider with ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
+      // Error saving notification, continue without saving
     }
   }
 
@@ -144,6 +146,7 @@ class NotificationProvider with ChangeNotifier {
       _unreadCount = 0;
       notifyListeners();
     } catch (e) {
+      // Error saving notification, continue without saving
     }
   }
 

@@ -6,30 +6,26 @@ plugins {
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
 }
+import java.util.Properties
+import java.io.FileInputStream
 
+val keystoreProperties = Properties()
+val keystorePropertiesFile = rootProject.file("key.properties")
+
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+}
 android {
-    namespace = "com.bitcoincloudmining.newapp"
+    namespace = "com.bitcoincloudmining.pro"
     compileSdk = 35
     ndkVersion = "27.0.12077973"
 
     signingConfigs {
-        getByName("debug") {
-            storePassword = "Shyam@1999"
-            keyPassword = "Shyam@1999"
-            storeFile = file("C:\\bitcoin_cloud_mining\\android\\keystore\\my-release-key.jks")
-            keyAlias = "my-key-alias"
-        }
         create("release") {
-            storeFile = file("C:\\bitcoin_cloud_mining\\android\\keystore\\my-release-key.jks")
-            storePassword = "Shyam@1999"
-            keyPassword = "Shyam@1999"
-            keyAlias = "my-key-alias"
-            if (project.hasProperty("storePassword")) {
-                storeFile = file(project.property("storeFile") as String)
-                storePassword = project.property("storePassword") as String
-                keyAlias = project.property("keyAlias") as String
-                keyPassword = project.property("keyPassword") as String
-            }
+            storeFile = file(keystoreProperties["storeFile"] as String)
+            storePassword = keystoreProperties["storePassword"] as String
+            keyAlias = keystoreProperties["keyAlias"] as String
+            keyPassword = keystoreProperties["keyPassword"] as String
         }
     }
 
@@ -55,7 +51,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.bitcoincloudmining.newapp"
+        applicationId = "com.bitcoincloudmining.pro"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = 23
@@ -132,4 +128,3 @@ dependencies {
     // Play Core is already included by Flutter's plugins, so we don't need to add it explicitly
     // This prevents version conflicts with the Play Core version included by Flutter
 }
-

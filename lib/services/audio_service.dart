@@ -10,6 +10,7 @@ class AudioService {
       await _audioPlayer.setReleaseMode(ReleaseMode.loop);
       _isInitialized = true;
     } catch (e) {
+      // Ignore audio errors
     }
   }
 
@@ -21,10 +22,10 @@ class AudioService {
 
     try {
       // Play custom notification sound
-      await _audioPlayer.play(AssetSource('sounds/notification_sound.mp3'));
+      await _audioPlayer.play(AssetSource('sounds/notification_alert.mp3'));
     } catch (e) {
       // Fallback to default system sound
-      await _audioPlayer.play(AssetSource('audio/coin_sound.mp3'));
+      await _audioPlayer.play(AssetSource('sounds/earning_notification.mp3'));
     }
   }
 
@@ -35,8 +36,9 @@ class AudioService {
     }
 
     try {
-      await _audioPlayer.play(AssetSource('audio/reward_sound.mp3'));
+      await _audioPlayer.play(AssetSource('sounds/success_chime.mp3'));
     } catch (e) {
+      // Ignore audio errors
     }
   }
 
@@ -47,8 +49,9 @@ class AudioService {
     }
 
     try {
-      await _audioPlayer.play(AssetSource('audio/coin_sound.mp3'));
+      await _audioPlayer.play(AssetSource('sounds/earning_notification.mp3'));
     } catch (e) {
+      // Ignore audio errors
     }
   }
 
@@ -59,8 +62,9 @@ class AudioService {
     }
 
     try {
-      await _audioPlayer.play(AssetSource('audio/error_sound.mp3'));
+      await _audioPlayer.play(AssetSource('sounds/notification_alert.mp3'));
     } catch (e) {
+      // Ignore audio errors
     }
   }
 
@@ -69,6 +73,7 @@ class AudioService {
     try {
       await _audioPlayer.stop();
     } catch (e) {
+      // Ignore audio errors
     }
   }
 
@@ -77,6 +82,7 @@ class AudioService {
     try {
       await _audioPlayer.setVolume(volume);
     } catch (e) {
+      // Ignore audio errors
     }
   }
 
@@ -86,6 +92,7 @@ class AudioService {
       await _audioPlayer.dispose();
       _isInitialized = false;
     } catch (e) {
+      // Ignore audio errors
     }
   }
 }

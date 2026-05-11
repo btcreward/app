@@ -330,7 +330,7 @@ class _BitcoinMachineScreenState extends State<BitcoinMachineScreen> {
     await _adService.showRewardedAd(
       onRewarded: (amount) {
         setState(() {
-          gameWalletBalance += (reward * 2);
+          gameWalletBalance += reward * 2;
         });
       },
       onAdDismissed: () {},
@@ -440,7 +440,8 @@ class _BitcoinMachineScreenState extends State<BitcoinMachineScreen> {
               _transferToMainWallet();
               Navigator.of(context).pop(true);
             },
-            child: const Text('TRANSFER & EXIT', style: TextStyle(color: Colors.greenAccent)),
+            child: const Text('TRANSFER & EXIT',
+                style: TextStyle(color: Colors.greenAccent)),
           ),
         ],
       ),
@@ -471,7 +472,7 @@ class _BitcoinMachineScreenState extends State<BitcoinMachineScreen> {
   void dispose() {
     spinTimer?.cancel();
     _transferToMainWallet();
-    _adService.dispose();
+    // Note: Don't dispose AdService here as it's a singleton shared across the app
     _saveAdRequiredState(isRewardedAdRequired);
     super.dispose();
   }
@@ -557,7 +558,8 @@ class _BitcoinMachineScreenState extends State<BitcoinMachineScreen> {
                                         width: 270,
                                         decoration: BoxDecoration(
                                           color: Colors.white.withAlpha(26),
-                                          borderRadius: BorderRadius.circular(20),
+                                          borderRadius:
+                                              BorderRadius.circular(20),
                                           border: Border.all(
                                             color: Colors.black.withAlpha(51),
                                             width: 1,
@@ -568,17 +570,18 @@ class _BitcoinMachineScreenState extends State<BitcoinMachineScreen> {
                                             Row(
                                               mainAxisAlignment:
                                                   MainAxisAlignment.center,
-                                              children: List.generate(3, (index) {
+                                              children:
+                                                  List.generate(3, (index) {
                                                 return Container(
                                                   width: 80,
-                                                  margin:
-                                                      const EdgeInsets.symmetric(
-                                                          horizontal: 4),
+                                                  margin: const EdgeInsets
+                                                      .symmetric(horizontal: 4),
                                                   decoration: BoxDecoration(
                                                     color: Colors.white
                                                         .withAlpha(26),
                                                     borderRadius:
-                                                        BorderRadius.circular(15),
+                                                        BorderRadius.circular(
+                                                            15),
                                                     boxShadow: [
                                                       BoxShadow(
                                                         color: Colors.black
@@ -590,22 +593,27 @@ class _BitcoinMachineScreenState extends State<BitcoinMachineScreen> {
                                                   ),
                                                   child: Column(
                                                     mainAxisAlignment:
-                                                        MainAxisAlignment.center,
+                                                        MainAxisAlignment
+                                                            .center,
                                                     children: List.generate(5,
                                                         (symbolIndex) {
                                                       return Container(
                                                         margin: const EdgeInsets
                                                             .symmetric(
                                                             vertical: 4.0),
-                                                        padding: const EdgeInsets
-                                                            .all(3),
-                                                        decoration: BoxDecoration(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(3),
+                                                        decoration:
+                                                            BoxDecoration(
                                                           color: symbolColors[
-                                                                          index][
+                                                                          index]
+                                                                      [
                                                                       symbolIndex] ==
                                                                   Colors
                                                                       .greenAccent
-                                                              ? Colors.greenAccent
+                                                              ? Colors
+                                                                  .greenAccent
                                                                   .withAlpha(51)
                                                               : Colors
                                                                   .transparent,
@@ -627,7 +635,8 @@ class _BitcoinMachineScreenState extends State<BitcoinMachineScreen> {
                                                                         symbolIndex] ==
                                                                     Colors
                                                                         .greenAccent
-                                                                ? FontWeight.bold
+                                                                ? FontWeight
+                                                                    .bold
                                                                 : FontWeight
                                                                     .normal,
                                                           ),
@@ -650,7 +659,8 @@ class _BitcoinMachineScreenState extends State<BitcoinMachineScreen> {
                                                       width: 2.5,
                                                     ),
                                                     borderRadius:
-                                                        BorderRadius.circular(14),
+                                                        BorderRadius.circular(
+                                                            14),
                                                     color: Colors.yellowAccent
                                                         .withAlpha(26),
                                                     boxShadow: [
@@ -688,8 +698,8 @@ class _BitcoinMachineScreenState extends State<BitcoinMachineScreen> {
                                                 BorderRadius.circular(25),
                                           ),
                                           elevation: 5,
-                                          shadowColor:
-                                              Colors.yellowAccent.withAlpha(100),
+                                          shadowColor: Colors.yellowAccent
+                                              .withAlpha(100),
                                         ),
                                         child: Text(
                                           isSpinning ? '...' : 'START',

@@ -7,7 +7,7 @@ class TermsConditionScreen extends StatelessWidget {
   final String supportEmail;
   const TermsConditionScreen({
     super.key,
-    this.appName = 'Bitcoin Cloud Mining',
+    this.appName = 'Bitcoin Mining Pro',
     this.supportEmail = 'bitcoincloudminingformobile@gmail.com',
   });
 

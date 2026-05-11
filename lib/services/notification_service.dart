@@ -64,7 +64,6 @@ class NotificationService {
 
     // Initialize mining notification
     await _initializeMiningNotification();
-
   }
 
   Future<void> _createNotificationChannels() async {
@@ -230,6 +229,7 @@ class NotificationService {
         },
       );
     } catch (e) {
+      // Ignore notification errors
     }
   }
 
@@ -246,6 +246,7 @@ class NotificationService {
         },
       );
     } catch (e) {
+      // Ignore notification errors
     }
   }
 
@@ -274,15 +275,14 @@ class NotificationService {
         'timestamp': DateTime.now().toIso8601String(),
       };
 
-
       final response = await ApiService.post(
         '/auth/login-notification',
         data,
       );
 
-      if (!response['success']) {
-      }
+      if (!response['success']) {}
     } catch (e) {
+      // Ignore notification errors
     }
   }
 
@@ -303,8 +303,8 @@ class NotificationService {
       _updateTimer = Timer.periodic(const Duration(seconds: 30), (_) {
         _updateMiningNotification();
       });
-
     } catch (e) {
+      // Ignore notification errors
     }
   }
 
@@ -351,7 +351,7 @@ class NotificationService {
         largeIcon: const DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
         styleInformation: BigTextStyleInformation(
           '$content\n\n🚀 Keep mining, keep earning! 💸',
-          contentTitle: '⛏️ Bitcoin Cloud Mining - Mining in Progress',
+          contentTitle: '⛏️ Bitcoin Mining Pro - Mining in Progress',
           summaryText: 'Mining is active. Don\'t close the app!',
         ),
         category: AndroidNotificationCategory.service,
@@ -362,12 +362,12 @@ class NotificationService {
 
       await _notifications.show(
         _notificationId,
-        '⛏️ Bitcoin Cloud Mining - Mining in Progress',
+        '⛏️ Bitcoin Mining Pro - Mining in Progress',
         null, // body is handled by BigTextStyleInformation
         notificationDetails,
       );
-
     } catch (e) {
+      // Ignore notification errors
     }
   }
 
@@ -378,6 +378,7 @@ class NotificationService {
       // Update stats (in real app, these would come from your mining service)
       await _showMiningNotification();
     } catch (e) {
+      // Ignore notification errors
     }
   }
 
@@ -431,8 +432,8 @@ class NotificationService {
 
       // Remove the notification
       await _notifications.cancel(_notificationId);
-
     } catch (e) {
+      // Ignore notification errors
     }
   }
 
