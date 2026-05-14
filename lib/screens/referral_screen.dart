@@ -416,45 +416,74 @@ class _ReferralScreenState extends State<ReferralScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Referral Code title
+          const Text(
+            'Referral Code',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // Actual referral code
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.black.withAlpha(51),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.amber.withAlpha(102)),
+            ),
+            child: SelectableText(
+              referralCode,
+              style: const TextStyle(
+                color: Colors.amber,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                fontFamily: 'monospace',
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // Copy and Share icons row
           Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
-                'Referral Code: ',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
-              ),
-              SelectableText(
-                referralCode,
-                style: const TextStyle(
-                  color: Colors.amber,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
-              ),
               IconButton(
                 onPressed: _copyReferralCode,
-                icon: const Icon(Icons.copy, color: Colors.amber),
+                icon: const Icon(Icons.copy, color: Colors.amber, size: 28),
                 tooltip: 'Copy Referral Code',
               ),
+              const SizedBox(width: 16),
               IconButton(
                 onPressed: _shareReferralCode,
-                icon: const Icon(Icons.share, color: Colors.amber),
+                icon: const Icon(Icons.share, color: Colors.amber, size: 28),
                 tooltip: 'Share Referral Code',
               ),
             ],
           ),
           const SizedBox(height: 16),
-          ElevatedButton.icon(
-            onPressed: _shareReferralCode,
-            icon: const Icon(Icons.share),
-            label: const Text('Share Referral Code'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.amber,
-              foregroundColor: Colors.black,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+
+          // Share Referral Code button
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: _shareReferralCode,
+              icon: const Icon(Icons.share),
+              label: const Text('Share Referral Code'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.amber,
+                foregroundColor: Colors.black,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
             ),
           ),
         ],
@@ -800,3 +829,4 @@ class _ReferralScreenState extends State<ReferralScreen> {
     );
   }
 }
+

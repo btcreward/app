@@ -292,3 +292,4 @@ class MiningNotificationService {
     return 0;
   }
 }
+

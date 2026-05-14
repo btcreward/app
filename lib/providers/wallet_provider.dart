@@ -21,7 +21,7 @@ class WalletProvider extends ChangeNotifier {
   List<Transaction> _transactions = [];
   double _btcPrice = 30000.0; // Default BTC price in USD
   double _totalEarned = 0.0;
-  double _totalWithdrawn = 0.0;
+  double _totalRedeemed = 0.0;
   String _filterType = 'All';
   String _selectedCurrency = 'USD';
   bool _isSyncing = false;
@@ -60,7 +60,7 @@ class WalletProvider extends ChangeNotifier {
   String get selectedCurrency => _selectedCurrency;
   bool get isSyncing => _isSyncing;
   double get totalEarned => _totalEarned;
-  double get totalWithdrawn => _totalWithdrawn;
+  double get totalRedeemed => _totalRedeemed;
   double get balance => _balance;
   bool get isLoading => _isLoading;
   String? get error => _error;
@@ -71,6 +71,7 @@ class WalletProvider extends ChangeNotifier {
           .where((tx) =>
               tx.type.toLowerCase().contains('reward') ||
               tx.type.toLowerCase().contains('bonus') ||
+              tx.type.toLowerCase().contains('redemption') ||
               tx.type.toLowerCase().contains('withdrawal') ||
               tx.type.toLowerCase().contains('earnings'))
           .toList());
@@ -212,8 +213,8 @@ class WalletProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateTotalWithdrawn(double amount) {
-    _totalWithdrawn += amount;
+  void updateTotalRedeemed(double amount) {
+    _totalRedeemed += amount;
     notifyListeners();
   }
 
@@ -441,7 +442,7 @@ class WalletProvider extends ChangeNotifier {
     return _claimedTransactions.contains(transactionId);
   }
 
-  Future<bool> withdrawFunds({
+  Future<bool> redeemFunds({
     required String method,
     required String destination,
     required double amount,
@@ -449,9 +450,9 @@ class WalletProvider extends ChangeNotifier {
     required double btcAmount,
   }) async {
     try {
-      // Track withdrawal event
+      // Track redemption event
       AnalyticsService.trackTransaction(
-        type: 'withdrawal',
+        type: 'redemption',
         amount: btcAmount,
         currency: 'BTC',
       );
@@ -460,10 +461,10 @@ class WalletProvider extends ChangeNotifier {
       try {
         await initializeWallet();
       } catch (e) {
-        throw Exception('Failed to initialize wallet: \\${e.toString()}');
+        throw Exception('Failed to initialize wallet: \${e.toString()}');
       }
 
-      // Validate withdrawal after initialization
+      // Validate redemption after initialization
       if (btcAmount > _btcBalance) {
         throw Exception('Insufficient balance');
       }
@@ -471,8 +472,8 @@ class WalletProvider extends ChangeNotifier {
       // Convert scientific notation to decimal string
       final formattedAmount = NumberFormatter.fromScientific(btcAmount);
 
-      // Prepare withdrawal data
-      final Map<String, dynamic> withdrawalData = {
+      // Prepare redemption data
+      final Map<String, dynamic> redemptionData = {
         'method': method,
         'destination': destination,
         'amount': formattedAmount,
@@ -494,30 +495,35 @@ class WalletProvider extends ChangeNotifier {
         if (!formattedLocalAmount.contains('.')) {
           formattedLocalAmount += '.0000000000';
         }
-        withdrawalData['localAmount'] = formattedLocalAmount;
-        withdrawalData['localCurrency'] = localCurrency;
-        withdrawalData['exchangeRate'] = (_btcPrice * rate).toStringAsFixed(10);
+        redemptionData['localAmount'] = formattedLocalAmount;
+        redemptionData['localCurrency'] = localCurrency;
+        redemptionData['exchangeRate'] = (_btcPrice * rate).toStringAsFixed(10);
       }
 
-      final result = await _apiService.createWithdrawal(withdrawalData);
+      final result = await _apiService.redeemFunds(
+          method: method,
+          destination: destination,
+          amount: amount,
+          currency: currency,
+          btcAmount: btcAmount);
 
       if (result['success']) {
         // Update local balance immediately
         await updateBalance(_btcBalance - btcAmount);
-        // Update total withdrawn
-        updateTotalWithdrawn(btcAmount);
-        // Refresh transactions to show the new withdrawal
+        // Update total redeemed
+        updateTotalRedeemed(btcAmount);
+        // Refresh transactions to show the new redemption
         await refreshTransactions();
 
-        // Show withdrawal notification with sound
-        SoundNotificationService.showWithdrawalNotification(
+        // Show redemption notification with sound
+        SoundNotificationService.showRedemptionNotification(
           amount: btcAmount,
           method: method,
         );
 
         return true;
       } else {
-        throw Exception(result['message'] ?? 'Withdrawal failed');
+        throw Exception(result['message'] ?? 'Redemption failed');
       }
     } catch (e) {
       rethrow;
@@ -552,7 +558,7 @@ class WalletProvider extends ChangeNotifier {
     _transactions = [];
     _btcPrice = 0.0;
     _totalEarned = 0.0;
-    _totalWithdrawn = 0.0;
+    _totalRedeemed = 0.0;
     _filterType = 'All';
     _selectedCurrency = 'USD';
     _isSyncing = false;
@@ -622,3 +628,4 @@ class WalletProvider extends ChangeNotifier {
     super.dispose();
   }
 }
+

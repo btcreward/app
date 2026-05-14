@@ -23,8 +23,7 @@ class RewardScreenState extends State<RewardScreen>
   late TabController _tabController;
   final AdService _adService = AdService();
   late ConfettiController _confettiController;
-  late dynamic
-      _rewardClaimHandler; // यहाँ RewardClaimHandler की जगह dynamic का उपयोग किया गया है ताकि undefined class error न आए।
+  late RewardClaimHandler _rewardClaimHandler;
   Timer? _countdownTimer;
 
   // Banner ad future
@@ -37,14 +36,14 @@ class RewardScreenState extends State<RewardScreen>
     _adService.loadRewardedAd();
     _confettiController =
         ConfettiController(duration: const Duration(seconds: 3));
-    _loadSocialMediaPlatforms();
-    _startCountdownTimer();
     _rewardClaimHandler = RewardClaimHandler(
       context: context,
       rewardProvider: Provider.of<RewardProvider>(context, listen: false),
       walletProvider: Provider.of<WalletProvider>(context, listen: false),
       adService: _adService, // Pass the shared instance
     );
+    _loadSocialMediaPlatforms();
+    _startCountdownTimer();
     _bannerAdFuture = _adService.getBannerAdWidget();
   }
 
@@ -439,14 +438,18 @@ class RewardCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    rewardAmount,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                  Flexible(
+                    child: Text(
+                      rewardAmount,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
+                  const SizedBox(width: 8),
                   ElevatedButton(
                     onPressed: canClaim ? onClaim : null,
                     style: ElevatedButton.styleFrom(
@@ -472,3 +475,4 @@ class RewardCard extends StatelessWidget {
     );
   }
 }
+

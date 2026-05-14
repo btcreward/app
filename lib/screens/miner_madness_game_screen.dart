@@ -209,7 +209,7 @@ class _MinerMadnessGameScreenState extends State<MinerMadnessGameScreen>
       _bannerSize ??= const AdSize(width: 320, height: 100);
 
       _bannerAd = BannerAd(
-        adUnitId: 'ca-app-pub-3537329799200606/2028008282',
+        adUnitId: 'ca-app-pub-3940256099942544/6300978111',
         size: _bannerSize!,
         request: const AdRequest(),
         listener: BannerAdListener(
@@ -248,7 +248,7 @@ class _MinerMadnessGameScreenState extends State<MinerMadnessGameScreen>
   Future<void> _loadFallbackBannerAd() async {
     try {
       _bannerAd = BannerAd(
-        adUnitId: 'ca-app-pub-3537329799200606/2028008282',
+        adUnitId: 'ca-app-pub-3940256099942544/6300978111',
         size: const AdSize(
             width: 320, height: 50), // Standard banner size as fallback
         request: const AdRequest(),
@@ -392,7 +392,7 @@ class _MinerMadnessGameScreenState extends State<MinerMadnessGameScreen>
 
         // Play win sound
         if (!_isMuted) {
-          _audioPlayer.play(AssetSource('sounds/beep.mp3'));
+          await _audioPlayer.play(AssetSource('sounds/success_chime.mp3'));
         }
 
         // Show the reward display
@@ -709,24 +709,6 @@ class _MinerMadnessGameScreenState extends State<MinerMadnessGameScreen>
     final size = MediaQuery.of(context).size;
     final wheelSize = size.width * 0.8;
     const maxWheelSize = 300.0;
-
-    // Create a 320x100 banner ad
-    _bannerAd = BannerAd(
-      adUnitId: 'ca-app-pub-3537329799200606/2028008282',
-      size: AdSize.largeBanner, // This is 320x100
-      request: const AdRequest(),
-      listener: BannerAdListener(
-        onAdLoaded: (ad) {
-          setState(() {
-            _isBannerAdLoaded = true;
-          });
-        },
-        onAdFailedToLoad: (ad, error) {
-          ad.dispose();
-          _bannerAd = null;
-        },
-      ),
-    )..load();
 
     return Stack(
       alignment: Alignment.center,
@@ -1372,3 +1354,4 @@ class Confetti {
     required this.angle,
   });
 }
+

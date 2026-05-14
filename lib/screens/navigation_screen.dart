@@ -945,3 +945,4 @@ class _RGBLinePainter extends CustomPainter {
         oldDelegate.activeTab != activeTab;
   }
 }
+

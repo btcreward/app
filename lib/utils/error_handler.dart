@@ -18,3 +18,4 @@ class ApiError implements Exception {
   final String? code;
   ApiError(this.message, {this.code});
 }
+

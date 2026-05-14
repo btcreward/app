@@ -507,3 +507,4 @@ class NetworkIndicator extends StatelessWidget {
     );
   }
 }
+

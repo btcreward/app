@@ -198,3 +198,4 @@ class NetworkService {
     _connectionStatusController.close();
   }
 }
+

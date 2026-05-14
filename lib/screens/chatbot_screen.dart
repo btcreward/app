@@ -32,10 +32,10 @@ class ChatBotScreenState extends State<ChatBotScreen> {
       'Recent transactions',
       'Mining earnings',
     ],
-    'Withdrawals': [
-      'Start withdrawal',
+    'Redemptions': [
+      'Start redemption',
       'Check status',
-      'Withdrawal history',
+      'Redemption history',
     ],
     'Mining': [
       'Mining speed',
@@ -90,7 +90,7 @@ class ChatBotScreenState extends State<ChatBotScreen> {
         setState(() {
           userProfile!.walletBalance = _walletProvider.btcBalance;
           userProfile!.totalMined = _walletProvider.totalEarned;
-          userProfile!.totalWithdrawn = _walletProvider.totalWithdrawn;
+          userProfile!.totalRedeemed = _walletProvider.totalRedeemed;
           userProfile!.miningRate =
               _calculateMiningRate(userProfile!.totalMined);
           _saveUserProfile();
@@ -180,15 +180,15 @@ class ChatBotScreenState extends State<ChatBotScreen> {
       return _handleTransactionQuery(userInput);
     }
 
-    if (_isWithdrawalQuery(userInput)) {
-      return _handleWithdrawalQuery(userInput);
+    if (_isRedemptionQuery(userInput)) {
+      return _handleRedemptionQuery(userInput);
     }
 
     return '${acknowledgements[_random.nextInt(acknowledgements.length)]} '
         'I\'m here to help with your mining journey, $name!\n\n'
         'You can ask me about:\n'
         '• Your earnings and current balance\n'
-        '• Withdrawal options and tracking\n'
+        '• Redemption options and tracking\n'
         '• Boosting your mining speed\n'
         '• Transaction history and stats\n\n'
         'What would you like to know?';
@@ -204,7 +204,7 @@ class ChatBotScreenState extends State<ChatBotScreen> {
         '• Current Balance: ${_formatBTC(userProfile!.walletBalance)} BTC '
         '(≈\$${usdBalance.toStringAsFixed(2)})\n'
         '• Total Mined: ${_formatBTC(userProfile!.totalMined)} BTC\n'
-        '• Total Withdrawn: ${_formatBTC(userProfile!.totalWithdrawn)} BTC\n'
+        '• Total Redeemed: ${_formatBTC(userProfile!.totalRedeemed)} BTC\n'
         '• Mining Rate: ${_formatBTC(userProfile!.miningRate)} BTC/hour\n'
         '• Days Mining: ${userProfile!.getDaysActive()} days\n\n'
         '${_getProgressMessage()}';
@@ -218,11 +218,11 @@ class ChatBotScreenState extends State<ChatBotScreen> {
     } else if (progress < 50) {
       return 'You\'re getting there! Keep up the great work! 🚀';
     } else if (progress < 75) {
-      return 'Almost halfway to your first withdrawal! 💪';
+      return 'Almost halfway to your first redemption! 💪';
     } else if (progress < 100) {
-      return 'You\'re so close to reaching the withdrawal threshold! 🎯';
+      return 'You\'re so close to reaching the redemption threshold! 🎯';
     } else {
-      return 'Congratulations! You can withdraw your earnings now! 🎉';
+      return 'Congratulations! You can redeem your earnings now! 🎉';
     }
   }
 
@@ -268,26 +268,26 @@ class ChatBotScreenState extends State<ChatBotScreen> {
     return transactionWords.any((word) => input.contains(word));
   }
 
-  bool _isWithdrawalQuery(String input) {
-    final withdrawalWords = [
-      'withdraw',
-      'withdrawal',
+  bool _isRedemptionQuery(String input) {
+    final redemptionWords = [
+      'redeem',
+      'redemption',
       'track#',
       'status#',
-      'track withdrawal',
-      'withdrawal status',
+      'track redemption',
+      'redemption status',
       'payment',
       'cash out',
-      'pending withdrawals',
-      'withdrawal history',
-      'cancel withdrawal',
-      'withdrawal limit',
-      'withdrawal fee',
-      'withdrawal address',
-      'withdrawal info',
-      'all withdrawals'
+      'pending redemptions',
+      'redemption history',
+      'cancel redemption',
+      'redemption limit',
+      'redemption fee',
+      'redemption address',
+      'redemption info',
+      'all redemptions'
     ];
-    return withdrawalWords
+    return redemptionWords
         .any((word) => input.toLowerCase().contains(word.toLowerCase()));
   }
 
@@ -318,7 +318,7 @@ class ChatBotScreenState extends State<ChatBotScreen> {
     return response;
   }
 
-  Future<String> _handleWithdrawalQuery(String userInput) async {
+  Future<String> _handleRedemptionQuery(String userInput) async {
     if (userProfile == null) return 'Still initializing...';
     final name = userProfile!.getDisplayName();
     final balance = _walletProvider.btcBalance;
@@ -326,109 +326,109 @@ class ChatBotScreenState extends State<ChatBotScreen> {
     // Check if this is a status check query
     if (userInput.toLowerCase().contains('status#') ||
         userInput.toLowerCase().contains('track#')) {
-      // Extract withdrawal ID number
+      // Extract redemption ID number
       final idMatch = RegExp(r'#(\d+)').firstMatch(userInput);
       if (idMatch != null) {
-        final withdrawalId = idMatch.group(1);
-        return _getWithdrawalStatus(withdrawalId!, name);
+        final redemptionId = idMatch.group(1);
+        return _getRedemptionStatus(redemptionId!, name);
       }
     }
 
-    if (userInput.toLowerCase().contains('track withdrawal') ||
-        userInput.toLowerCase().contains('withdrawal status')) {
-      return 'To check your withdrawal status, please provide your withdrawal ID in this format:\n'
+    if (userInput.toLowerCase().contains('track redemption') ||
+        userInput.toLowerCase().contains('redemption status')) {
+      return 'To check your redemption status, please provide your redemption ID in this format:\n'
           'status#123 or track#123\n\n'
-          'For example: "status#1" to check withdrawal #1';
+          'For example: "status#1" to check redemption #1';
     }
 
-    if (userInput.toLowerCase().startsWith('withdraw')) {
+    if (userInput.toLowerCase().startsWith('redeem')) {
       if (balance < 0.000000000000000001) {
-        return 'I\'m sorry, $name. Your balance is below the minimum withdrawal amount.\n\n'
+        return 'I\'m sorry, $name. Your balance is below the minimum redemption amount.\n\n'
             'Minimum needed: 0.000000000000000001 BTC\n'
             'Your balance: ${_formatBTC(balance)} BTC\n\n'
             '${_getProgressMessage()}\n'
-            'Keep mining to reach the minimum withdrawal amount! 💪';
+            'Keep mining to reach the minimum redemption amount! 💪';
       }
 
-      // Generate a new withdrawal ID
-      final withdrawalId = _generateWithdrawalId();
-      _saveWithdrawalRequest(withdrawalId);
+      // Generate a new redemption ID
+      final redemptionId = _generateRedemptionId();
+      _saveRedemptionRequest(redemptionId);
 
-      return 'Great news, $name! I\'ve initiated your withdrawal request.\n\n'
+      return 'Great news, $name! I\'ve initiated your redemption request.\n\n'
           '• Amount: ${_formatBTC(balance)} BTC\n'
-          '• Withdrawal ID: #$withdrawalId\n\n'
-          'Your withdrawal is now processing. This typically takes up to 48 hours.\n'
+          '• Redemption ID: #$redemptionId\n\n'
+          'Your redemption is now processing. This typically takes up to 48 hours.\n'
           'You can check the status anytime by sending:\n'
-          'status#$withdrawalId\n\n'
+          'status#$redemptionId\n\n'
           'Need anything else?';
     }
-    if (userInput.toLowerCase().contains('withdrawal history') ||
-        userInput.toLowerCase().contains('all withdrawals')) {
-      return _getWithdrawalHistory(name);
+    if (userInput.toLowerCase().contains('redemption history') ||
+        userInput.toLowerCase().contains('all redemptions')) {
+      return _getRedemptionHistory(name);
     }
 
-    if (userInput.toLowerCase().contains('pending withdrawals')) {
-      return _getPendingWithdrawals(name);
+    if (userInput.toLowerCase().contains('pending redemptions')) {
+      return _getPendingRedemptions(name);
     }
 
-    if (userInput.toLowerCase().contains('withdrawal limit')) {
-      return 'Here are the withdrawal limits, $name:\n\n'
-          '• Minimum withdrawal: 0.000000000000000001 BTC\n'
-          '• Maximum withdrawal: No limit\n'
-          '• Daily withdrawal limit: No limit\n'
+    if (userInput.toLowerCase().contains('redemption limit')) {
+      return 'Here are the redemption limits, $name:\n\n'
+          '• Minimum redemption: 0.000000000000000001 BTC\n'
+          '• Maximum redemption: No limit\n'
+          '• Daily redemption limit: No limit\n'
           '• Your available balance: ${_formatBTC(balance)} BTC\n\n'
-          'Need help with making a withdrawal?';
+          'Need help with making a redemption?';
     }
 
-    if (userInput.toLowerCase().contains('withdrawal fee')) {
+    if (userInput.toLowerCase().contains('redemption fee')) {
       return 'Good news, $name! We currently charge:\n\n'
-          '• 0% withdrawal fee\n'
+          '• 0% redemption fee\n'
           '• No transaction fees\n'
           '• No hidden charges\n\n'
-          'Would you like to make a withdrawal now?';
+          'Would you like to make a redemption now?';
     }
 
-    if (userInput.toLowerCase().contains('cancel withdrawal')) {
-      return 'To cancel a withdrawal, please provide the withdrawal ID in this format:\n'
+    if (userInput.toLowerCase().contains('cancel redemption')) {
+      return 'To cancel a redemption, please provide the redemption ID in this format:\n'
           'cancel#123\n\n'
-          'Note: You can only cancel pending withdrawals that are less than 1 hour old.';
+          'Note: You can only cancel pending redemptions that are less than 1 hour old.';
     }
 
-    if (userInput.toLowerCase().contains('withdrawal info') ||
-        userInput.toLowerCase().contains('withdrawal address')) {
-      return 'Here\'s what you need to know about withdrawals, $name:\n\n'
+    if (userInput.toLowerCase().contains('redemption info') ||
+        userInput.toLowerCase().contains('redemption address')) {
+      return 'Here\'s what you need to know about redemptions, $name:\n\n'
           '• Minimum amount: 0.000000000000000001 BTC\n'
           '• Processing time: Up to 48 hours\n'
           '• Fee: 0%\n'
           '• Available balance: ${_formatBTC(balance)} BTC\n\n'
-          'To withdraw:\n'
-          '1. Type "withdraw" to start\n'
+          'To redeem:\n'
+          '1. Type "redeem" to start\n'
           '2. Enter your BTC address\n'
           '3. Confirm the transaction\n\n'
-          'Would you like to start a withdrawal now?';
+          'Would you like to start a redemption now?';
     }
 
-    return 'Hi $name! How can I help you with withdrawals?\n\n'
-        '• Type "withdraw" to start a new withdrawal\n'
-        '• Type "status#ID" to check an existing withdrawal\n'
-        '• Type "withdrawal history" to see all your withdrawals\n'
-        '• Type "pending withdrawals" to see processing withdrawals\n'
-        '• Type "withdrawal info" for fees and limits\n'
-        '• Type "cancel withdrawal" to cancel a pending withdrawal\n\n'
+    return 'Hi $name! How can I help you with redemptions?\n\n'
+        '• Type "redeem" to start a new redemption\n'
+        '• Type "status#ID" to check an existing redemption\n'
+        '• Type "redemption history" to see all your redemptions\n'
+        '• Type "pending redemptions" to see processing redemptions\n'
+        '• Type "redemption info" for fees and limits\n'
+        '• Type "cancel redemption" to cancel a pending redemption\n\n'
         'Your current balance: ${_formatBTC(balance)} BTC\n\n'
         '${_getProgressMessage()}';
   }
 
-  Future<String> _getWithdrawalStatus(String withdrawalId, String name) async {
-    final status = await _retrieveWithdrawalStatus(withdrawalId);
+  Future<String> _getRedemptionStatus(String redemptionId, String name) async {
+    final status = await _retrieveRedemptionStatus(redemptionId);
     if (status == null) {
-      return 'I\'m sorry, $name. I couldn\'t find a withdrawal with ID #$withdrawalId.\n'
-          'Please make sure you\'ve entered the correct withdrawal ID.\n\n'
+      return 'I\'m sorry, $name. I couldn\'t find a redemption with ID #$redemptionId.\n'
+          'Please make sure you\'ve entered the correct redemption ID.\n\n'
           'Need help with something else?';
     }
 
     final amount = double.tryParse(status['amount'] ?? '0') ?? 0.0;
-    return 'Here\'s the status of your withdrawal #$withdrawalId, $name:\n\n'
+    return 'Here\'s the status of your redemption #$redemptionId, $name:\n\n'
         '• Status: ${status['status']}\n'
         '• Amount: ${_formatBTC(amount)} BTC\n'
         '• Requested: ${status['timestamp']}\n\n'
@@ -436,35 +436,35 @@ class ChatBotScreenState extends State<ChatBotScreen> {
         'Need anything else?';
   }
 
-  int _generateWithdrawalId() {
+  int _generateRedemptionId() {
     return DateTime.now().millisecondsSinceEpoch % 10000;
   }
 
-  Future<void> _saveWithdrawalRequest(int withdrawalId) async {
+  Future<void> _saveRedemptionRequest(int redemptionId) async {
     final prefs = await SharedPreferences.getInstance();
-    final withdrawals = prefs.getStringList('withdrawals') ?? [];
+    final redemptions = prefs.getStringList('redemptions') ?? [];
 
-    final withdrawal = {
-      'id': withdrawalId.toString(),
+    final redemption = {
+      'id': redemptionId.toString(),
       'amount': _walletProvider.btcBalance.toString(),
       'status': 'Processing',
       'timestamp': DateFormat('MMM dd, yyyy HH:mm').format(DateTime.now())
     };
 
-    withdrawals.add(jsonEncode(withdrawal));
-    await prefs.setStringList('withdrawals', withdrawals);
+    redemptions.add(jsonEncode(redemption));
+    await prefs.setStringList('redemptions', redemptions);
   }
 
-  Future<Map<String, String>?> _retrieveWithdrawalStatus(
-      String withdrawalId) async {
+  Future<Map<String, String>?> _retrieveRedemptionStatus(
+      String redemptionId) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final withdrawals = prefs.getStringList('withdrawals') ?? [];
+      final redemptions = prefs.getStringList('redemptions') ?? [];
 
-      for (var w in withdrawals) {
-        final withdrawal = jsonDecode(w) as Map<String, dynamic>;
-        if (withdrawal['id'] == withdrawalId) {
-          return Map<String, String>.from(withdrawal);
+      for (var r in redemptions) {
+        final redemption = jsonDecode(r) as Map<String, dynamic>;
+        if (redemption['id'] == redemptionId) {
+          return Map<String, String>.from(redemption);
         }
       }
       return null;
@@ -505,7 +505,7 @@ class ChatBotScreenState extends State<ChatBotScreen> {
           name: 'User',
           walletBalance: _walletProvider.btcBalance,
           totalMined: _walletProvider.totalEarned,
-          totalWithdrawn: _walletProvider.totalWithdrawn,
+          totalRedeemed: _walletProvider.totalRedeemed,
           miningRate: 0.00001,
         );
       });
@@ -513,71 +513,71 @@ class ChatBotScreenState extends State<ChatBotScreen> {
     }
   }
 
-  Future<String> _getWithdrawalHistory(String name) async {
+  Future<String> _getRedemptionHistory(String name) async {
     final prefs = await SharedPreferences.getInstance();
-    final withdrawals = prefs.getStringList('withdrawals') ?? [];
+    final redemptions = prefs.getStringList('redemptions') ?? [];
 
-    if (withdrawals.isEmpty) {
-      return 'You haven\'t made any withdrawals yet, $name.\n\n'
+    if (redemptions.isEmpty) {
+      return 'You haven\'t made any redemptions yet, $name.\n\n'
           'Your current balance: ${_formatBTC(_walletProvider.btcBalance)} BTC\n'
-          'Would you like to make your first withdrawal?';
+          'Would you like to make your first redemption?';
     }
 
-    var response = 'Here\'s your withdrawal history, $name:\n\n';
-    final sortedWithdrawals = withdrawals
-        .map((w) => jsonDecode(w) as Map<String, dynamic>)
+    var response = 'Here\'s your redemption history, $name:\n\n';
+    final sortedRedemptions = redemptions
+        .map((r) => jsonDecode(r) as Map<String, dynamic>)
         .toList()
       ..sort((a, b) => DateTime.parse(b['timestamp'])
           .compareTo(DateTime.parse(a['timestamp'])));
 
-    for (var withdrawal in sortedWithdrawals.take(5)) {
-      final amount = double.tryParse(withdrawal['amount'] ?? '0') ?? 0.0;
-      response += '📤 Withdrawal #${withdrawal['id']}\n'
+    for (var redemption in sortedRedemptions.take(5)) {
+      final amount = double.tryParse(redemption['amount'] ?? '0') ?? 0.0;
+      response += '📤 Redemption #${redemption['id']}\n'
           '• Amount: ${_formatBTC(amount)} BTC\n'
-          '• Status: ${withdrawal['status']}\n'
-          '• Date: ${withdrawal['timestamp']}\n\n';
+          '• Status: ${redemption['status']}\n'
+          '• Date: ${redemption['timestamp']}\n\n';
     }
 
-    if (sortedWithdrawals.length > 5) {
+    if (sortedRedemptions.length > 5) {
       response +=
-          '... and ${sortedWithdrawals.length - 5} more withdrawals.\n\n';
+          '... and ${sortedRedemptions.length - 5} more redemptions.\n\n';
     }
 
     response += 'Need help with anything else?';
     return response;
   }
 
-  Future<String> _getPendingWithdrawals(String name) async {
+  Future<String> _getPendingRedemptions(String name) async {
     final prefs = await SharedPreferences.getInstance();
-    final withdrawals = prefs.getStringList('withdrawals') ?? [];
+    final redemptions = prefs.getStringList('redemptions') ?? [];
 
-    final pendingWithdrawals = withdrawals
-        .map((w) => jsonDecode(w) as Map<String, dynamic>)
-        .where((w) => w['status'].toString().toLowerCase() == 'processing')
+    final pendingRedemptions = redemptions
+        .map((r) => jsonDecode(r) as Map<String, dynamic>)
+        .where((r) => r['status'].toString().toLowerCase() == 'processing')
         .toList();
 
-    if (pendingWithdrawals.isEmpty) {
-      return 'You don\'t have any pending withdrawals, $name.\n\n'
+    if (pendingRedemptions.isEmpty) {
+      return 'You don\'t have any pending redemptions, $name.\n\n'
           'Your current balance: ${_formatBTC(_walletProvider.btcBalance)} BTC\n'
-          'Would you like to make a withdrawal?';
+          'Would you like to make a redemption?';
     }
 
-    var response = 'Here are your pending withdrawals, $name:\n\n';
+    var response = 'Here are your pending redemptions, $name:\n\n';
 
-    for (var withdrawal in pendingWithdrawals) {
-      final amount = double.tryParse(withdrawal['amount'] ?? '0') ?? 0.0;
-      final timestamp = DateTime.parse(withdrawal['timestamp']);
+    for (var redemption in pendingRedemptions) {
+      final amount = double.tryParse(redemption['amount'] ?? '0') ?? 0.0;
+      final timestamp = DateTime.parse(redemption['timestamp']);
       final hoursAgo = DateTime.now().difference(timestamp).inHours;
 
-      response += '⏳ Withdrawal #${withdrawal['id']}\n'
+      response += '⏳ Redemption #${redemption['id']}\n'
           '• Amount: ${_formatBTC(amount)} BTC\n'
-          '• Requested: ${withdrawal['timestamp']}\n'
+          '• Requested: ${redemption['timestamp']}\n'
           '• Time in processing: $hoursAgo hours\n'
           '• Estimated completion: ${48 - hoursAgo} hours remaining\n\n';
     }
 
-    response += 'Withdrawals typically complete within 48 hours.\n'
-        'You can check specific withdrawals using status#ID\n\n'
+    response += 'Redemptions typically complete within 48 hours.\n'
+        'You can check specific redemptions using status#ID\n\n'
         'Need anything else?';
 
     return response;
@@ -690,3 +690,4 @@ class ChatBotScreenState extends State<ChatBotScreen> {
     );
   }
 }
+

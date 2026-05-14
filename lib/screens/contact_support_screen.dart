@@ -14,7 +14,6 @@ class ContactSupportScreen extends StatefulWidget {
 
 class _ContactSupportScreenState extends State<ContactSupportScreen> {
   final AdService _adService = AdService();
-  bool _adLoaded = false;
 
   @override
   void initState() {
@@ -24,13 +23,23 @@ class _ContactSupportScreenState extends State<ContactSupportScreen> {
 
   Future<void> _loadNativeAd() async {
     try {
+      // Load both native and banner for fallback
       await _adService.loadNativeAd();
-      setState(() {
-        _adLoaded = true;
-      });
+      await _adService.loadBannerAd();
+      if (mounted) {
+        setState(() {});
+      }
     } catch (e) {
-      // Optionally handle ad load error
+      if (mounted) {
+        setState(() {});
+      }
     }
+  }
+
+  @override
+  void dispose() {
+    _adService.disposeNativeAdWithId('native');
+    super.dispose();
   }
 
   @override
@@ -158,7 +167,8 @@ class _ContactSupportScreenState extends State<ContactSupportScreen> {
                 const SizedBox(height: 24),
 
                 // Native Ad Section
-                if (_adLoaded) _adService.getNativeAd(),
+                _adService.getNativeAd(),
+                const SizedBox(height: 16),
                 // Social Media Links
                 const Text(
                   'Follow Us',
@@ -265,3 +275,4 @@ class _ContactSupportScreenState extends State<ContactSupportScreen> {
     );
   }
 }
+

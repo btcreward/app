@@ -137,7 +137,7 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
 
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final result = await authProvider.signInWithGoogle(context);
+      final result = await authProvider.signInWithGoogle();
 
       if (result['success']) {
         // Call success callback
@@ -257,7 +257,7 @@ class _GoogleSignInButtonOutlinedState
 
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final result = await authProvider.signInWithGoogle(context);
+      final result = await authProvider.signInWithGoogle();
 
       if (result['success']) {
         widget.onSuccess?.call();
@@ -275,3 +275,4 @@ class _GoogleSignInButtonOutlinedState
     }
   }
 }
+

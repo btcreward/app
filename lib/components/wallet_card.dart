@@ -155,3 +155,4 @@ class WalletCardState extends State<WalletCard> {
     );
   }
 }
+

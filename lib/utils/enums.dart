@@ -15,7 +15,7 @@ enum TransactionStatus { pending, completed, failed, cancelled }
 // Transaction types
 enum TransactionType {
   mining,
-  withdrawal,
+  redemption,
   deposit,
   tap,
   referral,
@@ -32,9 +32,9 @@ enum TransactionType {
   tiktokReward,
   socialReward,
   adReward,
-  withdrawalBitcoin,
-  withdrawalPaypal,
-  withdrawalPaytm
+  redemptionBitcoin,
+  redemptionPaypal,
+  redemptionPaytm
 }
 
 // Get string value for transaction type
@@ -43,7 +43,7 @@ extension TransactionTypeExtension on TransactionType {
     switch (this) {
       case TransactionType.mining:
         return 'mining';
-      case TransactionType.withdrawal:
+      case TransactionType.redemption:
         return 'withdrawal';
       case TransactionType.deposit:
         return 'deposit';
@@ -77,11 +77,11 @@ extension TransactionTypeExtension on TransactionType {
         return 'social_reward';
       case TransactionType.adReward:
         return 'ad_reward';
-      case TransactionType.withdrawalBitcoin:
+      case TransactionType.redemptionBitcoin:
         return 'withdrawal_bitcoin';
-      case TransactionType.withdrawalPaypal:
+      case TransactionType.redemptionPaypal:
         return 'withdrawal_paypal';
-      case TransactionType.withdrawalPaytm:
+      case TransactionType.redemptionPaytm:
         return 'withdrawal_paytm';
     }
   }
@@ -114,3 +114,4 @@ enum UserRole { user, admin, moderator }
 
 // OTP purpose
 enum OtpPurpose { registration, signup, login, resetPassword }
+

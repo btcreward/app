@@ -13,7 +13,7 @@ class Transaction {
   final String? destination;
   final String? adminNote;
   final String description;
-  final String? withdrawalId;
+  final String? redemptionId;
   final double? balanceBefore;
   final double? balanceAfter;
   final Map<String, dynamic>? details;
@@ -38,7 +38,7 @@ class Transaction {
     this.destination,
     this.adminNote,
     this.description = '',
-    this.withdrawalId,
+    this.redemptionId,
     this.balanceBefore,
     this.balanceAfter,
     this.details,
@@ -70,7 +70,7 @@ class Transaction {
     String? destination,
     String? adminNote,
     String? description,
-    String? withdrawalId,
+    String? redemptionId,
     double? balanceBefore,
     double? balanceAfter,
     Map<String, dynamic>? details,
@@ -95,7 +95,7 @@ class Transaction {
       destination: destination ?? this.destination,
       adminNote: adminNote ?? this.adminNote,
       description: description ?? this.description,
-      withdrawalId: withdrawalId ?? this.withdrawalId,
+      redemptionId: redemptionId ?? this.redemptionId,
       balanceBefore: balanceBefore ?? this.balanceBefore,
       balanceAfter: balanceAfter ?? this.balanceAfter,
       details: details ?? this.details,
@@ -120,7 +120,7 @@ class Transaction {
       'description': description,
       'currency': currency,
       'destination': destination,
-      'withdrawalId': withdrawalId,
+      'withdrawalId': redemptionId,
       'adminNote': adminNote,
       'balanceBefore': balanceBefore?.toString() ?? '0',
       'balanceAfter': balanceAfter?.toString() ?? '0',
@@ -186,7 +186,7 @@ class Transaction {
         currency: json['currency']?.toString() ?? 'BTC',
         description: json['description']?.toString() ?? '',
         adminNote: json['adminNote']?.toString(),
-        withdrawalId: json['withdrawalId']?.toString(),
+        redemptionId: json['withdrawalId']?.toString(),
         details: details,
         isClaimed: json['isClaimed'] ?? false,
       );
@@ -195,3 +195,4 @@ class Transaction {
     }
   }
 }
+

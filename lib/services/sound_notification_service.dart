@@ -57,11 +57,11 @@ class SoundNotificationService {
         playSound: true,
       );
 
-      // Withdrawal notification channel
-      const withdrawalChannel = AndroidNotificationChannel(
-        'withdrawal_channel',
-        'Withdrawals',
-        description: 'Notifications for withdrawals',
+      // Redemption notification channel
+      const redemptionChannel = AndroidNotificationChannel(
+        'redemption_channel',
+        'Redemptions',
+        description: 'Notifications for redemptions',
         importance: Importance.high,
         enableVibration: true,
         enableLights: true,
@@ -92,7 +92,7 @@ class SoundNotificationService {
       await _notifications
           .resolvePlatformSpecificImplementation<
               AndroidFlutterLocalNotificationsPlugin>()
-          ?.createNotificationChannel(withdrawalChannel);
+          ?.createNotificationChannel(redemptionChannel);
 
       await _notifications
           .resolvePlatformSpecificImplementation<
@@ -112,7 +112,7 @@ class SoundNotificationService {
         case 'reward':
           soundPath = 'sounds/reward_notification.mp3';
           break;
-        case 'withdrawal':
+        case 'redemption':
           soundPath = 'sounds/withdrawal_notification.mp3';
           break;
         case 'alert':
@@ -241,8 +241,8 @@ class SoundNotificationService {
         return 'Mining Status';
       case 'reward_channel':
         return 'Rewards';
-      case 'withdrawal_channel':
-        return 'Withdrawals';
+      case 'redemption_channel':
+        return 'Redemptions';
       case 'alert_channel':
       default:
         return 'Alerts';
@@ -256,8 +256,8 @@ class SoundNotificationService {
         return 'Shows current mining stats and status';
       case 'reward_channel':
         return 'Notifications for rewards and earnings';
-      case 'withdrawal_channel':
-        return 'Notifications for withdrawals';
+      case 'redemption_channel':
+        return 'Notifications for redemptions';
       case 'alert_channel':
       default:
         return 'General app alerts and notifications';
@@ -282,18 +282,18 @@ class SoundNotificationService {
     );
   }
 
-  // Show withdrawal notification
-  static Future<void> showWithdrawalNotification({
+  // Show redemption notification
+  static Future<void> showRedemptionNotification({
     required double amount,
     required String method,
   }) async {
     await showNotification(
-      title: '💰 Withdrawal Successful!',
-      body: '${amount.toStringAsFixed(18)} BTC withdrawn via $method',
-      soundType: 'withdrawal',
-      channelId: 'withdrawal_channel',
+      title: '💰 Redemption Successful!',
+      body: '${amount.toStringAsFixed(18)} BTC redeemed via $method',
+      soundType: 'redemption',
+      channelId: 'redemption_channel',
       payload: {
-        'type': 'withdrawal',
+        'type': 'redemption',
         'amount': amount,
         'method': method,
       },
@@ -459,3 +459,4 @@ class SoundNotificationService {
     _audioPlayer.dispose();
   }
 }
+

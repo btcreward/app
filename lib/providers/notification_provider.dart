@@ -177,3 +177,4 @@ class NotificationProvider with ChangeNotifier {
     super.dispose();
   }
 }
+

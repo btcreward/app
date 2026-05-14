@@ -750,3 +750,4 @@ class _BitcoinMachineScreenState extends State<BitcoinMachineScreen> {
     );
   }
 }
+

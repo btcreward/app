@@ -981,3 +981,4 @@ class FallingItem {
 
   FallingItem(this.type, this.xPosition, this.yPosition);
 }
+

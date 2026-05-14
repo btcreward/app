@@ -14,8 +14,8 @@ import 'package:provider/provider.dart';
 import '../components/processing_dialog.dart';
 import '../screens/transaction_details_screen.dart';
 import '../utils/number_formatter.dart';
-import '../widgets/withdrawal_disclaimer_dialog.dart';
-import '../widgets/withdrawal_eligibility_widget.dart';
+import '../widgets/redemption_disclaimer_dialog.dart';
+import '../widgets/redemption_eligibility_widget.dart';
 
 class WalletScreen extends StatefulWidget {
   const WalletScreen({super.key});
@@ -326,8 +326,8 @@ class WalletScreenState extends State<WalletScreen>
     return double.parse(NumberFormatter.formatBTCAmount(btcAmount));
   }
 
-  // Add method to calculate maximum withdrawal amount for different currencies based on BTC balance
-  double getMaxWithdrawalAmount(
+  // Add method to calculate maximum redemption amount for different currencies based on BTC balance
+  double getMaxRedemptionAmount(
       String method, double btcPrice, Map<String, double> currencyRates) {
     final btcBalance =
         Provider.of<WalletProvider>(context, listen: false).btcBalance;
@@ -351,173 +351,6 @@ class WalletScreenState extends State<WalletScreen>
     return amount.toStringAsFixed(2);
   }
 
-  void _showWithdrawalDialog() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              title: Column(
-                children: [
-                  Icon(
-                    Icons.account_balance_wallet,
-                    size: 48,
-                    color: Colors.blue[700],
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Withdraw Funds',
-                    style: TextStyle(
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  buildBalanceDisplay(),
-                ],
-              ),
-              content: Form(
-                key: _formKey,
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      DropdownButtonFormField<String>(
-                        value: _selectedMethod,
-                        decoration: const InputDecoration(
-                          labelText: 'Withdrawal Method',
-                          prefixIcon: Icon(Icons.payment),
-                        ),
-                        items: ['Bitcoin', 'Paytm', 'Paypal']
-                            .map((method) => DropdownMenuItem(
-                                  value: method,
-                                  child: Text(method),
-                                ))
-                            .toList(),
-                        onChanged: _isProcessing
-                            ? null
-                            : (value) {
-                                if (value != null) {
-                                  setState(() {
-                                    _selectedMethod = value;
-                                    amountController.clear();
-                                    _addressController.clear();
-                                    _destinationController.clear();
-                                    lastCalculatedBtc = null;
-                                  });
-                                }
-                              },
-                      ),
-                      const SizedBox(height: 16),
-                      TextField(
-                        controller: amountController,
-                        enabled: !_isProcessing,
-                        keyboardType: const TextInputType.numberWithOptions(
-                            decimal: true),
-                        decoration: InputDecoration(
-                          labelText: 'Amount (${getCurrencySymbol()})',
-                          hintText: 'Enter amount to withdraw',
-                          prefixIcon: Icon(_selectedMethod == 'Paytm'
-                              ? Icons.currency_rupee
-                              : Icons.attach_money),
-                        ),
-                        onChanged: updateBtcEquivalent,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Maximum withdrawal: ${getCurrencySymbol()}${getLocalCurrencyBalance().toStringAsFixed(_selectedMethod == "Bitcoin" ? 18 : 10)}',
-                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                      ),
-                      if (_selectedMethod != 'Bitcoin' &&
-                          lastCalculatedBtc != null) ...[
-                        const SizedBox(height: 8),
-                        Text(
-                          'BTC Equivalent: ${lastCalculatedBtc!.toStringAsFixed(18)} BTC',
-                          style:
-                              TextStyle(color: Colors.grey[600], fontSize: 12),
-                        ),
-                      ],
-                      const SizedBox(height: 16),
-                      if (_selectedMethod == 'Bitcoin')
-                        TextField(
-                          controller: _addressController,
-                          enabled: !_isProcessing,
-                          decoration: const InputDecoration(
-                            labelText: 'Bitcoin Address',
-                            hintText: 'Enter your Bitcoin address',
-                            prefixIcon: Icon(Icons.account_balance_wallet),
-                          ),
-                        )
-                      else
-                        TextField(
-                          controller: _destinationController,
-                          enabled: !_isProcessing,
-                          decoration: InputDecoration(
-                            labelText: _selectedMethod == 'Paytm'
-                                ? 'Paytm Number'
-                                : 'PayPal Email',
-                            hintText: _selectedMethod == 'Paytm'
-                                ? 'Enter your Paytm number'
-                                : 'Enter your PayPal email',
-                            prefixIcon: Icon(_selectedMethod == 'Paytm'
-                                ? Icons.phone
-                                : Icons.email),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: _isProcessing
-                      ? null
-                      : () {
-                          Navigator.pop(context);
-                        },
-                  child: const Text('Cancel'),
-                ),
-                ElevatedButton(
-                  onPressed: _isProcessing
-                      ? null
-                      : () async {
-                          if (!_formKey.currentState!.validate()) {
-                            return;
-                          }
-
-                          if (amountController.text.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Please enter amount'),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                            return;
-                          }
-                          await _processWithdrawal();
-                        },
-                  child: _isProcessing
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                          ),
-                        )
-                      : const Text('Withdraw'),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
 
   bool _isValidBitcoinAddress(String address) {
     // Basic validation for Bitcoin address
@@ -533,9 +366,9 @@ class WalletScreenState extends State<WalletScreen>
       body,
       const NotificationDetails(
         android: AndroidNotificationDetails(
-          'withdrawal_channel',
-          'Withdrawal Notifications',
-          channelDescription: 'Notifications for withdrawal updates',
+          'redemption_channel',
+          'Redemption Notifications',
+          channelDescription: 'Notifications for redemption updates',
           importance: Importance.high,
           priority: Priority.high,
           color: Colors.blue,
@@ -675,9 +508,15 @@ class WalletScreenState extends State<WalletScreen>
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.pending_actions, size: 18),
-                      SizedBox(width: 4),
-                      Text('Pending', style: TextStyle(fontSize: 12)),
+                      Icon(Icons.pending_actions, size: 16),
+                      SizedBox(width: 2),
+                      Flexible(
+                        child: Text(
+                          'Pending',
+                          style: TextStyle(fontSize: 11),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -685,9 +524,15 @@ class WalletScreenState extends State<WalletScreen>
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.check_circle, size: 18),
-                      SizedBox(width: 4),
-                      Text('Completed', style: TextStyle(fontSize: 12)),
+                      Icon(Icons.check_circle, size: 16),
+                      SizedBox(width: 2),
+                      Flexible(
+                        child: Text(
+                          'Completed',
+                          style: TextStyle(fontSize: 11),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -695,9 +540,15 @@ class WalletScreenState extends State<WalletScreen>
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.cancel, size: 18),
-                      SizedBox(width: 4),
-                      Text('Rejected', style: TextStyle(fontSize: 12)),
+                      Icon(Icons.cancel, size: 16),
+                      SizedBox(width: 2),
+                      Flexible(
+                        child: Text(
+                          'Rejected',
+                          style: TextStyle(fontSize: 11),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -780,21 +631,26 @@ class WalletScreenState extends State<WalletScreen>
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      Icon(
-                        _getTransactionIcon(transaction.type),
-                        color: _getTransactionColor(transaction.type),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        transaction.type.toUpperCase(),
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Icon(
+                          _getTransactionIcon(transaction.type),
                           color: _getTransactionColor(transaction.type),
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            transaction.type.toUpperCase(),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: _getTransactionColor(transaction.type),
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                   Container(
                     padding:
@@ -836,12 +692,15 @@ class WalletScreenState extends State<WalletScreen>
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    DateFormat('dd MMM yyyy, hh:mm a')
-                        .format(transaction.timestamp),
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 12,
+                  Expanded(
+                    child: Text(
+                      DateFormat('dd MMM yyyy, hh:mm a')
+                          .format(transaction.timestamp),
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 12,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   if (transaction.status.toLowerCase() == 'rejected')
@@ -1207,8 +1066,8 @@ class WalletScreenState extends State<WalletScreen>
               padding: const EdgeInsets.symmetric(horizontal: 4.0),
               child: _buildActionButton(
                 icon: Icons.call_made,
-                label: 'Withdraw',
-                onTap: _startWithdrawalFlow,
+                label: 'Redeem',
+                onTap: _startRedemptionFlow,
                 color: Colors.red,
               ),
             ),
@@ -1256,7 +1115,7 @@ class WalletScreenState extends State<WalletScreen>
                     padding: MediaQuery.of(context).viewInsets,
                     child: Padding(
                       padding: const EdgeInsets.all(24.0),
-                      child: WithdrawalEligibilityWidget(
+                      child: RedemptionEligibilityWidget(
                         btcBalance: walletProvider.btcBalance,
                         onNext: null, // Dialog me Next button disable rahega
                         onBack: () => Navigator.of(ctx).pop(),
@@ -1376,7 +1235,7 @@ class WalletScreenState extends State<WalletScreen>
         );
   }
 
-  Future<void> _processWithdrawal() async {
+  Future<void> _processRedemption() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -1384,7 +1243,7 @@ class WalletScreenState extends State<WalletScreen>
     if (amountController.text.isEmpty) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Please enter amount'),
             backgroundColor: Colors.red,
           ),
@@ -1393,10 +1252,14 @@ class WalletScreenState extends State<WalletScreen>
       return;
     }
 
-    if (_selectedMethod == 'Bitcoin' && _addressController.text.isEmpty) {
+    final destination = _selectedMethod == 'Bitcoin'
+        ? _addressController.text.trim()
+        : _destinationController.text.trim();
+
+    if (_selectedMethod == 'Bitcoin' && destination.isEmpty) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Please enter Bitcoin address'),
             backgroundColor: Colors.red,
           ),
@@ -1405,11 +1268,10 @@ class WalletScreenState extends State<WalletScreen>
       return;
     }
 
-    if (_selectedMethod == 'Bitcoin' &&
-        !_isValidBitcoinAddress(_addressController.text)) {
+    if (_selectedMethod == 'Bitcoin' && !_isValidBitcoinAddress(destination)) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Please enter valid Bitcoin address'),
             backgroundColor: Colors.red,
           ),
@@ -1418,11 +1280,11 @@ class WalletScreenState extends State<WalletScreen>
       return;
     }
 
-    if (_selectedMethod != 'Bitcoin' && _destinationController.text.isEmpty) {
+    if (_selectedMethod != 'Bitcoin' && destination.isEmpty) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Please enter destination'),
+          const SnackBar(
+            content: Text('Please enter destination details'),
             backgroundColor: Colors.red,
           ),
         );
@@ -1436,208 +1298,79 @@ class WalletScreenState extends State<WalletScreen>
     });
 
     try {
-      // Capture context references before async operation
-      final navigator = Navigator.of(context);
-      final scaffoldMessenger = ScaffoldMessenger.of(context);
-
       // Show processing popup
       showDialog(
         context: context,
         barrierDismissible: false,
         builder: (context) => const ProcessingDialog(
-          message: 'Processing withdrawal request...',
+          message: 'Processing redemption request...',
         ),
       );
 
-      final destination = _selectedMethod == 'Bitcoin'
-          ? _addressController.text
-          : _destinationController.text;
-
-      // Convert method to backend format
-      String paymentMethod;
-      if (_selectedMethod == 'Bitcoin') {
-        paymentMethod =
-            'Crypto'; // Changed from 'BTC' to 'Crypto' to match backend validation
-      } else if (_selectedMethod == 'Paytm') {
-        paymentMethod = 'Paytm';
-      } else if (_selectedMethod == 'Paypal') {
-        paymentMethod = 'Paypal';
-      } else {
-        paymentMethod = _selectedMethod;
-      }
-
       // Calculate BTC amount based on local currency
-      final localAmount = double.parse(amountController.text);
-      final btcAmount = convertLocalCurrencyToBtc(localAmount);
+      final amount = double.parse(amountController.text);
+      final btcAmount = convertLocalCurrencyToBtc(amount);
 
       // Check if we have sufficient balance
       if (btcAmount > _walletProvider.btcBalance) {
         throw Exception('Insufficient balance');
       }
 
-      // Initialize and sync wallet before withdrawal
+      // Initialize and sync wallet before redemption
       await _walletProvider.initializeWallet();
-      await _syncWalletBalance();
+      await _walletProvider.refreshTransactions();
 
-      // Double check balance after initialization
-      if (btcAmount > _walletProvider.btcBalance) {
-        throw Exception('Insufficient balance after wallet sync');
-      }
-
-      // Capture context references before async operation
       if (!mounted) return;
-      final withdrawalNavigator = Navigator.of(context);
-      final withdrawalScaffoldMessenger = ScaffoldMessenger.of(context);
+      final redemptionNavigator = Navigator.of(context);
+      final redemptionScaffoldMessenger = ScaffoldMessenger.of(context);
 
-      final success = await _walletProvider.withdrawFunds(
-        method: paymentMethod,
+      final success = await _walletProvider.redeemFunds(
+        method: _selectedMethod,
         destination: destination,
-        amount: localAmount,
-        currency: _selectedMethod == 'Bitcoin'
-            ? 'BTC'
-            : _selectedMethod == 'Paytm'
-                ? 'INR'
-                : 'USD',
+        amount: amount,
+        currency: _selectedMethod == 'Bitcoin' ? 'BTC' : 'USD',
         btcAmount: btcAmount,
       );
 
-      // Close processing popup
-      withdrawalNavigator.pop();
+      // Remove processing dialog
+      redemptionNavigator.pop();
 
       if (success) {
-        // Show success message
-        withdrawalScaffoldMessenger.showSnackBar(
-          SnackBar(
-            content: const Row(
-              children: [
-                Icon(Icons.check_circle, color: Colors.white),
-                SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'Withdrawal request submitted successfully!',
-                  ),
-                ),
-              ],
-            ),
+        redemptionScaffoldMessenger.showSnackBar(
+          const SnackBar(
+            content: Text('Redemption request submitted successfully!'),
             backgroundColor: Colors.green,
-            duration: const Duration(seconds: 5),
-            action: SnackBarAction(
-              label: 'View Details',
-              textColor: Colors.white,
-              onPressed: () async {
-                // Get the latest transaction
-                await _walletProvider.refreshTransactions();
-                final latestTransaction =
-                    _walletProvider.transactions.firstWhere(
-                  (tx) =>
-                      tx.type.toLowerCase().contains('withdrawal') &&
-                      tx.amount == btcAmount &&
-                      tx.timestamp.isAfter(
-                          DateTime.now().subtract(const Duration(seconds: 5))),
-                  orElse: () => Transaction(
-                    id: DateTime.now().millisecondsSinceEpoch.toString(),
-                    type: _selectedMethod == 'Bitcoin'
-                        ? 'withdrawal_bitcoin'
-                        : 'withdrawal_${_selectedMethod.toLowerCase()}',
-                    amount: btcAmount,
-                    status: 'pending',
-                    timestamp: DateTime.now(),
-                    currency: _selectedMethod == 'Bitcoin' ? 'BTC' : 'INR',
-                    description: 'Withdrawal to $_selectedMethod',
-                    details: {
-                      'Method': _selectedMethod,
-                      'Destination': destination,
-                      'Amount': localAmount.toString(),
-                      'BTC Amount': btcAmount.toString(),
-                    },
-                  ),
-                );
-
-                // Capture navigator reference before async operation
-                if (!mounted) return;
-                final detailsNavigator = Navigator.of(context);
-                detailsNavigator.push(
-                  MaterialPageRoute(
-                    builder: (context) => TransactionDetailsScreen(
-                      transaction: latestTransaction,
-                    ),
-                  ),
-                );
-              },
-            ),
           ),
         );
 
-        // Reset form
+        // Reset fields
         amountController.clear();
         _addressController.clear();
         _destinationController.clear();
-        setState(() {
-          _btcAmount = 0;
-          lastCalculatedBtc = null;
-        });
 
-        // Close withdrawal dialog
-        navigator.pop();
+        // Close redemption dialog
+        redemptionNavigator.pop();
 
-        // Refresh wallet balance and transactions
-        await _walletProvider.loadWallet();
-        await _walletProvider.refreshTransactions();
-        await _syncWalletBalance(); // Add balance sync after withdrawal
-      } else {
-        // Show error message
-        setState(() {
-          _errorMessage = 'Withdrawal request failed';
-        });
-        scaffoldMessenger.showSnackBar(
+        await _syncWalletBalance();
+      }
+    } catch (e) {
+      if (mounted) {
+        if (Navigator.canPop(context)) {
+          Navigator.pop(context); // Remove processing dialog
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.error, color: Colors.white),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(_errorMessage!),
-                ),
-              ],
-            ),
+            content: Text('Error: ${e.toString()}'),
             backgroundColor: Colors.red,
-            duration: const Duration(seconds: 5),
           ),
         );
       }
-    } catch (e) {
-      // Capture context references before async operation
-      if (!mounted) return;
-      final catchNavigator = Navigator.of(context);
-      final catchScaffoldMessenger = ScaffoldMessenger.of(context);
-
-      // Close processing popup if open
-      if (mounted && Navigator.canPop(context)) {
-        catchNavigator.pop();
-      }
-
-      setState(() {
-        _errorMessage = e.toString();
-      });
-      catchScaffoldMessenger.showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.error, color: Colors.white),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(_errorMessage!),
-              ),
-            ],
-          ),
-          backgroundColor: Colors.red,
-          duration: const Duration(seconds: 5),
-        ),
-      );
     } finally {
-      setState(() {
-        _isProcessing = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isProcessing = false;
+        });
+      }
     }
   }
 
@@ -1653,7 +1386,7 @@ class WalletScreenState extends State<WalletScreen>
     }
 
     final btcPrice = _walletProvider.btcPrice;
-    double currencyRate = 1.0; // Default USD rate
+    double currencyRate = 1.0;
 
     if (_selectedMethod == 'Paytm') {
       currencyRate = _walletProvider.currencyRates['INR'] ?? 83.0;
@@ -1674,11 +1407,15 @@ class WalletScreenState extends State<WalletScreen>
 
     final amount = double.tryParse(value) ?? 0;
     if (amount > 0) {
-      final btcAmount = convertLocalCurrencyToBtc(amount);
-      setState(() {
-        lastCalculatedBtc = btcAmount;
-        _btcAmount = btcAmount;
-      });
+      try {
+        final btcAmount = convertLocalCurrencyToBtc(amount);
+        setState(() {
+          lastCalculatedBtc = btcAmount;
+          _btcAmount = btcAmount;
+        });
+      } catch (e) {
+        // Handle error silently
+      }
     }
   }
 
@@ -1764,7 +1501,6 @@ class WalletScreenState extends State<WalletScreen>
     );
   }
 
-  // Add pull to refresh functionality
   Future<void> _onRefresh() async {
     try {
       final wallet = Provider.of<WalletProvider>(context, listen: false);
@@ -1783,6 +1519,7 @@ class WalletScreenState extends State<WalletScreen>
     switch (type.toLowerCase()) {
       case 'deposit':
         return Icons.arrow_downward;
+      case 'redemption':
       case 'withdrawal':
         return Icons.arrow_upward;
       case 'bonus':
@@ -1798,6 +1535,7 @@ class WalletScreenState extends State<WalletScreen>
     switch (type.toLowerCase()) {
       case 'deposit':
         return Colors.green;
+      case 'redemption':
       case 'withdrawal':
         return Colors.red;
       case 'bonus':
@@ -1811,7 +1549,6 @@ class WalletScreenState extends State<WalletScreen>
 
   void _handleClaim(Transaction transaction) async {
     try {
-      // Show loading dialog
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -1820,19 +1557,15 @@ class WalletScreenState extends State<WalletScreen>
         ),
       );
 
-      // Load rewarded ad if not loaded
       await _adService.loadRewardedAd();
 
-      // Close loading dialog
       if (mounted) {
         Navigator.pop(context);
       }
 
-      // Show rewarded ad
       final bool adShown = await _adService.showRewardedAd(
         onRewarded: (double rewardAmount) async {
           try {
-            // Show claiming progress
             final claimNavigator = Navigator.of(context);
             final claimScaffoldMessenger = ScaffoldMessenger.of(context);
             showDialog(
@@ -1843,15 +1576,12 @@ class WalletScreenState extends State<WalletScreen>
               ),
             );
 
-            // Process the claim
             await _walletProvider.claimRejectedTransaction(transaction.id);
 
-            // Close processing dialog
             if (claimNavigator.mounted && claimNavigator.canPop()) {
               claimNavigator.pop();
             }
 
-            // Show success message
             if (mounted) {
               claimScaffoldMessenger.showSnackBar(
                 const SnackBar(
@@ -1862,29 +1592,20 @@ class WalletScreenState extends State<WalletScreen>
               );
             }
 
-            // Refresh wallet data
             await _loadData();
           } catch (e) {
-            // Close processing dialog if open
             if (mounted) {
               final closeNavigator = Navigator.of(context);
               if (closeNavigator.mounted && closeNavigator.canPop()) {
                 closeNavigator.pop();
               }
-            }
-
-            // Show error message
-            if (mounted) {
-              final errorScaffoldMessenger = ScaffoldMessenger.of(context);
-              if (errorScaffoldMessenger.mounted) {
-                errorScaffoldMessenger.showSnackBar(
-                  SnackBar(
-                    content:
-                        Text('Failed to claim transaction: ${e.toString()}'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              }
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content:
+                      Text('Failed to claim transaction: ${e.toString()}'),
+                  backgroundColor: Colors.red,
+                ),
+              );
             }
           }
         },
@@ -1901,62 +1622,202 @@ class WalletScreenState extends State<WalletScreen>
         );
       }
     } catch (e) {
-      // Close any open dialogs
       if (mounted) {
         final closeNavigator = Navigator.of(context);
         if (closeNavigator.mounted && closeNavigator.canPop()) {
           closeNavigator.pop();
         }
-      }
-
-      // Show error message
-      if (mounted) {
-        final errorScaffoldMessenger = ScaffoldMessenger.of(context);
-        if (errorScaffoldMessenger.mounted) {
-          errorScaffoldMessenger.showSnackBar(
-            SnackBar(
-              content: Text('Error: ${e.toString()}'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
   }
 
-  void _startWithdrawalFlow() async {
-    await showWithdrawalDisclaimerDialog(
+  void _startRedemptionFlow() async {
+    await showRedemptionDisclaimerDialog(
       context: context,
       onContinue: () {
-        showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          builder: (ctx) {
-            return Container(
-              color: Colors.blue[900], // Background blue kar diya
-              child: Padding(
-                padding: MediaQuery.of(context).viewInsets,
-                child: Consumer<WalletProvider>(
-                  builder: (context, walletProvider, _) {
-                    return Padding(
-                      padding: const EdgeInsets.all(24.0),
-                      child: WithdrawalEligibilityWidget(
-                        btcBalance: walletProvider.btcBalance,
-                        onNext: walletProvider.btcBalance >= 0.00005
-                            ? () {
-                                Navigator.of(ctx).pop();
-                                _showWithdrawalDialog();
-                              }
-                            : null,
-                        onBack: () => Navigator.of(ctx).pop(),
-                      ),
-                    );
-                  },
+        if (mounted) {
+          showModalBottomSheet(
+            context: context,
+            backgroundColor: Colors.transparent,
+            isScrollControlled: true,
+            builder: (ctx) => Container(
+              height: MediaQuery.of(context).size.height * 0.7,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
                 ),
               ),
+              child: RedemptionEligibilityWidget(
+                btcBalance: _walletProvider.btcBalance,
+                onBack: () => Navigator.pop(ctx),
+                onNext: () {
+                  Navigator.pop(ctx);
+                  _showRedemptionDialog();
+                },
+              ),
+            ),
+          );
+        }
+      },
+    );
+  }
+
+  void _showRedemptionDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              title: Column(
+                children: [
+                  Icon(
+                    Icons.account_balance_wallet,
+                    size: 48,
+                    color: Colors.blue[700],
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Redeem Funds',
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  buildBalanceDisplay(),
+                ],
+              ),
+              content: Form(
+                key: _formKey,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      DropdownButtonFormField<String>(
+                        value: _selectedMethod,
+                        decoration: const InputDecoration(
+                          labelText: 'Redemption Method',
+                          prefixIcon: Icon(Icons.payment),
+                        ),
+                        items: ['Bitcoin', 'Paytm', 'Paypal']
+                            .map((method) => DropdownMenuItem(
+                                  value: method,
+                                  child: Text(method),
+                                ))
+                            .toList(),
+                        onChanged: _isProcessing
+                            ? null
+                            : (value) {
+                                if (value != null) {
+                                  setState(() {
+                                    _selectedMethod = value;
+                                    amountController.clear();
+                                    _addressController.clear();
+                                    _destinationController.clear();
+                                    lastCalculatedBtc = null;
+                                  });
+                                }
+                              },
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: amountController,
+                        enabled: !_isProcessing,
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
+                        decoration: InputDecoration(
+                          labelText: 'Amount (${getCurrencySymbol()})',
+                          hintText: 'Enter amount to redeem',
+                          prefixIcon: Icon(_selectedMethod == 'Paytm'
+                              ? Icons.currency_rupee
+                              : Icons.attach_money),
+                        ),
+                        onChanged: updateBtcEquivalent,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Maximum redemption: ${getCurrencySymbol()}${getLocalCurrencyBalance().toStringAsFixed(_selectedMethod == "Bitcoin" ? 18 : 10)}',
+                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                      ),
+                      if (_selectedMethod != 'Bitcoin' &&
+                          lastCalculatedBtc != null) ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          'BTC Equivalent: ${lastCalculatedBtc!.toStringAsFixed(18)} BTC',
+                          style:
+                              TextStyle(color: Colors.grey[600], fontSize: 12),
+                        ),
+                      ],
+                      const SizedBox(height: 16),
+                      if (_selectedMethod == 'Bitcoin')
+                        TextField(
+                          controller: _addressController,
+                          enabled: !_isProcessing,
+                          decoration: const InputDecoration(
+                            labelText: 'Bitcoin Address',
+                            hintText: 'Enter your Bitcoin address',
+                            prefixIcon: Icon(Icons.account_balance_wallet),
+                          ),
+                        )
+                      else
+                        TextField(
+                          controller: _destinationController,
+                          enabled: !_isProcessing,
+                          decoration: InputDecoration(
+                            labelText: _selectedMethod == 'Paytm'
+                                ? 'Paytm Number'
+                                : 'PayPal Email',
+                            hintText: _selectedMethod == 'Paytm'
+                                ? 'Enter your Paytm number'
+                                : 'Enter your PayPal email',
+                            prefixIcon: Icon(_selectedMethod == 'Paytm'
+                                ? Icons.phone
+                                : Icons.email),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: _isProcessing
+                      ? null
+                      : () {
+                          Navigator.pop(context);
+                        },
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: _isProcessing
+                      ? null
+                      : () async {
+                          await _processRedemption();
+                        },
+                  child: _isProcessing
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Text('Redeem'),
+                ),
+              ],
             );
           },
         );
@@ -1964,3 +1825,4 @@ class WalletScreenState extends State<WalletScreen>
     );
   }
 }
+

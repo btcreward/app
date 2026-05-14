@@ -62,7 +62,7 @@ class _FlipCoinGameScreenState extends State<FlipCoinGameScreen>
 
     _bannerAd = BannerAd(
       adUnitId:
-          'ca-app-pub-3537329799200606/2028008282', // Same as hash rush screen
+          'ca-app-pub-3940256099942544/6300978111', // Same as hash rush screen
       size: AdSize.mediumRectangle, // 300x250 banner ad
       request: const AdRequest(),
       listener: BannerAdListener(
@@ -70,21 +70,10 @@ class _FlipCoinGameScreenState extends State<FlipCoinGameScreen>
           setState(() {
             _isBannerAdLoaded = true;
           });
-          // Schedule the next ad refresh after 30 seconds
-          Future.delayed(const Duration(seconds: 30), () {
-            if (mounted) {
-              _loadBannerAd();
-            }
-          });
         },
         onAdFailedToLoad: (ad, error) {
           ad.dispose();
-          // Retry loading the ad after a delay
-          Future.delayed(const Duration(seconds: 5), () {
-            if (mounted) {
-              _loadBannerAd();
-            }
-          });
+          // Optionally log error, but don't aggressively retry
         },
       ),
     );
@@ -384,287 +373,339 @@ class _FlipCoinGameScreenState extends State<FlipCoinGameScreen>
                 ),
               ),
               child: SafeArea(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: 10),
-                    Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 16),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withAlpha(25),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: Colors.white.withAlpha(50),
-                          width: 1,
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: constraints.maxHeight,
                         ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          _buildStatItem('Total Flips', '$_totalFlips'),
-                          _buildStatItem('Wins', '$_wins'),
-                          _buildStatItem('Win Rate', '$_winRate%'),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 16),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withAlpha(25),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: Colors.white.withAlpha(50),
-                          width: 1,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.account_balance_wallet,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Game Wallet: ${_gameWalletBalance.toString()} BTC',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    AnimatedBuilder(
-                      animation: _animation,
-                      builder: (context, child) {
-                        final transform = Matrix4.identity()
-                          ..setEntry(3, 2, 0.001)
-                          ..rotateX(_animation.value * pi);
-                        return Transform(
-                          transform: transform,
-                          alignment: Alignment.center,
-                          child: Container(
-                            width: 160,
-                            height: 160,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  Colors.amber.shade300,
-                                  Colors.amber.shade700,
-                                ],
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.amber.withAlpha(77),
-                                  blurRadius: 15,
-                                  spreadRadius: 3,
+                        child: IntrinsicHeight(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const SizedBox(height: 10),
+                              Container(
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 16),
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withAlpha(25),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: Colors.white.withAlpha(50),
+                                    width: 1,
+                                  ),
                                 ),
-                                BoxShadow(
-                                  color: Colors.black.withAlpha(77),
-                                  blurRadius: 8,
-                                  spreadRadius: -3,
-                                  offset: const Offset(0, 3),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    _buildStatItem(
+                                        'Total Flips', '$_totalFlips'),
+                                    _buildStatItem('Wins', '$_wins'),
+                                    _buildStatItem('Win Rate', '$_winRate%'),
+                                  ],
                                 ),
-                              ],
-                              border: Border.all(
-                                color: Colors.amber.shade200,
-                                width: 2,
                               ),
-                            ),
-                            child: Center(
-                              child: _result == null || _animation.value < 0.5
-                                  ? Column(
+                              const SizedBox(height: 10),
+                              Container(
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 16),
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withAlpha(25),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: Colors.white.withAlpha(50),
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.account_balance_wallet,
+                                      color: Colors.white,
+                                      size: 20,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Flexible(
+                                      child: Text(
+                                        'Game Wallet: ${_gameWalletBalance.toString()} BTC',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              AnimatedBuilder(
+                                animation: _animation,
+                                builder: (context, child) {
+                                  final transform = Matrix4.identity()
+                                    ..setEntry(3, 2, 0.001)
+                                    ..rotateX(_animation.value * pi);
+                                  return Transform(
+                                    transform: transform,
+                                    alignment: Alignment.center,
+                                    child: Container(
+                                      width: 160,
+                                      height: 160,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                          colors: [
+                                            Colors.amber.shade300,
+                                            Colors.amber.shade700,
+                                          ],
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.amber.withAlpha(77),
+                                            blurRadius: 15,
+                                            spreadRadius: 3,
+                                          ),
+                                          BoxShadow(
+                                            color: Colors.black.withAlpha(77),
+                                            blurRadius: 8,
+                                            spreadRadius: -3,
+                                            offset: const Offset(0, 3),
+                                          ),
+                                        ],
+                                        border: Border.all(
+                                          color: Colors.amber.shade200,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      child: Center(
+                                        child: _result == null ||
+                                                _animation.value < 0.5
+                                            ? Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Container(
+                                                    padding:
+                                                        const EdgeInsets.all(8),
+                                                    decoration: BoxDecoration(
+                                                      shape: BoxShape.circle,
+                                                      color: Colors
+                                                          .amber.shade200
+                                                          .withAlpha(77),
+                                                    ),
+                                                    child: const Icon(
+                                                      Icons.currency_bitcoin,
+                                                      size: 40,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 6),
+                                                  Container(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                      horizontal: 12,
+                                                      vertical: 6,
+                                                    ),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors
+                                                          .amber.shade200
+                                                          .withAlpha(77),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              16),
+                                                    ),
+                                                    child: const Text(
+                                                      'HEADS',
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 20,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        shadows: [
+                                                          Shadow(
+                                                            color:
+                                                                Colors.black26,
+                                                            offset:
+                                                                Offset(1, 1),
+                                                            blurRadius: 2,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              )
+                                            : Transform(
+                                                transform: Matrix4.identity()
+                                                  ..rotateX(pi),
+                                                alignment: Alignment.center,
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Container(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8),
+                                                      decoration: BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        color: Colors
+                                                            .amber.shade200
+                                                            .withAlpha(77),
+                                                      ),
+                                                      child: const Icon(
+                                                        Icons.currency_bitcoin,
+                                                        size: 40,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 6),
+                                                    Container(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                        horizontal: 12,
+                                                        vertical: 6,
+                                                      ),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors
+                                                            .amber.shade200
+                                                            .withAlpha(77),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(16),
+                                                      ),
+                                                      child: Text(
+                                                        _result!
+                                                            ? 'HEADS'
+                                                            : 'TAILS',
+                                                        style: const TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 20,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          shadows: [
+                                                            Shadow(
+                                                              color: Colors
+                                                                  .black26,
+                                                              offset:
+                                                                  Offset(1, 1),
+                                                              blurRadius: 2,
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                              const SizedBox(height: 20),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 16),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    _buildChoiceButton(true),
+                                    _buildChoiceButton(false),
+                                  ],
+                                ),
+                              ),
+                              _buildAdRequiredSection(),
+                              // AdMob Banner Ad
+                              if (_isBannerAdLoaded && _bannerAd != null)
+                                Container(
+                                  width: _bannerAd!.size.width.toDouble(),
+                                  height: _bannerAd!.size.height.toDouble(),
+                                  margin:
+                                      const EdgeInsets.only(bottom: 16, top: 8),
+                                  child: AdWidget(ad: _bannerAd!),
+                                ),
+                              if (_showResult &&
+                                  _userChoice != null &&
+                                  _result != null)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 16),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(12),
+                                    margin: const EdgeInsets.symmetric(
+                                        horizontal: 16),
+                                    decoration: BoxDecoration(
+                                      color: _userChoice == _result
+                                          ? ColorConstants.successColor
+                                              .withAlpha(77)
+                                          : ColorConstants.errorColor
+                                              .withAlpha(77),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: _userChoice == _result
+                                            ? ColorConstants.successColor
+                                            : ColorConstants.errorColor,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
-                                        Container(
-                                          padding: const EdgeInsets.all(8),
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: Colors.amber.shade200
-                                                .withAlpha(77),
-                                          ),
-                                          child: const Icon(
-                                            Icons.currency_bitcoin,
-                                            size: 40,
-                                            color: Colors.white,
-                                          ),
+                                        Icon(
+                                          _userChoice == _result
+                                              ? Icons.check_circle
+                                              : Icons.cancel,
+                                          color: Colors.white,
+                                          size: 20,
                                         ),
-                                        const SizedBox(height: 6),
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 12,
-                                            vertical: 6,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: Colors.amber.shade200
-                                                .withAlpha(77),
-                                            borderRadius:
-                                                BorderRadius.circular(16),
-                                          ),
-                                          child: const Text(
-                                            'HEADS',
-                                            style: TextStyle(
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: Text(
+                                            _userChoice == _result
+                                                ? 'Correct! You earned ${_winAmount.toString()} BTC'
+                                                : 'Wrong! Penalty: ${_penaltyAmount.toString()} BTC',
+                                            style: const TextStyle(
                                               color: Colors.white,
-                                              fontSize: 20,
+                                              fontSize: 16,
                                               fontWeight: FontWeight.bold,
-                                              shadows: [
-                                                Shadow(
-                                                  color: Colors.black26,
-                                                  offset: Offset(1, 1),
-                                                  blurRadius: 2,
-                                                ),
-                                              ],
                                             ),
+                                            textAlign: TextAlign.center,
                                           ),
                                         ),
                                       ],
-                                    )
-                                  : Transform(
-                                      transform: Matrix4.identity()
-                                        ..rotateX(pi),
-                                      alignment: Alignment.center,
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Container(
-                                            padding: const EdgeInsets.all(8),
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Colors.amber.shade200
-                                                  .withAlpha(77),
-                                            ),
-                                            child: const Icon(
-                                              Icons.currency_bitcoin,
-                                              size: 40,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 6),
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 12,
-                                              vertical: 6,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: Colors.amber.shade200
-                                                  .withAlpha(77),
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                            ),
-                                            child: Text(
-                                              _result! ? 'HEADS' : 'TAILS',
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold,
-                                                shadows: [
-                                                  Shadow(
-                                                    color: Colors.black26,
-                                                    offset: Offset(1, 1),
-                                                    blurRadius: 2,
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
                                     ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          _buildChoiceButton(true),
-                          _buildChoiceButton(false),
-                        ],
-                      ),
-                    ),
-                    _buildAdRequiredSection(),
-                    // AdMob Banner Ad
-                    if (_isBannerAdLoaded && _bannerAd != null)
-                      Container(
-                        width: _bannerAd!.size.width.toDouble(),
-                        height: _bannerAd!.size.height.toDouble(),
-                        margin: const EdgeInsets.only(bottom: 16, top: 8),
-                        child: AdWidget(ad: _bannerAd!),
-                      ),
-                    if (_showResult && _userChoice != null && _result != null)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16),
-                        child: Container(
-                          padding: const EdgeInsets.all(12),
-                          margin: const EdgeInsets.symmetric(horizontal: 16),
-                          decoration: BoxDecoration(
-                            color: _userChoice == _result
-                                ? ColorConstants.successColor.withAlpha(77)
-                                : ColorConstants.errorColor.withAlpha(77),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: _userChoice == _result
-                                  ? ColorConstants.successColor
-                                  : ColorConstants.errorColor,
-                              width: 2,
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                _userChoice == _result
-                                    ? Icons.check_circle
-                                    : Icons.cancel,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  _userChoice == _result
-                                      ? 'Correct! You earned ${_winAmount.toString()} BTC'
-                                      : 'Wrong! Penalty: ${_penaltyAmount.toString()} BTC',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
                                   ),
-                                  textAlign: TextAlign.center,
                                 ),
+                              const Spacer(),
+                              FutureBuilder<Widget?>(
+                                future: _bannerAdFuture,
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                          ConnectionState.done &&
+                                      snapshot.hasData) {
+                                    return snapshot.data ??
+                                        const SizedBox.shrink();
+                                  }
+                                  return const SizedBox(height: 90);
+                                },
                               ),
                             ],
                           ),
                         ),
                       ),
-                    const Spacer(),
-                    FutureBuilder<Widget?>(
-                      future: _bannerAdFuture,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.done &&
-                            snapshot.hasData) {
-                          return snapshot.data ?? const SizedBox.shrink();
-                        }
-                        return const SizedBox(height: 90);
-                      },
-                    ),
-                  ],
+                    );
+                  },
                 ),
               ),
             ),
@@ -971,4 +1012,6 @@ class _FlipCoinGameScreenState extends State<FlipCoinGameScreen>
       ),
     );
   }
+
 }
+

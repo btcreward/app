@@ -995,3 +995,4 @@ class _SignUpDialogState extends State<SignUpDialog> {
     );
   }
 }
+

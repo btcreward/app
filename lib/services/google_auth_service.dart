@@ -1,12 +1,13 @@
 import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:flutter/widgets.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 
 import '../config/api_config.dart';
+import '../firebase_options.dart';
 import '../utils/app_logger.dart';
 import '../utils/storage_utils.dart';
 
@@ -20,14 +21,30 @@ class GoogleAuthService {
   // GoogleSignIn for mobile only (web uses Firebase Auth directly)
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
-  Future<Map<String, dynamic>> signInWithGoogle(BuildContext context) async {
+  Future<Map<String, dynamic>> signInWithGoogle() async {
+    await _ensureFirebaseInitialized();
+
     // WEB: Use Firebase Auth signInWithPopup directly
     // This avoids gapi.auth2 double-initialization conflict
     if (kIsWeb) {
       return _signInWithGoogleWeb();
     }
     // MOBILE: Use GoogleSignIn package
-    return _signInWithGoogleMobile(context);
+    return _signInWithGoogleMobile();
+  }
+
+  Future<void> _ensureFirebaseInitialized() async {
+    if (Firebase.apps.isEmpty) {
+      try {
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
+      } catch (e, stackTrace) {
+        AppLogger.authError('Firebase initializeApp failed',
+            error: e, stackTrace: stackTrace);
+        rethrow;
+      }
+    }
   }
 
   /// Web-specific Google Sign-In using Firebase Auth popup
@@ -76,8 +93,7 @@ class GoogleAuthService {
   }
 
   /// Mobile-specific Google Sign-In using google_sign_in package
-  Future<Map<String, dynamic>> _signInWithGoogleMobile(
-      BuildContext context) async {
+  Future<Map<String, dynamic>> _signInWithGoogleMobile() async {
     try {
       // Step 1: Google account select karen
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
@@ -188,6 +204,17 @@ class GoogleAuthService {
   Future<Map<String, dynamic>> _sendToBackend(User user, String idToken) async {
     try {
       final url = Uri.parse('${ApiConfig.baseUrl}/api/auth/google-signin');
+      AppLogger.info('Sending Google sign-in request to: $url');
+
+      final requestBody = jsonEncode({
+        'firebaseUid': user.uid,
+        'email': user.email,
+        'displayName': user.displayName,
+        'photoURL': user.photoURL,
+      });
+
+      AppLogger.info('Request body: $requestBody');
+
       final response = await http
           .post(
             url,
@@ -195,14 +222,12 @@ class GoogleAuthService {
               'Content-Type': 'application/json',
               'Authorization': 'Bearer $idToken',
             },
-            body: jsonEncode({
-              'firebaseUid': user.uid,
-              'email': user.email,
-              'displayName': user.displayName,
-              'photoURL': user.photoURL,
-            }),
+            body: requestBody,
           )
           .timeout(const Duration(seconds: 30));
+
+      AppLogger.info('Response status: ${response.statusCode}');
+      AppLogger.info('Response body: ${response.body}');
 
       final responseData = jsonDecode(response.body);
 
@@ -219,7 +244,7 @@ class GoogleAuthService {
         };
       }
     } catch (e, stackTrace) {
-      AppLogger.apiError('/api/auth/google-signin',
+      AppLogger.error('Google sign-in backend request failed',
           error: e, stackTrace: stackTrace);
       return {
         'success': false,
@@ -245,3 +270,4 @@ class GoogleAuthService {
   bool get isSignedIn => _auth.currentUser != null;
   dynamic get currentUser => _auth.currentUser;
 }
+

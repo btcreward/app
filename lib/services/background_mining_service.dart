@@ -159,3 +159,4 @@ class BackgroundMiningService {
     _backgroundMiningStartTime = null;
   }
 }
+

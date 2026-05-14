@@ -52,7 +52,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyAwS7-6JQyZVEsnEg72ZZf-LQ0872lHLiM',
-    appId: '1:486206486627:android:b06af3d7eed564ce73e056',
+    appId: '1:486206486627:android:be96c44548e59eab73e056',
     messagingSenderId: '486206486627',
     projectId: 'bitcoin-cloud-mining-19fb5',
     storageBucket: 'bitcoin-cloud-mining-19fb5.firebasestorage.app',
@@ -89,3 +89,4 @@ class DefaultFirebaseOptions {
     storageBucket: 'bitcoin-cloud-mining-19fb5.firebasestorage.app',
   );
 }
+

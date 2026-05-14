@@ -93,10 +93,10 @@ class ApiConstants {
 }
 
 class WalletConstants {
-  static const double minWithdrawalBtc = 0.00005;
-  static const double minWithdrawalUsd = 1.0;
-  static const double minWithdrawalInr = 100.0;
-  static const double dailyWithdrawalLimit = 1.0; // BTC
+  static const double minRedemptionBtc = 0.00005;
+  static const double minRedemptionUsd = 1.0;
+  static const double minRedemptionInr = 100.0;
+  static const double dailyRedemptionLimit = 1.0; // BTC
   static const int transactionHistoryLimit = 50;
   static const Duration balanceUpdateInterval = Duration(minutes: 1);
 }
@@ -115,3 +115,4 @@ class UIConstants {
   static const double cardRadius = 16.0;
   static const double defaultPadding = 16.0;
 }
+

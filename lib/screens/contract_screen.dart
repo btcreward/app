@@ -27,7 +27,8 @@ class ContractScreenState extends State<ContractScreen>
   TextEditingController withdrawAmountController = TextEditingController();
   List<String> withdrawalHistory = [];
   Timer? _uiUpdateTimer;
-  Timer? _nativeAdAutoRefreshTimer;
+  // Native ad timers removed
+
 
   List<Map<String, dynamic>> contracts = [
     {
@@ -196,26 +197,16 @@ class ContractScreenState extends State<ContractScreen>
     _restoreContractStates();
     _restoreAdCooldown();
     _startUiUpdateTimer();
-    // ContractScreen खुलते ही दोनों ads reload करें
+    // ContractScreen खुलते ही ads reload करें
     _reloadBannerAd();
-    _reloadNativeAd();
-    // Native ad auto-refresh timer
-    _nativeAdAutoRefreshTimer?.cancel();
-    _nativeAdAutoRefreshTimer =
-        Timer.periodic(const Duration(seconds: 60), (timer) {
-      if (mounted) {
-        _reloadNativeAd(force: true);
-      }
-    });
   }
 
   void _reloadBannerAd() {
     setState(() {});
   }
 
-  void _reloadNativeAd({bool force = false}) {
-    setState(() {});
-  }
+  // Native ad reload method removed
+
 
   Future<void> _restoreAdCooldown() async {
     final prefs = await SharedPreferences.getInstance();
@@ -277,7 +268,8 @@ class ContractScreenState extends State<ContractScreen>
     WidgetsBinding.instance.removeObserver(this);
     _uiUpdateTimer?.cancel();
     _adCooldownTimer?.cancel();
-    _nativeAdAutoRefreshTimer?.cancel();
+    // Native ad timer cancel removed
+
     for (var contract in contracts) {
       contract['timer']?.cancel();
     }
@@ -597,28 +589,23 @@ class ContractScreenState extends State<ContractScreen>
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: const Color.fromARGB(255, 93, 144, 219),
-        leading: IconButton(
-          icon: const Icon(Icons.notifications),
-          onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Notifications not available!')),
-            );
-          },
-        ),
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Icon(Icons.currency_bitcoin, size: 30, color: Colors.amber),
             const SizedBox(width: 10),
-            Consumer<WalletProvider>(
-              builder: (context, walletProvider, child) {
-                return Text(
-                  walletProvider.btcBalance.toStringAsFixed(18),
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
-                );
-              },
+            Expanded(
+              child: Consumer<WalletProvider>(
+                builder: (context, walletProvider, child) {
+                  return Text(
+                    walletProvider.btcBalance.toStringAsFixed(18),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.white),
+                  );
+                },
+              ),
             ),
           ],
         ),
@@ -670,8 +657,6 @@ class ContractScreenState extends State<ContractScreen>
                 child: SwipeableAdCarousel(
                   adService: _adService,
                   screenId: 'contract_screen',
-                  nativeAdRefreshInterval: const Duration(seconds: 60),
-                  autoSwipeInterval: const Duration(seconds: 10),
                 ),
               );
             }
@@ -865,11 +850,13 @@ class ContractCard extends StatelessWidget {
                           color: Color.fromARGB(255, 211, 198, 11),
                         ),
                       ),
-                      Text(
-                        '${contract['currentEarnings'].toStringAsFixed(18)}',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Color.fromARGB(255, 196, 146, 9),
+                      Expanded(
+                        child: Text(
+                          '${contract['currentEarnings'].toStringAsFixed(13)}',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Color.fromARGB(255, 196, 146, 9),
+                          ),
                         ),
                       ),
                       const SizedBox(width: 4),
@@ -1033,3 +1020,4 @@ class MiningBackgroundState extends State<MiningBackground>
     );
   }
 }
+

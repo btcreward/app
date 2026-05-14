@@ -165,3 +165,4 @@ class NetworkProvider extends ChangeNotifier {
     super.dispose();
   }
 }
+

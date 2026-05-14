@@ -1424,7 +1424,7 @@ class AuthProvider extends ChangeNotifier {
   }
 
   /// Google Sign-In method
-  Future<Map<String, dynamic>> signInWithGoogle(BuildContext context) async {
+  Future<Map<String, dynamic>> signInWithGoogle() async {
     try {
       // Check connectivity first
       if (!await checkConnectivity()) {
@@ -1436,14 +1436,8 @@ class AuthProvider extends ChangeNotifier {
       }
 
       // Use Google Auth Service
-      if (!context.mounted) {
-        return {
-          'success': false,
-          'message': 'Context no longer available',
-          'error': 'CONTEXT_UNMOUNTED'
-        };
-      }
-      final result = await GoogleAuthService().signInWithGoogle(context);
+
+      final result = await GoogleAuthService().signInWithGoogle();
 
       if (result['success']) {
         // Update user state with Google user data
@@ -1522,3 +1516,4 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 }
+

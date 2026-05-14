@@ -151,7 +151,7 @@ class HashRushGameScreenState extends State<HashRushGameScreen> {
 
     _bannerAd = BannerAd(
       adUnitId:
-          'ca-app-pub-3537329799200606/2028008282', // Your banner ad unit ID
+          'ca-app-pub-3940256099942544/6300978111', // Your banner ad unit ID
       size: AdSize.mediumRectangle, // 300x250 banner ad
       request: const AdRequest(),
       listener: BannerAdListener(
@@ -1205,3 +1205,4 @@ class CountdownOverlayState extends State<CountdownOverlay> {
     );
   }
 }
+

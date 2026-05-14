@@ -12,3 +12,4 @@ class ColorConstants {
   static const Color errorColor = Color(0xFFE94560);
   static const Color successColor = Color(0xFF06D6A0);
 }
+

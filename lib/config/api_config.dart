@@ -19,8 +19,9 @@ class ApiConfig {
     }
 
     if (Platform.isAndroid) {
-      // 🧪 Android Emulator on PC
-      return 'http://10.0.2.2:5000';
+      // 🧪 Android Emulator on PC - temporarily use production for testing
+      return 'https://bitcoincloudmining.onrender.com';
+      // Original debug URL: return 'http://10.0.2.2:5000';
     }
 
     if (Platform.isIOS) {
@@ -161,15 +162,15 @@ class ApiConfig {
   static const String walletTransactions = '/api/wallet/transactions';
   static const String walletPendingTransactions =
       '/api/wallet/transactions/pending';
-  static const String walletWithdrawals = '/api/wallet/withdrawals';
-  static const String withdrawFunds = '/api/wallet/withdraw';
+  static const String walletRedemptions = '/api/wallet/withdrawals';
+  static const String redeemFunds = '/api/wallet/withdraw';
   static const String depositFunds = '/api/wallet/deposit';
   static const String walletInfo = '/api/wallet/info';
   static const String syncBalance = '/api/wallet/sync-balance';
   static const String walletTransactionById = '/api/wallet/transactions/';
   static const String walletTransactionStatus =
       '/api/wallet/transactions/status/';
-  static const String walletWithdrawalStatus =
+  static const String walletRedemptionStatus =
       '/api/wallet/transactions/withdrawal/';
   static const String walletAddTransaction = '/api/wallet/transactions';
   static const String walletStartMining = '/api/wallet/start-mining';
@@ -325,3 +326,4 @@ class ApiConfig {
   // Image API endpoint
   static String get imagesApi => '$baseUrl/api/images';
 }
+

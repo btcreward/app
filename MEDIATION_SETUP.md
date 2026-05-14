@@ -24,15 +24,15 @@ implementation("com.google.ads.mediation:unity:4.15.1.0")
 <!-- android/app/src/main/AndroidManifest.xml -->
 <meta-data
     android:name="com.google.android.gms.ads.APPLICATION_ID"
-    android:value="ca-app-pub-3537329799200606~9074161734" />
+    android:value="ca-app-pub-3940256099942544~3347511713" />
 ```
 
 ### 3. Ad Unit IDs (Production Ready)
 ```dart
 // lib/services/ad_service.dart
-'banner': 'ca-app-pub-3537329799200606/2028008282'
-'rewarded': 'ca-app-pub-3537329799200606/7827129874'
-'native': 'ca-app-pub-3537329799200606/2260507229'
+'banner': 'ca-app-pub-3940256099942544/6300978111'
+'rewarded': 'ca-app-pub-3940256099942544/5224354917'
+'native': 'ca-app-pub-3940256099942544/2247696110'
 ```
 
 ## Next Steps for Full Mediation

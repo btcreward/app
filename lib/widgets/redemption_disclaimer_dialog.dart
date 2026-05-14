@@ -2,7 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class WithdrawalDisclaimerDialog extends StatelessWidget {
+class RedemptionDisclaimerDialog extends StatelessWidget {
   final String title;
   final String message;
   final VoidCallback? onContinue;
@@ -10,11 +10,11 @@ class WithdrawalDisclaimerDialog extends StatelessWidget {
 
   static const Color kBlue = Color(0xFF1976D2); // Material Blue 700
 
-  const WithdrawalDisclaimerDialog({
+  const RedemptionDisclaimerDialog({
     super.key,
     this.title = 'Disclaimer',
     this.message =
-        '⚠️ This is a virtual mining simulation app. All BTC shown is virtual. Withdrawals are enabled only when minimum thresholds are reached and verified.',
+        '⚠️ This is a virtual mining simulation app. All BTC shown is virtual. Redemptions are enabled only when minimum thresholds are reached and verified.',
     this.onContinue,
     this.icon = Icons.warning_amber_rounded,
   });
@@ -128,7 +128,7 @@ class WithdrawalDisclaimerDialog extends StatelessWidget {
 }
 
 // Helper function
-Future<void> showWithdrawalDisclaimerDialog({
+Future<void> showRedemptionDisclaimerDialog({
   required BuildContext context,
   String? title,
   String? message,
@@ -138,10 +138,10 @@ Future<void> showWithdrawalDisclaimerDialog({
   await showDialog(
     context: context,
     barrierDismissible: false,
-    builder: (ctx) => WithdrawalDisclaimerDialog(
+    builder: (ctx) => RedemptionDisclaimerDialog(
       title: title ?? 'Disclaimer',
       message: message ??
-          '⚠️ This is a virtual mining simulation app. All BTC shown is virtual. Withdrawals are enabled only when minimum thresholds are reached and verified.',
+          '⚠️ This is a virtual mining simulation app. All BTC shown is virtual. Redemptions are enabled only when minimum thresholds are reached and verified.',
       onContinue: onContinue,
       icon: icon ?? Icons.warning_amber_rounded,
     ),

@@ -19,7 +19,8 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     final transaction = widget.transaction;
-    final isWithdrawal = transaction.type.toLowerCase().contains('withdrawal');
+    final isRedemption = transaction.type.toLowerCase().contains('redemption') ||
+        transaction.type.toLowerCase().contains('withdrawal');
 
     Color statusColor;
     IconData statusIcon;
@@ -128,9 +129,9 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
               child: Column(
                 children: [
                   Text(
-                    '${isWithdrawal ? '-' : '+'}${transaction.amount.toStringAsFixed(18)} ${transaction.currency}',
+                    '${isRedemption ? '-' : '+'}${transaction.amount.toStringAsFixed(18)} ${transaction.currency}',
                     style: TextStyle(
-                      color: isWithdrawal
+                      color: isRedemption
                           ? Colors.blue.shade900
                           : Colors.blue.shade600,
                       fontSize: 24,
@@ -179,8 +180,8 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
                   ),
                   const SizedBox(height: 15),
                   _buildDetailRow('Transaction ID', transaction.transactionId),
-                  if (transaction.withdrawalId != null)
-                    _buildDetailRow('Withdrawal ID', transaction.withdrawalId!),
+                  if (transaction.redemptionId != null)
+                    _buildDetailRow('Redemption ID', transaction.redemptionId!),
                   if (transaction.destination != null &&
                       transaction.destination != 'Wallet')
                     _buildDetailRow('Destination', transaction.destination!),
@@ -234,3 +235,4 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
     );
   }
 }
+

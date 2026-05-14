@@ -41,37 +41,35 @@ class AdService with ChangeNotifier {
   static const Duration unityBannerTimeout = Duration(seconds: 15);
 
   // Unity Ad Unit IDs - Real placement IDs for your Unity Dashboard
-  final Map<String, Map<String, String>> _unityAdUnitIds = {
+  static const Map<String, Map<String, String>> _unityAdUnitIds = {
     'android': {
-      'banner': 'Banner_Android', // Create this placement in Unity Dashboard
-      'rewarded':
-          'Rewarded_Android', // Create this placement in Unity Dashboard
-      'interstitial':
-          'Interstitial_Android', // Create this placement in Unity Dashboard
+      'banner': 'Banner_Android',
+      'rewarded': 'Rewarded_Android',
+      'interstitial': 'Interstitial_Android',
     },
     'ios': {
-      'banner': 'Banner_iOS', // Create this placement in Unity Dashboard
-      'rewarded': 'Rewarded_iOS', // Create this placement in Unity Dashboard
-      'interstitial':
-          'Interstitial_iOS', // Create this placement in Unity Dashboard
+      'banner': 'Banner_iOS',
+      'rewarded': 'Rewarded_iOS',
+      'interstitial': 'Interstitial_iOS',
     },
   };
 
   // AdMob IDs
-  final Map<String, Map<String, String>> _adMobUnitIds = {
+  // AdMob IDs
+  static const Map<String, Map<String, String>> _adMobUnitIds = {
     'android': {
-      'native':
-          'ca-app-pub-3537329799200606/2260507229', // Native_Contract_Card
-      'banner': 'ca-app-pub-3537329799200606/2028008282', // Home_Banner_Ad
-      'swipeable_banner':
-          'ca-app-pub-3537329799200606/2028008282', // Using same as banner for now
+      'native': 'ca-app-pub-3940256099942544/2247696110',
+      'banner': 'ca-app-pub-3940256099942544/6300978111',
+      'swipeable_banner': 'ca-app-pub-3940256099942544/6300978111',
+      'rewarded': 'ca-app-pub-3940256099942544/5224354917',
+      'interstitial': 'ca-app-pub-3940256099942544/1033173712',
     },
     'ios': {
-      'native':
-          'ca-app-pub-3537329799200606/2260507229', // Native_Contract_Card
-      'banner': 'ca-app-pub-3537329799200606/2028008282', // Home_Banner_Ad
-      'swipeable_banner':
-          'ca-app-pub-3537329799200606/2028008282', // Using same as banner for now
+      'native': 'ca-app-pub-3940256099942544/3986624511',
+      'banner': 'ca-app-pub-3940256099942544/2934735716',
+      'swipeable_banner': 'ca-app-pub-3940256099942544/2934735716',
+      'rewarded': 'ca-app-pub-3940256099942544/1712485313',
+      'interstitial': 'ca-app-pub-3940256099942544/4411468910',
     },
   };
 
@@ -85,8 +83,14 @@ class AdService with ChangeNotifier {
   // Unity Ad objects
   bool _isUnityInitialized = false;
 
-  // AdMob objects (only for native ads)
-  NativeAd? _nativeAd; // Legacy single instance - to be removed after migration
+  // AdMob objects
+  NativeAd? _nativeAd; // Legacy single instance
+  RewardedAd? _admobRewardedAd;
+  bool _isAdmobRewardedAdLoaded = false;
+  bool _isAdmobRewardedAdLoading = false;
+  InterstitialAd? _admobInterstitialAd;
+  bool _isAdmobInterstitialAdLoaded = false;
+  bool _isAdmobInterstitialAdLoading = false;
 
   // Multiple Native Ads Manager (AdMob)
   // Format: 'screenId_adType_adId' -> NativeAd
@@ -98,6 +102,10 @@ class AdService with ChangeNotifier {
   final Map<String, BannerAd> _swipeableBannerAds = {};
   final Map<String, NativeAd> _swipeableNativeAds = {};
   final Map<String, bool> _swipeableAdLoadedStates = {};
+
+  // AdMob Banner fallbacks for native ads
+  final Map<String, BannerAd> _admobFallbackBanners = {};
+  final Map<String, bool> _admobFallbackLoadedStates = {};
 
   // Unity Banner fallback for native ads
   final Map<String, bool> _nativeFallbackStates = {};
@@ -131,6 +139,7 @@ class AdService with ChangeNotifier {
   final Map<String, DateTime> _adCacheTimes = {};
   final Map<String, int> _adFailures = {};
   final Map<String, List<Duration>> _adLoadTimes = {};
+  bool _isAdShowing = false;
 
   // Mediation tracking
   final Map<String, int> _mediationAdShows = {};
@@ -178,25 +187,45 @@ class AdService with ChangeNotifier {
       };
 
   // Public getters for ad loaded states
-  bool get isRewardedAdLoaded => _isRewardedAdLoaded;
+  bool get isRewardedAdLoaded => _isRewardedAdLoaded || _isAdmobRewardedAdLoaded;
   bool get isBannerAdLoaded => _isBannerAdLoaded;
   bool get isNativeAdLoaded => _isNativeAdLoaded;
+  bool get isInterstitialAdLoaded =>
+      _isInterstitialAdLoaded || _isAdmobInterstitialAdLoaded;
   bool get isInitialized => _isInitialized;
   bool get isInitializing => _isInitializing;
 
-  // Get ad unit ID based on platform and ad type
-  String _getAdUnitId(String adType) {
+  // Get ad unit ID based on platform, network and ad type
+  String _getAdUnitId(String adType, {String network = 'admob'}) {
     if (kIsWeb) return '';
 
-    final platform = Platform.isAndroid ? 'android' : 'ios';
-
-    // For native ads, use AdMob
-    if (adType == 'native') {
-      return _adMobUnitIds[platform]?[adType] ?? '';
+    String platform;
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      platform = 'android';
+    } else if (defaultTargetPlatform == TargetPlatform.iOS) {
+      platform = 'ios';
+    } else {
+      platform = 'android'; // Default fallback
     }
 
-    // For banner and rewarded, use Unity
-    return _unityAdUnitIds[platform]?[adType] ?? '';
+    String? id;
+    if (network == 'admob') {
+      id = _adMobUnitIds[platform]?[adType];
+    } else {
+      id = _unityAdUnitIds[platform]?[adType];
+    }
+
+    if (id == null || id.isEmpty) {
+      // Try to fallback to android if ios fails or vice versa
+      final otherPlatform = platform == 'android' ? 'ios' : 'android';
+      if (network == 'admob') {
+        id = _adMobUnitIds[otherPlatform]?[adType];
+      } else {
+        id = _unityAdUnitIds[otherPlatform]?[adType];
+      }
+    }
+
+    return id ?? '';
   }
 
   String _getUnityGameId() {
@@ -314,21 +343,7 @@ class AdService with ChangeNotifier {
 
   Timer? _bannerAdRefreshTimer;
 
-  // Start auto-refresh timer for Unity banner ads
-  void _startBannerAdAutoRefresh() {
-    _bannerAdRefreshTimer?.cancel();
-    _bannerAdRefreshTimer =
-        Timer.periodic(const Duration(seconds: 25), (timer) {
-      if (_disposed) {
-        timer.cancel();
-        return;
-      }
-      // Unity ads don't need manual disposal
-      _isBannerAdLoaded = false;
-      loadBannerAd(); // Reload Unity banner ad
-    });
-  }
-
+  // Manual auto-refresh removed to prevent main thread lag.
   // Load banner ad
   Future<void> loadBannerAd() async {
     if (_disposed || !_isUnityInitialized) {
@@ -340,7 +355,7 @@ class AdService with ChangeNotifier {
     await _loadAdWithRetry(
       'banner',
       () async {
-        final adUnitId = _getAdUnitId('banner');
+        final adUnitId = _getAdUnitId('banner', network: 'unity');
         if (adUnitId.isEmpty) {
           throw Exception('Invalid Unity banner ad unit ID');
         }
@@ -350,21 +365,9 @@ class AdService with ChangeNotifier {
           placementId: adUnitId,
           onComplete: (placementId) {
             _isBannerAdLoaded = true;
-            _startBannerAdAutoRefresh();
-
-            // Update mediation metrics for successful load
-            if (_isMediationEnabled) {
-              _updateMediationMetrics('unity', true, null);
-            }
           },
           onFailed: (placementId, error, message) {
             _isBannerAdLoaded = false;
-
-            // Update mediation metrics for failed load
-            if (_isMediationEnabled) {
-              _updateMediationMetrics('unity', false, null);
-            }
-
             throw Exception('Unity banner ad failed: $message');
           },
         );
@@ -454,7 +457,7 @@ class AdService with ChangeNotifier {
       return _bannerWidgetInstance!;
     }
 
-    final adUnitId = _getAdUnitId('banner');
+    final adUnitId = _getAdUnitId('banner', network: 'unity');
 
     _bannerWidgetInstance = SizedBox(
       height: 50,
@@ -474,12 +477,7 @@ class AdService with ChangeNotifier {
 
   // Unity fallback widget for native ad failures
   Widget _getUnityFallbackWidget(String adId) {
-    final bannerAdUnitId = _getAdUnitId('banner');
-
-    debugPrint('🔄 Creating Unity fallback widget for ad: $adId');
-    debugPrint('📱 Banner Unit ID: $bannerAdUnitId');
-    debugPrint(
-        '🎯 Unity Status: Init=$_isUnityInitialized, Banner=$_isBannerAdLoaded');
+    final bannerAdUnitId = _getAdUnitId('banner', network: 'unity');
 
     return Container(
       height: 250,
@@ -545,15 +543,17 @@ class AdService with ChangeNotifier {
                 margin: const EdgeInsets.all(16),
                 child: UnityBannerAd(
                   placementId: bannerAdUnitId,
-                  onLoad: (placementId) {
-                    debugPrint('Unity Fallback Banner loaded: $placementId');
-                  },
-                  onClick: (placementId) {
-                    debugPrint('Unity Fallback Banner clicked: $placementId');
-                  },
+                  onLoad: (placementId) {},
+                  onClick: (placementId) {},
                   onFailed: (placementId, error, message) {
-                    debugPrint(
-                        'Unity Fallback Banner failed: $error - $message');
+                    // Automatically try AdMob again if Unity fails to fill
+                    if (error.toString().contains('noFill') ||
+                        message.toLowerCase().contains('no fill') ||
+                        message.toLowerCase().contains('no_fill')) {
+                      Future.delayed(const Duration(seconds: 5), () {
+                        loadNativeAdWithId(adId);
+                      });
+                    }
                   },
                 ),
               ),
@@ -564,35 +564,68 @@ class AdService with ChangeNotifier {
     );
   }
 
+  // Load AdMob rewarded ad
+  Future<void> _loadAdmobRewardedAd() async {
+    if (_isAdmobRewardedAdLoading || _isAdmobRewardedAdLoaded) return;
+
+    _isAdmobRewardedAdLoading = true;
+    final adUnitId = _getAdUnitId('rewarded', network: 'admob');
+
+    try {
+      await RewardedAd.load(
+        adUnitId: adUnitId,
+        request: const AdRequest(),
+        rewardedAdLoadCallback: RewardedAdLoadCallback(
+          onAdLoaded: (ad) {
+            _admobRewardedAd = ad;
+            _isAdmobRewardedAdLoaded = true;
+            _isAdmobRewardedAdLoading = false;
+            
+            _admobRewardedAd!.fullScreenContentCallback = FullScreenContentCallback(
+              onAdDismissedFullScreenContent: (ad) {
+                ad.dispose();
+                _isAdmobRewardedAdLoaded = false;
+                loadRewardedAd();
+              },
+              onAdFailedToShowFullScreenContent: (ad, error) {
+                ad.dispose();
+                _isAdmobRewardedAdLoaded = false;
+                loadRewardedAd();
+              },
+            );
+          },
+          onAdFailedToLoad: (error) {
+            _isAdmobRewardedAdLoading = false;
+            _isAdmobRewardedAdLoaded = false;
+          },
+        ),
+      );
+    } catch (e) {
+      _isAdmobRewardedAdLoading = false;
+    }
+  }
+
   // Load rewarded ad with better error handling and mediation tracking
   Future<void> loadRewardedAd() async {
     if (_disposed || kIsWeb) return;
 
-    debugPrint(' Loading Unity Rewarded Ad...');
+    // Start loading AdMob in background (don't await here to allow parallel loading)
+    _loadAdmobRewardedAd();
 
-    if (!_isUnityInitialized) {
-      debugPrint(' Unity Ads not initialized yet - cannot load rewarded ad');
-      return;
-    }
-
+    // Then try Unity
     if (_isRewardedAdLoading) {
-      debugPrint(' Rewarded ad already loading...');
       return;
     }
 
     _isRewardedAdLoading = true;
 
     try {
-      final adUnitId = _getAdUnitId('rewarded');
-      debugPrint(' Using rewarded ad unit ID: $adUnitId');
+      final adUnitId = _getAdUnitId('rewarded', network: 'unity');
 
       if (adUnitId.isEmpty) {
-        debugPrint(' Empty rewarded ad unit ID');
         _isRewardedAdLoading = false;
         return;
       }
-
-      debugPrint(' Calling UnityAds.load for rewarded ad...');
 
       // Load Unity Rewarded Ad
       await UnityAds.load(
@@ -601,37 +634,15 @@ class AdService with ChangeNotifier {
           _isRewardedAdLoaded = true;
           _isRewardedAdLoading = false;
           _adCacheTimes['rewarded'] = DateTime.now();
-          debugPrint(' Unity Rewarded Ad loaded successfully: $placementId');
-
-          // Update mediation metrics for successful load
-          if (_isMediationEnabled) {
-            _updateMediationMetrics('unity', true, null);
-          }
         },
         onFailed: (placementId, error, message) {
           _isRewardedAdLoading = false;
           _isRewardedAdLoaded = false;
-          debugPrint(' Unity Rewarded Ad failed to load!');
-          debugPrint(' Placement ID: $placementId');
-          debugPrint(' Error: $error');
-          debugPrint(' Message: $message');
-
-          // Update mediation metrics for failed load
-          if (_isMediationEnabled) {
-            _updateMediationMetrics('unity', false, null);
-          }
         },
       );
     } catch (e) {
       _isRewardedAdLoading = false;
       _isRewardedAdLoaded = false;
-      debugPrint(' Unity Rewarded Ad load exception: $e');
-      debugPrint(' Stack trace: ${StackTrace.current}');
-
-      // Update mediation metrics for exception
-      if (_isMediationEnabled) {
-        _updateMediationMetrics('unity', false, null);
-      }
     }
   }
 
@@ -674,11 +685,6 @@ class AdService with ChangeNotifier {
                   (_nativeAdAverageLoadTime * (_nativeAdLoadCount - 1) +
                           loadTime.inMilliseconds) /
                       _nativeAdLoadCount;
-
-              // Update mediation metrics for successful load
-              if (_isMediationEnabled) {
-                _updateMediationMetrics('admob', true, null);
-              }
             },
             onAdFailedToLoad: (ad, error) {
               _isNativeAdLoaded = false;
@@ -686,35 +692,17 @@ class AdService with ChangeNotifier {
               ad.dispose();
               _adFailures['native'] = (_adFailures['native'] ?? 0) + 1;
 
-              // Update mediation metrics for failed load
-              if (_isMediationEnabled) {
-                _updateMediationMetrics('admob', false, null);
-              }
-
+              // Trigger secondary fallback load
+              loadNativeAdWithId('native_fallback');
               throw error;
             },
-            onAdOpened: (ad) {
-              // Update mediation metrics for ad opened
-              if (_isMediationEnabled) {
-                _updateMediationMetrics('admob', true, null);
-              }
-            },
+            onAdOpened: (ad) {},
             onAdClosed: (ad) {},
             onAdImpression: (ad) {
               _nativeAdImpressionCount++;
-
-              // Update mediation metrics for impression
-              if (_isMediationEnabled) {
-                _updateMediationMetrics('admob', true, null);
-              }
             },
             onAdClicked: (ad) {
               _nativeAdClickCount++;
-
-              // Update mediation metrics for click
-              if (_isMediationEnabled) {
-                _updateMediationMetrics('admob', true, null);
-              }
             },
           ),
         );
@@ -726,25 +714,9 @@ class AdService with ChangeNotifier {
         _isNativeAdLoaded = success;
       },
     );
-    _startNativeAdAutoRefresh();
   }
 
-  // Start auto-refresh timer for native ads
-  void _startNativeAdAutoRefresh() {
-    _nativeAdRefreshTimer?.cancel();
-    // Refresh native ad every 1 minute (60 seconds)
-    _nativeAdRefreshTimer = Timer.periodic(const Duration(minutes: 1), (timer) {
-      if (_disposed) {
-        timer.cancel();
-        return;
-      }
-      _isNativeAdLoaded = false;
-      _nativeAd?.dispose();
-      _nativeAd = null;
-      loadNativeAd();
-    });
-  }
-
+  // Auto-refresh removed to prevent main thread lag and excessive memory usage.
   // Force refresh native ad
   Future<void> refreshNativeAd() async {
     _isNativeAdLoaded = false;
@@ -755,142 +727,87 @@ class AdService with ChangeNotifier {
 
   // Get native ad widget with improved error handling and refresh capability
   Widget getNativeAd() {
-    if (!_isNativeAdLoaded || _nativeAd == null) {
-      // Show Unity banner ad as fallback if Unity is initialized and banner is loaded
-      if (_isUnityInitialized && _isBannerAdLoaded) {
-        return _getUnityFallbackWidget('native_fallback');
-      }
-
+    if (_isNativeAdLoaded && _nativeAd != null) {
       return Container(
         height: 360,
         decoration: BoxDecoration(
-          color: Colors.grey[200],
+          color: Colors.white,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: Colors.grey[300]!),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.ads_click, color: Colors.grey, size: 24),
-            const SizedBox(height: 4),
-            Text(
-              _isUnityInitialized ? 'Loading Fallback Ad...' : 'Ad Loading...',
-              style: const TextStyle(
-                color: Colors.grey,
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-              ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(26),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
             ),
-            const SizedBox(height: 4),
-            // Add refresh button for failed ads
-            GestureDetector(
-              onTap: () {
-                _isNativeAdLoaded = false;
-                _nativeAd?.dispose();
-                _nativeAd = null;
-                loadNativeAd();
-                // Also try to load banner ad for fallback
-                if (_isUnityInitialized) {
-                  loadBannerAd();
-                }
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.blue.withAlpha(51),
-                  borderRadius: BorderRadius.circular(4),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Stack(
+            children: [
+              // Native ad content with error boundary
+              Positioned.fill(
+                child: Builder(
+                  builder: (context) {
+                    try {
+                      return AdWidget(ad: _nativeAd!);
+                    } catch (e) {
+                      // Return fallback UI if ad rendering fails
+                      return Container(
+                        color: Colors.grey[100],
+                        child: const Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.error_outline,
+                                  color: Colors.grey, size: 20),
+                              SizedBox(height: 4),
+                              Text(
+                                'Ad Unavailable',
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 10,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }
+                  },
                 ),
-                child: const Text(
-                  'Refresh',
-                  style: TextStyle(
-                    color: Colors.blue,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w500,
+              ),
+              // Close button for better UX
+              Positioned(
+                top: 4,
+                right: 4,
+                child: GestureDetector(
+                  onTap: () {
+                    // Optionally track ad dismissal
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withAlpha(179),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.close,
+                      color: Colors.white,
+                      size: 12,
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
     }
 
-    return Container(
-      height: 360,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey[300]!),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(26),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: Stack(
-          children: [
-            // Native ad content with error boundary
-            Positioned.fill(
-              child: Builder(
-                builder: (context) {
-                  try {
-                    return AdWidget(ad: _nativeAd!);
-                  } catch (e) {
-                    // Return fallback UI if ad rendering fails
-                    return Container(
-                      color: Colors.grey[100],
-                      child: const Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.error_outline,
-                                color: Colors.grey, size: 20),
-                            SizedBox(height: 4),
-                            Text(
-                              'Ad Unavailable',
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 10,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  }
-                },
-              ),
-            ),
-            // Close button for better UX
-            Positioned(
-              top: 4,
-              right: 4,
-              child: GestureDetector(
-                onTap: () {
-                  // Optionally track ad dismissal
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withAlpha(179),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(
-                    Icons.close,
-                    color: Colors.white,
-                    size: 12,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+    // Fallback to the ID-based system
+    return getNativeAdWithId('native_fallback');
   }
 
   // Show rewarded ad with better error handling
@@ -905,94 +822,157 @@ class AdService with ChangeNotifier {
       return true;
     }
 
-    if (!_isUnityInitialized) {
-      debugPrint('Unity Ads not initialized');
-      onAdDismissed();
+    if (_isAdShowing) {
       return false;
     }
 
-    if (!_isRewardedAdLoaded) {
-      await loadRewardedAd();
-      if (!_isRewardedAdLoaded) {
-        onAdDismissed();
-        return false;
+    // 1. Try AdMob first
+    if (_isAdmobRewardedAdLoaded && _admobRewardedAd != null) {
+      _isAdShowing = true;
+      
+      _admobRewardedAd!.fullScreenContentCallback = FullScreenContentCallback(
+        onAdDismissedFullScreenContent: (ad) {
+          _isAdShowing = false;
+          _isAdmobRewardedAdLoaded = false;
+          ad.dispose();
+          onAdDismissed();
+          loadRewardedAd(); // Load next in background
+        },
+        onAdFailedToShowFullScreenContent: (ad, error) {
+          _isAdShowing = false;
+          _isAdmobRewardedAdLoaded = false;
+          ad.dispose();
+          onAdDismissed();
+          loadRewardedAd();
+        },
+      );
+
+      try {
+        await _admobRewardedAd!.show(
+          onUserEarnedReward: (AdWithoutView ad, RewardItem reward) {
+            onRewarded(reward.amount.toDouble());
+            _updateAdMetrics('rewarded', true, null);
+          },
+        );
+        return true;
+      } catch (e) {
+        _isAdShowing = false;
+        _isAdmobRewardedAdLoaded = false;
+        // Continue to Unity fallback
       }
     }
 
-    final adUnitId = _getAdUnitId('rewarded');
+    // 2. Fallback to Unity (if AdMob isn't ready)
+    if (_isRewardedAdLoaded) {
+    } else {
+      if (!_isUnityInitialized) {
+        onAdDismissed();
+        return false;
+      }
+      
+      await loadRewardedAd();
+      
+      if (!_isRewardedAdLoaded && !_isAdmobRewardedAdLoaded) {
+        onAdDismissed();
+        return false;
+      }
+
+      if (_isAdmobRewardedAdLoaded) {
+        return showRewardedAd(
+            onRewarded: onRewarded, onAdDismissed: onAdDismissed);
+      }
+    }
+
+    final adUnitId = _getAdUnitId('rewarded', network: 'unity');
 
     try {
+      _isAdShowing = true;
       await UnityAds.showVideoAd(
         placementId: adUnitId,
-        onStart: (placementId) {
-          debugPrint('Unity Rewarded Ad started: $placementId');
-        },
+        onStart: (placementId) {},
         onComplete: (placementId) {
+          _isAdShowing = false;
           _isRewardedAdLoaded = false;
-          debugPrint('Unity Rewarded Ad completed: $placementId');
-
-          // Grant reward (Unity doesn't provide amount, so we use default)
           onRewarded(1.0); // Default reward amount
-
-          // Preload next ad
           loadRewardedAd();
-
           _updateAdMetrics('rewarded', true, null);
-
-          // Update mediation metrics for successful show
-          if (_isMediationEnabled) {
-            _updateMediationMetrics('unity', true, null);
-          }
         },
         onSkipped: (placementId) {
+          _isAdShowing = false;
           _isRewardedAdLoaded = false;
-          debugPrint('Unity Rewarded Ad skipped: $placementId');
-
-          // Call onAdDismissed if ad was skipped (no reward)
           onAdDismissed();
-
-          // Preload next ad
           loadRewardedAd();
-
           _updateAdMetrics('rewarded', false, null);
         },
         onFailed: (placementId, error, message) {
+          _isAdShowing = false;
           _isRewardedAdLoaded = false;
-          debugPrint('Unity Rewarded Ad failed: $error - $message');
-
-          // Call onAdDismissed on error
           onAdDismissed();
-
-          // Preload next ad
           loadRewardedAd();
-
           _updateAdMetrics('rewarded', false, null);
-
-          // Update mediation metrics for failed show
-          if (_isMediationEnabled) {
-            _updateMediationMetrics('unity', false, null);
-          }
         },
       );
 
       return true;
     } catch (e) {
+      _isAdShowing = false;
       _isRewardedAdLoaded = false;
-      debugPrint('Unity Rewarded Ad show exception: $e');
-
-      // Preload next ad
       loadRewardedAd();
-
-      // Call onAdDismissed on error
       onAdDismissed();
-
       _updateAdMetrics('rewarded', false, null);
       return false;
     }
   }
 
+  // Load AdMob interstitial ad
+  Future<void> _loadAdmobInterstitialAd() async {
+    if (_isAdmobInterstitialAdLoading || _isAdmobInterstitialAdLoaded) return;
+
+    _isAdmobInterstitialAdLoading = true;
+    final adUnitId = _getAdUnitId('interstitial', network: 'admob');
+
+    try {
+      await InterstitialAd.load(
+        adUnitId: adUnitId,
+        request: const AdRequest(),
+        adLoadCallback: InterstitialAdLoadCallback(
+          onAdLoaded: (ad) {
+            _admobInterstitialAd = ad;
+            _isAdmobInterstitialAdLoaded = true;
+            _isAdmobInterstitialAdLoading = false;
+
+            _admobInterstitialAd!.fullScreenContentCallback =
+                FullScreenContentCallback(
+              onAdDismissedFullScreenContent: (ad) {
+                ad.dispose();
+                _isAdmobInterstitialAdLoaded = false;
+                loadInterstitialAd();
+              },
+              onAdFailedToShowFullScreenContent: (ad, error) {
+                ad.dispose();
+                _isAdmobInterstitialAdLoaded = false;
+                loadInterstitialAd();
+              },
+            );
+          },
+          onAdFailedToLoad: (error) {
+            _isAdmobInterstitialAdLoading = false;
+            _isAdmobInterstitialAdLoaded = false;
+          },
+        ),
+      );
+    } catch (e) {
+      _isAdmobInterstitialAdLoading = false;
+    }
+  }
+
   // Load Unity interstitial ad
   Future<void> loadInterstitialAd() async {
+    if (_disposed || kIsWeb) return;
+
+    // Start loading AdMob in background
+    _loadAdmobInterstitialAd();
+
     if (_isInterstitialAdLoading || !_isUnityInitialized) {
       return;
     }
@@ -1029,12 +1009,57 @@ class AdService with ChangeNotifier {
   }
 
   // Show Unity interstitial ad
+  // Show interstitial ad
   Future<bool> showInterstitialAd({
     VoidCallback? onAdDismissed,
   }) async {
-    if (!_isInterstitialAdLoaded || !_isUnityInitialized) {
-      onAdDismissed?.call();
+    if (_isAdShowing) {
       return false;
+    }
+
+    // 1. Try AdMob first
+    if (_isAdmobInterstitialAdLoaded && _admobInterstitialAd != null) {
+      _isAdShowing = true;
+      
+      _admobInterstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
+        onAdDismissedFullScreenContent: (ad) {
+          _isAdShowing = false;
+          _isAdmobInterstitialAdLoaded = false;
+          ad.dispose();
+          onAdDismissed?.call();
+          loadInterstitialAd(); // Load next in background
+        },
+        onAdFailedToShowFullScreenContent: (ad, error) {
+          _isAdShowing = false;
+          _isAdmobInterstitialAdLoaded = false;
+          ad.dispose();
+          onAdDismissed?.call();
+          loadInterstitialAd();
+        },
+      );
+
+      try {
+        await _admobInterstitialAd!.show();
+        _updateAdMetrics('interstitial', true, null);
+        return true;
+      } catch (e) {
+        _isAdShowing = false;
+        _isAdmobInterstitialAdLoaded = false;
+        // Continue to Unity fallback
+      }
+    }
+
+    // 2. Fallback to Unity
+    if (!_isInterstitialAdLoaded || !_isUnityInitialized) {
+      await loadInterstitialAd();
+      if (!_isInterstitialAdLoaded && !_isAdmobInterstitialAdLoaded) {
+        onAdDismissed?.call();
+        return false;
+      }
+      // If AdMob loaded while waiting for Unity
+      if (_isAdmobInterstitialAdLoaded) {
+        return showInterstitialAd(onAdDismissed: onAdDismissed);
+      }
     }
 
     try {
@@ -1046,9 +1071,11 @@ class AdService with ChangeNotifier {
         return false;
       }
 
+      _isAdShowing = true;
       await UnityAds.showVideoAd(
         placementId: adUnitId,
         onComplete: (placementId) {
+          _isAdShowing = false;
           _isInterstitialAdLoaded = false; // Need to reload after showing
           onAdDismissed?.call();
           _updateAdMetrics('interstitial', true, null);
@@ -1056,11 +1083,6 @@ class AdService with ChangeNotifier {
           loadInterstitialAd();
         },
         onFailed: (placementId, error, message) {
-          _isInterstitialAdLoaded = false;
-          onAdDismissed?.call();
-          _updateAdMetrics('interstitial', false, null);
-        },
-        onStart: (placementId) {
           // Ad started playing
         },
         onClick: (placementId) {
@@ -1080,9 +1102,6 @@ class AdService with ChangeNotifier {
     }
   }
 
-  // Getters for interstitial ad state
-  bool get isInterstitialAdLoaded => _isInterstitialAdLoaded;
-  bool get isInterstitialAdLoading => _isInterstitialAdLoading;
 
   // Get Unity banner ad widget (deprecated - use getBannerAdWidget instead)
   Widget getBannerAd() {
@@ -1117,22 +1136,19 @@ class AdService with ChangeNotifier {
       // Wait a moment for Unity Ads to be fully ready
       await Future.delayed(const Duration(milliseconds: 500));
 
-      // Preload ads only if Unity Ads is properly initialized
-      if (_isUnityInitialized) {
-        await Future.wait([
-          loadBannerAd(), // Unity banner
-          loadRewardedAd(), // Unity rewarded
-        ]);
-      }
-
-      // Load native ads separately (AdMob)
-      await loadNativeAd();
+      // Preload ads (both AdMob and Unity)
+      await Future.wait([
+        loadBannerAd(), // Unity banner
+        loadRewardedAd(), // AdMob + Unity rewarded
+        loadInterstitialAd(), // AdMob + Unity interstitial
+        loadNativeAd(), // AdMob native
+      ]);
 
       _isInitialized = true;
       debugPrint('🎯 Hash Rush: All ads initialized. Status: $_isInitialized');
-      debugPrint('🎯 Hash Rush: Rewarded ad loaded: $_isRewardedAdLoaded');
+      debugPrint('🎯 Hash Rush: Rewarded ad loaded: $isRewardedAdLoaded');
       debugPrint(
-          '🎯 Hash Rush: Interstitial ad loaded: $_isInterstitialAdLoaded');
+          '🎯 Hash Rush: Interstitial ad loaded: $isInterstitialAdLoaded');
       debugPrint('🎯 Hash Rush: Banner ad loaded: $_isBannerAdLoaded');
       debugPrint('🎯 Hash Rush: Native ad loaded: $_isNativeAdLoaded');
     } catch (e, stackTrace) {
@@ -1492,11 +1508,11 @@ class AdService with ChangeNotifier {
   }
 
   static const String bannerAdUnitId =
-      'ca-app-pub-3537329799200606/2028008282'; // Home_Banner_Ad
+      'ca-app-pub-3940256099942544/6300978111'; // Home_Banner_Ad
   static const String rewardedAdUnitId =
-      'ca-app-pub-3537329799200606/7827129874'; // Rewarded_BTC_Ad
+      'ca-app-pub-3940256099942544/5224354917'; // Rewarded_BTC_Ad
   static const String nativeAdUnitId =
-      'ca-app-pub-3537329799200606/2260507229'; // Native_Contract_Card
+      'ca-app-pub-3940256099942544/2247696110'; // Native_Contract_Card
 
   // Unity Ads doesn't need getRewardedAd function like AdMob
   // Use isRewardedAdLoaded getter and showRewardedAd() function instead
@@ -1571,6 +1587,9 @@ class AdService with ChangeNotifier {
     _nativeAds[adId]?.dispose();
     _nativeAds.remove(adId);
     _nativeAdLoadedStates[adId] = false;
+    
+    // Maintain cache size
+    _limitNativeAdCache();
 
     // Enable fallback by default when starting to load a new ad
     _nativeFallbackStates[adId] = true;
@@ -1703,8 +1722,8 @@ class AdService with ChangeNotifier {
             ),
           );
 
-          await nativeAd.load();
           _nativeAds[adId] = nativeAd;
+          await nativeAd.load();
           return;
         },
         (success) {
@@ -1755,6 +1774,102 @@ class AdService with ChangeNotifier {
       debugPrint('Unity initialized but banner not loaded, loading banner...');
       loadBannerAd();
     }
+
+    // Also try to load AdMob banner as an additional fallback
+    _loadAdmobFallbackBanner(adId);
+  }
+
+  void _loadAdmobFallbackBanner(String adId) {
+    if (_admobFallbackLoadedStates[adId] == true) return;
+
+    final bannerAdId = _getAdUnitId('banner', network: 'admob');
+    if (bannerAdId.isEmpty) return;
+
+    debugPrint('🔄 Loading AdMob Fallback Banner for: $adId');
+
+    final bannerAd = BannerAd(
+      adUnitId: bannerAdId,
+      size: AdSize.mediumRectangle, // Use medium rectangle for native slots
+      request: const AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          _admobFallbackLoadedStates[adId] = true;
+          _notifyAdStateChange();
+          debugPrint('✅ AdMob Fallback Banner loaded for: $adId');
+        },
+        onAdFailedToLoad: (ad, error) {
+          ad.dispose();
+          _admobFallbackLoadedStates[adId] = false;
+          debugPrint('❌ AdMob Fallback Banner failed: $error');
+        },
+      ),
+    );
+
+    _admobFallbackBanners[adId] = bannerAd;
+    bannerAd.load();
+  }
+
+  Widget _getAdMobFallbackWidget(String adId) {
+    final bannerAd = _admobFallbackBanners[adId];
+    if (bannerAd == null || _admobFallbackLoadedStates[adId] != true) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      height: 360,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey[300]!),
+      ),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.blue.withAlpha(25),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(8),
+                topRight: Radius.circular(8),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.info_outline, color: Colors.blue[700], size: 14),
+                    const SizedBox(width: 4),
+                    Text(
+                      'AdMob Banner Fallback',
+                      style: TextStyle(
+                        color: Colors.blue[700],
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                GestureDetector(
+                  onTap: () {
+                    _admobFallbackLoadedStates[adId] = false;
+                    _loadAdmobFallbackBanner(adId);
+                    _notifyAdStateChange();
+                  },
+                  child: Icon(Icons.refresh, color: Colors.blue[700], size: 14),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Center(
+              child: AdWidget(ad: bannerAd),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void _notifyAdStateChange() {
@@ -1782,6 +1897,13 @@ class AdService with ChangeNotifier {
 
     // Enhanced fallback logic with more flexible conditions
     if (!isLoaded && shouldShowFallback) {
+      // 1. Try AdMob Banner Fallback first
+      if (_admobFallbackLoadedStates[adId] == true) {
+        debugPrint('✅ Showing AdMob Fallback Banner for ad ID: $adId');
+        return _getAdMobFallbackWidget(adId);
+      }
+
+      // 2. Try Unity Fallback Banner second
       if (_isUnityInitialized && _isBannerAdLoaded) {
         debugPrint('✅ Showing Unity Fallback Banner for ad ID: $adId');
         return _getUnityFallbackWidget(adId);
@@ -2082,6 +2204,7 @@ class AdService with ChangeNotifier {
 
       // Store the banner ad before loading
       _swipeableBannerAds[adKey] = bannerAd;
+      _limitNativeAdCache();
 
       // Load the ad with a timeout
       debugPrint('⏳ [SwipeableBanner] Loading banner ad for screen: $screenId');
@@ -2328,14 +2451,14 @@ class AdService with ChangeNotifier {
     // Production ad unit IDs
     final Map<String, Map<String, String>> productionAdUnitIds = {
       'android': {
-        'banner': 'ca-app-pub-3537329799200606/2028008282',
-        'rewarded': 'ca-app-pub-3537329799200606/7827129874',
-        'native': 'ca-app-pub-3537329799200606/2260507229',
+        'banner': 'ca-app-pub-3940256099942544/6300978111',
+        'rewarded': 'ca-app-pub-3940256099942544/5224354917',
+        'native': 'ca-app-pub-3940256099942544/2247696110',
       },
       'ios': {
-        'banner': 'ca-app-pub-3537329799200606/2028008282',
-        'rewarded': 'ca-app-pub-3537329799200606/7827129874',
-        'native': 'ca-app-pub-3537329799200606/2260507229',
+        'banner': 'ca-app-pub-3940256099942544/2934735716',
+        'rewarded': 'ca-app-pub-3940256099942544/1712485313',
+        'native': 'ca-app-pub-3940256099942544/3986624511',
       },
     };
 
@@ -2424,8 +2547,41 @@ class AdService with ChangeNotifier {
     _nativeAdRefreshTimer?.cancel();
     _nativeAdRefreshTimer = null;
 
+    _swipeableBannerAds.forEach((_, ad) => ad.dispose());
+    _swipeableBannerAds.clear();
+    _swipeableNativeAds.forEach((_, ad) => ad.dispose());
+    _swipeableNativeAds.clear();
+    
     // Call super.dispose() to properly clean up ChangeNotifier
     super.dispose();
     debugPrint('AdService resources disposed');
+  }
+  void _limitNativeAdCache() {
+    // Limit standard native ads to 2
+    if (_nativeAds.length > 2) {
+      final oldestKey = _nativeAds.keys.first;
+      _nativeAds[oldestKey]?.dispose();
+      _nativeAds.remove(oldestKey);
+      _nativeAdLoadedStates.remove(oldestKey);
+      debugPrint('🧹 Cache limit reached, disposed native ad: $oldestKey');
+    }
+    
+    // Limit swipeable native ads to 2
+    if (_swipeableNativeAds.length > 2) {
+      final oldestKey = _swipeableNativeAds.keys.first;
+      _swipeableNativeAds[oldestKey]?.dispose();
+      _swipeableNativeAds.remove(oldestKey);
+      _swipeableAdLoadedStates.remove(oldestKey);
+      debugPrint('🧹 Cache limit reached, disposed swipeable native ad: $oldestKey');
+    }
+
+    // Limit swipeable banner ads to 2
+    if (_swipeableBannerAds.length > 2) {
+      final oldestKey = _swipeableBannerAds.keys.first;
+      _swipeableBannerAds[oldestKey]?.dispose();
+      _swipeableBannerAds.remove(oldestKey);
+      _swipeableAdLoadedStates.remove(oldestKey);
+      debugPrint('🧹 Cache limit reached, disposed swipeable banner ad: $oldestKey');
+    }
   }
 }

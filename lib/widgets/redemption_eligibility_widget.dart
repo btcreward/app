@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-class WithdrawalEligibilityWidget extends StatelessWidget {
+class RedemptionEligibilityWidget extends StatelessWidget {
   final double btcBalance;
   final VoidCallback? onNext;
   final VoidCallback? onBack;
   static const double minBtc = 0.00005;
 
-  const WithdrawalEligibilityWidget({
+  const RedemptionEligibilityWidget({
     super.key,
     required this.btcBalance,
     this.onNext,
@@ -49,7 +49,7 @@ class WithdrawalEligibilityWidget extends StatelessWidget {
                 ),
                 const SizedBox(height: 28),
                 Text(
-                  'Withdrawal Eligibility',
+                  'Redemption Eligibility',
                   style: theme.textTheme.titleLarge?.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -95,8 +95,8 @@ class WithdrawalEligibilityWidget extends StatelessWidget {
                       Flexible(
                         child: Text(
                           eligible
-                              ? 'You are eligible for withdrawal!'
-                              : 'Withdrawals will be available once your balance reaches 0.00005 BTC.',
+                              ? 'You are eligible for redemption!'
+                              : 'Redemptions will be available once your balance reaches 0.00005 BTC.',
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w600,

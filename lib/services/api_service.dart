@@ -489,7 +489,7 @@ class ApiService {
     }
   }
 
-  Future<Map<String, dynamic>> withdrawFunds({
+  Future<Map<String, dynamic>> redeemFunds({
     required String method,
     required String destination,
     required double amount,
@@ -530,16 +530,16 @@ class ApiService {
         final responseData = jsonDecode(response.body);
         return responseData;
       } else {
-        throw Exception('Withdrawal request failed');
+        throw Exception('Redemption request failed');
       }
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<Map<String, dynamic>> getWithdrawalHistory() async {
+  Future<Map<String, dynamic>> getRedemptionHistory() async {
     try {
-      final response = await get(ApiConfig.walletWithdrawals);
+      final response = await get(ApiConfig.walletRedemptions);
 
       if (response['success']) {
         return response;
@@ -811,7 +811,7 @@ class ApiService {
     }
   }
 
-  Future<Map<String, dynamic>> getWithdrawals() async {
+  Future<Map<String, dynamic>> getRedemptions() async {
     try {
       final token = await StorageUtils.getToken();
       if (token == null) {
@@ -831,7 +831,7 @@ class ApiService {
       } else {
         return {
           'success': false,
-          'message': 'Failed to get withdrawals: ${response.statusCode}'
+          'message': 'Failed to get redemptions: ${response.statusCode}'
         };
       }
     } catch (e) {
@@ -1231,12 +1231,10 @@ class ApiService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         final responseData = jsonDecode(response.body);
         if (responseData['success']) {
-          // If this is a withdrawal transaction, also update withdrawal status
-          if (transaction['type']
-                  .toString()
-                  .toLowerCase()
-                  .contains('withdrawal') &&
-              transaction['withdrawalId'] != null) {
+          // If this is a redemption transaction, also update redemption status
+          final type = transaction['type'].toString().toLowerCase();
+          if ((type.contains('redemption') || type.contains('withdrawal')) &&
+              transaction['redemptionId'] != null) {
             await http.post(
               Uri.parse('${ApiConfig.baseUrl}/api/wallet/withdrawals/update'),
               headers: {
@@ -1245,7 +1243,7 @@ class ApiService {
                 'Authorization': 'Bearer $token',
               },
               body: json.encode({
-                'withdrawalId': transaction['withdrawalId'],
+                'withdrawalId': transaction['redemptionId'],
                 'status': transaction['status'],
                 'transactionId': transaction['transactionId'],
               }),
@@ -1453,13 +1451,13 @@ class ApiService {
     }
   }
 
-  Future<Map<String, dynamic>> createWithdrawal(
-      Map<String, dynamic> withdrawalData) async {
+  Future<Map<String, dynamic>> createRedemption(
+      Map<String, dynamic> redemptionData) async {
     try {
       final response = await _makeRequest(
           endpoint: '/api/wallet/withdraw',
           method: 'POST',
-          body: withdrawalData);
+          body: redemptionData);
 
       if (response['success']) {
         return response;
@@ -1467,11 +1465,11 @@ class ApiService {
         return {
           'success': false,
           'message':
-              response['message'] ?? 'Failed to create withdrawal request'
+              response['message'] ?? 'Failed to create redemption request'
         };
       }
     } catch (e) {
-      return {'success': false, 'message': 'Error creating withdrawal: $e'};
+      return {'success': false, 'message': 'Error creating redemption: $e'};
     }
   }
 
@@ -1550,3 +1548,4 @@ class ApiService {
     }
   }
 }
+

@@ -69,7 +69,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                   child: Padding(
                     padding: EdgeInsets.all(16.0),
                     child: Text(
-                      '⚠️ This is a virtual mining simulation app. All BTC shown is virtual. Withdrawals are enabled only when minimum thresholds are reached and verified.',
+                      '⚠️ This is a virtual mining simulation app. All BTC shown is virtual. Redemptions are enabled only when minimum thresholds are reached and verified.',
                       style: TextStyle(fontSize: 16, color: Colors.black87),
                       textAlign: TextAlign.center,
                     ),
@@ -105,7 +105,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                                   '⚡ Deliver transparent and competitive mining returns.\n'),
                           TextSpan(
                               text:
-                                  '🔒 Ensure secure and timely withdrawals.\n'),
+                                  '🔒 Ensure secure and timely redemptions.\n'),
                           TextSpan(
                               text:
                                   '🌐 Make Bitcoin mining accessible globally.\n'),
@@ -128,7 +128,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                       '🎮 Simulated Bitcoin mining experience – Enjoy a rewarding gameplay experience with engaging in-app rewards.\n\n'
                       '💫 24/7 Mining Performance – Continuous operation with 99.9% uptime and professional maintenance.\n\n'
                       '🛟 24/7 Support – Dedicated customer service team available round the clock.\n\n'
-                      '⚡ Withdrawals processed within 48 hours if eligible. Withdrawal requests are reviewed and processed based on eligibility.\n',
+                      '⚡ Redemptions processed within 48 hours if eligible. Redemption requests are reviewed and processed based on eligibility.\n',
                       style: textStyle,
                     ),
                   ),
@@ -232,7 +232,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                               ),
                               _TestimonialCard(
                                 text:
-                                    '“Finally, a mining app that lets you request BTC withdrawals after reaching a minimum threshold and passing eligibility review!”',
+                                    '“Finally, a mining app that lets you request BTC redemptions after reaching a minimum threshold and passing eligibility review!”',
                                 rating: 5,
                               ),
                             ],
@@ -598,3 +598,4 @@ class _SocialMediaButton extends StatelessWidget {
     );
   }
 }
+

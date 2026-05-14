@@ -98,7 +98,8 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   bool _wasPowerBoostActive = false;
 
   Timer? _adUiUpdateTimer;
-  Timer? _nativeAdAutoRefreshTimer;
+  // Native ad timers removed
+
 
   // AdMob Banner Ad
   BannerAd? _bannerAd;
@@ -133,7 +134,7 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
       // Create the banner ad with the determined size
       _bannerAd = BannerAd(
-        adUnitId: 'ca-app-pub-3537329799200606/2028008282',
+        adUnitId: 'ca-app-pub-3940256099942544/6300978111',
         size: targetAdSize,
         request: const AdRequest(),
         listener: BannerAdListener(
@@ -148,19 +149,12 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               setState(() {
                 _isBannerAdLoaded = true;
               });
-              // Schedule the next ad refresh after 30 seconds
-              Future.delayed(const Duration(seconds: 30), () {
-                if (mounted) _reloadBannerAd();
-              });
             }
           },
           onAdFailedToLoad: (ad, error) {
             debugPrint('❌ Adaptive Banner ad failed to load: $error');
             ad.dispose();
-            // Retry loading the ad after a delay
-            Future.delayed(const Duration(seconds: 5), () {
-              if (mounted) _reloadBannerAd();
-            });
+            // AdMob will retry automatically or on next view creation.
           },
           onAdImpression: (ad) {
             debugPrint('👁️ Banner ad impression');
@@ -180,7 +174,7 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   Future<void> _loadFallbackBannerAd() async {
     try {
       _bannerAd = BannerAd(
-        adUnitId: 'ca-app-pub-3537329799200606/2028008282',
+        adUnitId: 'ca-app-pub-3940256099942544/6300978111',
         size: const AdSize(width: 320, height: 50), // Standard banner size
         request: const AdRequest(),
         listener: BannerAdListener(
@@ -204,12 +198,7 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     }
   }
 
-  // Reload the banner ad
-  Future<void> _reloadBannerAd() async {
-    if (mounted) {
-      await _initializeBannerAd();
-    }
-  }
+
 
   Future<Widget?> _getMiddleBannerAdWidget() async {
     return Container(
@@ -270,8 +259,12 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     _audioPlayer = AudioPlayer();
     _adService = AdService();
 
-    // Initialize banner ad
-    _initializeBannerAd();
+    // Initialize banner ad after the first frame when MediaQuery is available
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _initializeBannerAd();
+      }
+    });
     _middleBannerAdFuture = _getMiddleBannerAdWidget();
 
     Future.microtask(() async {
@@ -283,8 +276,8 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     _loadUserProfile();
     _loadPercentage();
     _loadSavedSettings();
-    _startAdReloadTimer();
-    _startAdTimer();
+    // Manual ad reload timers removed to prevent main thread stuttering.
+
     _scrollController.addListener(() {
       if (_scrollController.offset > 50 && !_isScrolled) {
         setState(() => _isScrolled = true);
@@ -372,7 +365,8 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    _nativeAdAutoRefreshTimer?.cancel();
+    // Native ad timer cancel removed
+
     // Don't cancel mining timer - let it continue in background
     if (_isMining) {
       _saveMiningState();
@@ -1423,41 +1417,47 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                               child: CircularProgressIndicator(
                                   color: Colors.white))
                           : Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    _sciFiTapCount % 10 == 0
-                                        ? Icons.emoji_events
-                                        : _sciFiTapCount % 5 == 0
-                                            ? Icons.flash_on
-                                            : Icons.memory,
-                                    size: 60,
-                                    color: Colors.white,
-                                  ),
-                                  if (_sciFiTapCount > 0) ...[
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      '$_sciFiTapCount',
-                                      style: const TextStyle(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        _sciFiTapCount % 10 == 0
+                                            ? Icons.emoji_events
+                                            : _sciFiTapCount % 5 == 0
+                                                ? Icons.flash_on
+                                                : Icons.memory,
+                                        size: 60,
                                         color: Colors.white,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
                                       ),
-                                    ),
-                                  ],
-                                  if (_sciFiCooldownSeconds > 0) ...[
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      'Cooldown: $_sciFiCooldownSeconds s',
-                                      style: const TextStyle(
-                                        color: Colors.yellow,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ],
+                                      if (_sciFiTapCount > 0) ...[
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          '$_sciFiTapCount',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                      if (_sciFiCooldownSeconds > 0) ...[
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          'Cooldown: $_sciFiCooldownSeconds s',
+                                          style: const TextStyle(
+                                            color: Colors.yellow,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                ),
                               ),
                             ),
                     ),
@@ -1480,7 +1480,6 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               adService: _adService,
               screenId: 'home_screen',
               refreshInterval: const Duration(minutes: 2),
-              autoSwipeInterval: const Duration(seconds: 15),
               margin: const EdgeInsets.only(bottom: 16),
             ),
             Row(
@@ -1831,23 +1830,7 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     // Implement the logic to load saved settings from SharedPreferences
   }
 
-  void _startAdReloadTimer() {
-    _adReloadTimer?.cancel();
-    _adReloadTimer = Timer.periodic(const Duration(minutes: 1), (timer) {
-      if (mounted) {
-        // _loadAds(); // Removed as only rewarded ads are used
-      }
-    });
-  }
 
-  void _startAdTimer() {
-    _adTimer?.cancel();
-    _adTimer = Timer.periodic(const Duration(minutes: 10), (timer) {
-      if (mounted && _isMining) {
-        // _showRewardedAd(); // Auto-call hata diya gaya hai (AdMob policy compliance)
-      }
-    });
-  }
 
   Future<void> _startPowerBoost() async {
     if (!mounted || !_isMining) return;
@@ -2203,3 +2186,4 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     debugPrint('✅ Mining timer started successfully');
   }
 }
+

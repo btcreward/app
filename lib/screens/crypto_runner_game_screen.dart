@@ -62,7 +62,7 @@ class _CryptoRunnerGameScreenState extends State<CryptoRunnerGameScreen>
 
   Future<void> _loadSoundEffects() async {
     try {
-      await audioPlayer.setSource(AssetSource('sounds/beep.mp3'));
+      await audioPlayer.setSource(AssetSource('sounds/success_chime.mp3'));
       await audioPlayer.setVolume(0.5);
     } catch (e) {
       // Audio initialization failed, continue without sound
@@ -683,3 +683,4 @@ class GameObject {
     required this.height,
   });
 }
+

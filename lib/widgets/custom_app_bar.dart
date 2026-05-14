@@ -143,3 +143,4 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   Size get preferredSize =>
       Size.fromHeight(toolbarHeight + (bottom?.preferredSize.height ?? 0.0));
 }
+

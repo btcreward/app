@@ -166,3 +166,4 @@ class GlobalMiningService {
     debugPrint('🗑️ Global mining service disposed');
   }
 }
+

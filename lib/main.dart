@@ -42,13 +42,8 @@ import 'utils/storage_utils.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-// Background message handler
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  if (Firebase.apps.isEmpty) {
-    await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform);
-  }
-}
+// Background message handling is managed in fcm_service.dart
+
 
 /// Initialize mobile-only services in parallel - non-critical, don't block startup
 void _initMobileServices() {
@@ -120,43 +115,35 @@ void _initMobileServices() {
   }
 }
 
-void main() async {
-  // Set zone error handling to non-fatal
-  // BindingBase.debugZoneErrorsAreFatal = false; // Optional: Debug zone errors ko ignore na karein
-
-  // Ensure Flutter bindings are initialized first
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // Preload fonts to prevent font loading issues
-  await GoogleFonts.pendingFonts([
-    GoogleFonts.notoSans(),
-    GoogleFonts.poppins(),
-  ]);
-
-  // Initialize Firebase with proper configuration
+Future<void> _initializeFirebaseServices() async {
   try {
     if (Firebase.apps.isEmpty) {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
     }
+  } catch (e, stackTrace) {
+    AppLogger.error('Firebase initialization failed',
+        error: e, stackTrace: stackTrace);
+    return;
+  }
 
-    // Set up background message handler (non-blocking)
-    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
-    // Run non-critical Firebase services in parallel (don't block startup)
-    Future.wait([
-      FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true),
-      AnalyticsService.trackAppOpen(),
-      FcmService.initializeFCM(),
-    ]).catchError((e) {
-      AppLogger.error('Non-critical Firebase services init failed', error: e);
-      return <Future>[];
+  try {
+    FirebaseAnalytics.instance
+        .setAnalyticsCollectionEnabled(true)
+        .catchError((e) {
+      AppLogger.error('Analytics collection enable failed', error: e);
     });
 
-    // Crashlytics initialization
+    AnalyticsService.trackAppOpen().catchError((e) {
+      AppLogger.error('Analytics track app open failed', error: e);
+    });
+
+    FcmService.initializeFCM().catchError((e) {
+      AppLogger.error('FCM initialization failed', error: e);
+    });
+
     try {
-      // Check if Crashlytics is available before initializing
       await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
       FlutterError.onError = (errorDetails) {
         FirebaseCrashlytics.instance.recordFlutterError(errorDetails);
@@ -165,17 +152,29 @@ void main() async {
     } catch (e, stackTrace) {
       AppLogger.error('Crashlytics initialization failed',
           error: e, stackTrace: stackTrace);
-      // Continue without crashlytics if it fails
       FlutterError.onError = (errorDetails) {
-        // Fallback error logging
         AppLogger.error('Flutter error',
             error: errorDetails.exception, stackTrace: errorDetails.stack);
       };
     }
   } catch (e, stackTrace) {
-    AppLogger.error('Firebase initialization failed',
+    AppLogger.error('Non-critical Firebase services init failed',
         error: e, stackTrace: stackTrace);
   }
+}
+
+void main() async {
+  // Set zone error handling to non-fatal
+  // BindingBase.debugZoneErrorsAreFatal = false; // Optional: Debug zone errors ko ignore na karein
+
+  // Ensure Flutter bindings are initialized first
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Do not block startup on font preloading. Load fonts lazily instead.
+  GoogleFonts.pendingFonts([
+    GoogleFonts.notoSans(),
+    GoogleFonts.poppins(),
+  ]);
 
   // Initialize ad SDKs and background tasks in parallel (non-blocking)
   if (!kIsWeb) {
@@ -189,7 +188,7 @@ void main() async {
       baseUrl: kIsWeb ? 'http://localhost:5000' : 'http://10.0.2.2:5000',
       apiService: apiService);
 
-  // Run the app
+  // Run the app first, then initialize Firebase in the background.
   try {
     runApp(MyApp(
       apiService: apiService,
@@ -198,6 +197,8 @@ void main() async {
   } catch (e, stackTrace) {
     AppLogger.error('App runApp failed', error: e, stackTrace: stackTrace);
   }
+
+  _initializeFirebaseServices();
 }
 
 class MyApp extends StatefulWidget {
@@ -436,9 +437,7 @@ class _MyAppState extends State<MyApp>
         ),
         initialRoute: '/launch',
         debugShowCheckedModeBanner: false,
-        navigatorObservers: [
-          FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
-        ],
+        navigatorObservers: const [],
         routes: {
           '/': (context) => const LaunchScreen(),
           '/launch': (context) => const LaunchScreen(),
@@ -451,3 +450,4 @@ class _MyAppState extends State<MyApp>
     );
   }
 }
+

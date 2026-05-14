@@ -165,3 +165,4 @@ class BackgroundMiningManager {
     debugPrint('🗑️ Background mining manager disposed');
   }
 }
+

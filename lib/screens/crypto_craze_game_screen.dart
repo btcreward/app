@@ -757,3 +757,4 @@ class CryptoCrazeGameScreenState extends State<CryptoCrazeGameScreen> {
     );
   }
 }
+

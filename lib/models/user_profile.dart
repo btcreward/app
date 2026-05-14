@@ -8,9 +8,9 @@ class UserProfile {
   DateTime joinDate;
   double walletBalance;
   double totalMined;
-  double totalWithdrawn;
+  double totalRedeemed;
   List<Transaction> transactions;
-  List<WithdrawalRequest> withdrawals;
+  List<RedemptionRequest> redemptions;
   double miningRate;
   int powerUps;
   Map<String, dynamic> preferences;
@@ -23,9 +23,9 @@ class UserProfile {
     DateTime? joinDate,
     this.walletBalance = 0.0,
     this.totalMined = 0.0,
-    this.totalWithdrawn = 0.0,
+    this.totalRedeemed = 0.0,
     List<Transaction>? transactions,
-    List<WithdrawalRequest>? withdrawals,
+    List<RedemptionRequest>? redemptions,
     this.miningRate = 0.00001,
     this.powerUps = 0,
     Map<String, dynamic>? preferences,
@@ -33,7 +33,7 @@ class UserProfile {
         lastActive = lastActive ?? DateTime.now(),
         joinDate = joinDate ?? DateTime.now(),
         transactions = transactions ?? [],
-        withdrawals = withdrawals ?? [],
+        redemptions = redemptions ?? [],
         preferences = preferences ?? {};
 
   void updateWalletBalance(double amount, String type) {
@@ -45,14 +45,14 @@ class UserProfile {
         amount: amount,
         description: 'Mining reward',
       ));
-    } else if (type == 'withdrawal') {
+    } else if (type == 'redemption' || type == 'withdrawal') {
       if (amount <= walletBalance) {
         walletBalance -= amount;
-        totalWithdrawn += amount;
+        totalRedeemed += amount;
         transactions.add(Transaction(
-          type: 'withdrawal',
+          type: 'redemption',
           amount: -amount,
-          description: 'Withdrawal',
+          description: 'Redemption',
         ));
       }
     }
@@ -74,9 +74,9 @@ class UserProfile {
         'joinDate': joinDate.toIso8601String(),
         'walletBalance': walletBalance,
         'totalMined': totalMined,
-        'totalWithdrawn': totalWithdrawn,
+        'totalWithdrawn': totalRedeemed,
         'transactions': transactions.map((t) => t.toJson()).toList(),
-        'withdrawals': withdrawals.map((w) => w.toJson()).toList(),
+        'withdrawals': redemptions.map((w) => w.toJson()).toList(),
         'miningRate': miningRate,
         'powerUps': powerUps,
         'preferences': preferences,
@@ -90,13 +90,13 @@ class UserProfile {
         joinDate: DateTime.parse(json['joinDate']),
         walletBalance: json['walletBalance'],
         totalMined: json['totalMined'] ?? 0.0,
-        totalWithdrawn: json['totalWithdrawn'] ?? 0.0,
+        totalRedeemed: json['totalWithdrawn'] ?? 0.0,
         transactions: (json['transactions'] as List?)
                 ?.map((t) => Transaction.fromJson(t))
                 .toList() ??
             [],
-        withdrawals: (json['withdrawals'] as List?)
-                ?.map((w) => WithdrawalRequest.fromJson(w))
+        redemptions: (json['withdrawals'] as List?)
+                ?.map((w) => RedemptionRequest.fromJson(w))
                 .toList() ??
             [],
         miningRate: json['miningRate'],
@@ -143,7 +143,7 @@ class Transaction {
       );
 }
 
-class WithdrawalRequest {
+class RedemptionRequest {
   final String id;
   final double amount;
   String destinationAddress;
@@ -151,7 +151,7 @@ class WithdrawalRequest {
   String status;
   DateTime? completionTime;
 
-  WithdrawalRequest({
+  RedemptionRequest({
     String? id,
     required this.amount,
     this.destinationAddress = 'pending',
@@ -170,8 +170,8 @@ class WithdrawalRequest {
         'completionTime': completionTime?.toIso8601String(),
       };
 
-  factory WithdrawalRequest.fromJson(Map<String, dynamic> json) =>
-      WithdrawalRequest(
+  factory RedemptionRequest.fromJson(Map<String, dynamic> json) =>
+      RedemptionRequest(
         id: json['id'],
         amount: json['amount'],
         destinationAddress: json['destinationAddress'],
@@ -182,3 +182,4 @@ class WithdrawalRequest {
             : null,
       );
 }
+

@@ -21,6 +21,7 @@ class MediationConfig {
     // Add your test device IDs here
     // You can get these from AdMob console or by running the app in debug mode
     // Example: '33BE2250B43518CCDA7DE426D04EE231',
+    '37A88FEA15A46F320C2118B949BC6966',
   ];
 
   // Supported mediation networks
@@ -123,3 +124,4 @@ class MediationConfig {
     }
   }
 }
+

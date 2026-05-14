@@ -131,3 +131,4 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     AppLogger.error('FCM error', error: e);
   }
 }
+
