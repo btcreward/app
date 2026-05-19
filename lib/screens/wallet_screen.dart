@@ -14,7 +14,6 @@ import 'package:provider/provider.dart';
 import '../components/processing_dialog.dart';
 import '../screens/transaction_details_screen.dart';
 import '../utils/number_formatter.dart';
-import '../widgets/redemption_disclaimer_dialog.dart';
 import '../widgets/redemption_eligibility_widget.dart';
 
 class WalletScreen extends StatefulWidget {
@@ -1636,37 +1635,32 @@ class WalletScreenState extends State<WalletScreen>
     }
   }
 
-  void _startRedemptionFlow() async {
-    await showRedemptionDisclaimerDialog(
-      context: context,
-      onContinue: () {
-        if (mounted) {
-          showModalBottomSheet(
-            context: context,
-            backgroundColor: Colors.transparent,
-            isScrollControlled: true,
-            builder: (ctx) => Container(
-              height: MediaQuery.of(context).size.height * 0.7,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
-              ),
-              child: RedemptionEligibilityWidget(
-                btcBalance: _walletProvider.btcBalance,
-                onBack: () => Navigator.pop(ctx),
-                onNext: () {
-                  Navigator.pop(ctx);
-                  _showRedemptionDialog();
-                },
-              ),
+  void _startRedemptionFlow() {
+    if (mounted) {
+      showModalBottomSheet(
+        context: context,
+        backgroundColor: Colors.transparent,
+        isScrollControlled: true,
+        builder: (ctx) => Container(
+          height: MediaQuery.of(context).size.height * 0.7,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
             ),
-          );
-        }
-      },
-    );
+          ),
+          child: RedemptionEligibilityWidget(
+            btcBalance: _walletProvider.btcBalance,
+            onBack: () => Navigator.pop(ctx),
+            onNext: () {
+              Navigator.pop(ctx);
+              _showRedemptionDialog();
+            },
+          ),
+        ),
+      );
+    }
   }
 
   void _showRedemptionDialog() {
