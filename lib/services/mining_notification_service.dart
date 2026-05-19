@@ -106,7 +106,7 @@ class MiningNotificationService {
       final status = statusOverride ?? _miningStatus;
 
       final content =
-          '💰 Balance: ${_formatBalanceTo18Decimals(_currentBalance)} BTC\n'
+          '💰 Reward: ${_formatBalanceTo18Decimals(_currentBalance)} BTC\n'
           '⚡ Hashrate: $_currentHashRate H/s\n'
           '⏱️ Duration: $duration\n'
           '📊 Status: $status';

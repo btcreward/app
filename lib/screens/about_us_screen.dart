@@ -124,7 +124,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                     child: Text(
                       '🔥 Why Choose BTC Reward?\n\n'
                       '⚡ BTC Gameplay - Collect in-app BTC points through simulated activities.\n\n'
-                      '🔐 Transparent Progress - Track your hash rate and reward balance in the app.\n\n'
+                      '🔐 Transparent Progress - Track your hash rate and reward in the app.\n\n'
                       '🎮 Entertainment First - Enjoy a BTC-themed reward experience without real device or cloud computing.\n\n'
                       '💫 No Investment Claims - Rewards are points and are not guaranteed income.\n\n'
                       '🛟 24/7 Support – Dedicated customer service team available round the clock.\n\n'

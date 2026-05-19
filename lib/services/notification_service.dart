@@ -398,7 +398,7 @@ class NotificationService {
 
   String _buildNotificationContent(String duration) {
     return '''
-💰 Balance: $_currentBalance BTC
+💰 Reward: $_currentBalance BTC
 ⚡ Hashrate: $_currentHashRate H/s
 ⏱️ Duration: $duration
 🔒 App is running in background''';

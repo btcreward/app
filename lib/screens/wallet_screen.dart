@@ -319,7 +319,7 @@ class WalletScreenState extends State<WalletScreen>
 
     // Ensure we don't exceed the available BTC balance
     if (btcAmount > _walletProvider.btcBalance) {
-      throw Exception('Insufficient balance');
+      throw Exception('Insufficient reward');
     }
 
     return double.parse(NumberFormatter.formatBTCAmount(btcAmount));
@@ -1311,7 +1311,7 @@ class WalletScreenState extends State<WalletScreen>
 
       // Check if we have sufficient balance
       if (btcAmount > _walletProvider.btcBalance) {
-        throw Exception('Insufficient balance');
+        throw Exception('Insufficient reward');
       }
 
       // Initialize and sync wallet before redemption
@@ -1585,7 +1585,7 @@ class WalletScreenState extends State<WalletScreen>
               claimScaffoldMessenger.showSnackBar(
                 const SnackBar(
                   content: Text(
-                      'Transaction claimed successfully! Reward added to your balance.'),
+                      'Transaction claimed successfully! Reward added.'),
                   backgroundColor: Colors.green,
                 ),
               );

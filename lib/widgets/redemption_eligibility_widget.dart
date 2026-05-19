@@ -59,7 +59,7 @@ class RedemptionEligibilityWidget extends StatelessWidget {
                 ),
                 const SizedBox(height: 18),
                 Text(
-                  'Your Balance:',
+                  'Your Reward:',
                   style: TextStyle(
                     color: Colors.white70,
                     fontSize: 17,
@@ -96,7 +96,7 @@ class RedemptionEligibilityWidget extends StatelessWidget {
                         child: Text(
                           eligible
                               ? 'You are eligible for redemption!'
-                              : 'Redemptions will be available once your balance reaches 0.00005 BTC.',
+                              : 'Redemptions will be available once your reward reaches 0.00005 BTC.',
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w600,

@@ -458,7 +458,7 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'You collected ${earningsToAdd.toStringAsFixed(18)} BTC points. Added to your reward balance.',
+                'You collected ${earningsToAdd.toStringAsFixed(18)} BTC points. Added to your reward.',
                 style: const TextStyle(fontSize: 16),
               ),
               backgroundColor: Colors.amber,
