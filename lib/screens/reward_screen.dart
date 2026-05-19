@@ -33,7 +33,7 @@ class RewardScreenState extends State<RewardScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    _adService.loadRewardedAd();
+    _adService.loadRewardedAd(slot: AdSlots.rewardRewarded1);
     _confettiController =
         ConfettiController(duration: const Duration(seconds: 3));
     _rewardClaimHandler = RewardClaimHandler(
@@ -44,7 +44,7 @@ class RewardScreenState extends State<RewardScreen>
     );
     _loadSocialMediaPlatforms();
     _startCountdownTimer();
-    _bannerAdFuture = _adService.getBannerAdWidget();
+    _bannerAdFuture = _adService.getBannerAdWidget(slot: AdSlots.rewardBanner1);
   }
 
   @override
@@ -201,7 +201,7 @@ class RewardScreenState extends State<RewardScreen>
                           RewardCard(
                             icon: Icons.share,
                             title: 'Referral Reward',
-                            subtitle: 'Refer friends and earn bonus!',
+                            subtitle: 'Refer friends and collect a bonus!',
                             rewardAmount: NumberFormatter.formatBTCAmount(
                                 rewardProvider.referralReward),
                             canClaim: true,
@@ -315,6 +315,7 @@ class RewardClaimHandler {
 
     try {
       return await adService.showRewardedAd(
+        slot: AdSlots.rewardRewarded1,
         onRewarded: onRewarded,
         onAdDismissed: onAdDismissed,
       );
@@ -475,4 +476,3 @@ class RewardCard extends StatelessWidget {
     );
   }
 }
-

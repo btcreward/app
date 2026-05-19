@@ -47,8 +47,10 @@ class CryptoCrazeGameScreenState extends State<CryptoCrazeGameScreen> {
   void initState() {
     super.initState();
     _loadGameData();
-    _adService.loadBannerAd();
-    _adService.loadInterstitialAd(); // Load interstitial ad on init
+    _adService.loadBannerAd(slot: AdSlots.cryptoCrazeBanner1);
+    _adService.loadInterstitialAd(
+      slot: AdSlots.cryptoCrazeInterstitial1,
+    ); // Load interstitial ad on init
 
     // Pending ad level load karo
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -161,7 +163,7 @@ class CryptoCrazeGameScreenState extends State<CryptoCrazeGameScreen> {
         builder: (context) => AlertDialog(
           title: const Text('Level Up!'),
           content: Text(
-              'Congratulations! You reached Level $_currentLevel and earned 0.00000000000000001 BTC!'),
+              'Congratulations! You reached Level $_currentLevel and collected 0.00000000000000001 BTC!'),
           actions: [
             TextButton(
               onPressed: () {
@@ -304,7 +306,7 @@ class CryptoCrazeGameScreenState extends State<CryptoCrazeGameScreen> {
         await _walletProvider.addEarning(
           _sessionEarnings,
           type: 'game',
-          description: 'Crypto Craze Game Earnings - Level $_currentLevel',
+          description: 'Crypto Craze Game Rewards - Level $_currentLevel',
         );
 
         // Play earning sound for game completion
@@ -314,7 +316,7 @@ class CryptoCrazeGameScreenState extends State<CryptoCrazeGameScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                '🎉 ${_sessionEarnings.toStringAsFixed(18)} BTC added to wallet!',
+                '🎉 ${_sessionEarnings.toStringAsFixed(18)} BTC points added!',
                 style: const TextStyle(fontSize: 16),
               ),
               backgroundColor: Colors.green,
@@ -326,7 +328,7 @@ class CryptoCrazeGameScreenState extends State<CryptoCrazeGameScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error saving earnings: ${e.toString()}'),
+              content: Text('Error saving rewards: ${e.toString()}'),
               backgroundColor: Colors.red,
               duration: const Duration(seconds: 3),
             ),
@@ -362,7 +364,7 @@ class CryptoCrazeGameScreenState extends State<CryptoCrazeGameScreen> {
             ],
           ),
           content: Text(
-            'You have ${_sessionEarnings.toStringAsFixed(18)} BTC earnings!\n\nDo you want to save and exit?',
+            'You have ${_sessionEarnings.toStringAsFixed(18)} BTC reward points!\n\nDo you want to save and exit?',
             style: const TextStyle(fontSize: 16),
           ),
           actions: [
@@ -390,6 +392,7 @@ class CryptoCrazeGameScreenState extends State<CryptoCrazeGameScreen> {
     // Show interstitial ad before exiting
     try {
       final adShown = await _adService.showInterstitialAd(
+        slot: AdSlots.cryptoCrazeInterstitial1,
         onAdDismissed: _exitAfterAd,
       );
 
@@ -411,10 +414,11 @@ class CryptoCrazeGameScreenState extends State<CryptoCrazeGameScreen> {
     });
     try {
       if (!_adService.isRewardedAdLoaded) {
-        await _adService.loadRewardedAd();
+        await _adService.loadRewardedAd(slot: AdSlots.cryptoCrazeRewarded1);
       }
       if (mounted) {
         await _adService.showRewardedAd(
+          slot: AdSlots.cryptoCrazeRewarded1,
           onRewarded: (amount) async {
             // Double mining activate karo
             setState(() {
@@ -480,6 +484,7 @@ class CryptoCrazeGameScreenState extends State<CryptoCrazeGameScreen> {
                 _isAdLoading = true;
               });
               await _adService.showRewardedAd(
+                slot: AdSlots.cryptoCrazeRewarded2,
                 onRewarded: (amount) async {
                   // Ad dekhne par reward do
                   const double adReward = 0.00000000000000001;
@@ -496,7 +501,7 @@ class CryptoCrazeGameScreenState extends State<CryptoCrazeGameScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text(
-                            'You earned 0.000000000000000010 BTC for watching the ad!'),
+                            'You collected 0.000000000000000010 BTC for watching the ad!'),
                         backgroundColor: Colors.green,
                         duration: Duration(seconds: 2),
                       ),
@@ -672,7 +677,9 @@ class CryptoCrazeGameScreenState extends State<CryptoCrazeGameScreen> {
                           height: 60,
                           margin: const EdgeInsets.only(bottom: 8),
                           child: _adService.isBannerAdLoaded
-                              ? _adService.getBannerAd()
+                              ? _adService.getBannerAd(
+                                  slot: AdSlots.cryptoCrazeBanner1,
+                                )
                               : Container(
                                   color: Colors.black.withAlpha(13),
                                   child: const Center(
@@ -757,4 +764,3 @@ class CryptoCrazeGameScreenState extends State<CryptoCrazeGameScreen> {
     );
   }
 }
-

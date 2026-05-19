@@ -25,7 +25,7 @@ class _ContactSupportScreenState extends State<ContactSupportScreen> {
     try {
       // Load both native and banner for fallback
       await _adService.loadNativeAd();
-      await _adService.loadBannerAd();
+      await _adService.loadBannerAd(slot: AdSlots.contactSupportBanner1);
       if (mounted) {
         setState(() {});
       }
@@ -275,4 +275,3 @@ class _ContactSupportScreenState extends State<ContactSupportScreen> {
     );
   }
 }
-

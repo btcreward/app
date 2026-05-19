@@ -140,7 +140,8 @@ class NavigationScreenState extends State<NavigationScreen>
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
             child: Container(
-              width: 340,
+              width: MediaQuery.sizeOf(context).width * 0.88,
+              constraints: const BoxConstraints(maxWidth: 340),
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(32),
@@ -213,14 +214,17 @@ class NavigationScreenState extends State<NavigationScreen>
                     children: [
                       _getNetworkIcon(networkProvider, showNetworkIcon: true),
                       const SizedBox(width: 8),
-                      Text(
-                        networkProvider.getNetworkStatusMessage(),
-                        style: TextStyle(
-                          color: networkProvider.isConnected
-                              ? Colors.greenAccent
-                              : Colors.redAccent,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                      Flexible(
+                        child: Text(
+                          networkProvider.getNetworkStatusMessage(),
+                          style: TextStyle(
+                            color: networkProvider.isConnected
+                                ? Colors.greenAccent
+                                : Colors.redAccent,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
@@ -233,12 +237,15 @@ class NavigationScreenState extends State<NavigationScreen>
                       const Icon(Icons.cable_rounded,
                           color: Colors.cyan, size: 20),
                       const SizedBox(width: 6),
-                      Text(
-                        'Connection: ${networkProvider.connectionType}',
-                        style: const TextStyle(
-                          color: Colors.cyan,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
+                      Flexible(
+                        child: Text(
+                          'Connection: ${networkProvider.connectionType}',
+                          style: const TextStyle(
+                            color: Colors.cyan,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
@@ -256,10 +263,15 @@ class NavigationScreenState extends State<NavigationScreen>
                               color: Colors.cyan[200],
                               fontWeight: FontWeight.bold)),
                       const SizedBox(width: 6),
-                      Text(server ?? networkProvider.currentServer,
+                      Flexible(
+                        child: Text(
+                          server ?? networkProvider.currentServer,
                           style: const TextStyle(
                               color: Colors.white,
-                              fontWeight: FontWeight.w600)),
+                              fontWeight: FontWeight.w600),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 12),
@@ -288,48 +300,59 @@ class NavigationScreenState extends State<NavigationScreen>
                     duration: const Duration(milliseconds: 800),
                     curve: Curves.easeOutCubic,
                     builder: (context, value, child) {
-                      return Stack(
-                        children: [
-                          Container(
-                            width: 220,
+                      return LayoutBuilder(
+                        builder: (context, constraints) {
+                          final barWidth =
+                              constraints.maxWidth.clamp(0.0, 220.0).toDouble();
+                          return SizedBox(
+                            width: barWidth,
                             height: 14,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              color:
-                                  Colors.white.withAlpha((255 * 0.08).toInt()),
-                            ),
-                          ),
-                          Container(
-                            width: 220 * value,
-                            height: 14,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              gradient: const LinearGradient(
-                                colors: [
-                                  Colors.greenAccent,
-                                  Colors.yellowAccent,
-                                  Colors.orangeAccent,
-                                  Colors.redAccent,
-                                ],
-                                stops: [0.0, 0.5, 0.8, 1.0],
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.greenAccent
-                                      .withAlpha((255 * 0.2).toInt()),
-                                  blurRadius: 8,
-                                  spreadRadius: 1,
+                            child: Stack(
+                              children: [
+                                Container(
+                                  width: barWidth,
+                                  height: 14,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    color: Colors.white
+                                        .withAlpha((255 * 0.08).toInt()),
+                                  ),
+                                ),
+                                Container(
+                                  width: barWidth * value,
+                                  height: 14,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    gradient: const LinearGradient(
+                                      colors: [
+                                        Colors.greenAccent,
+                                        Colors.yellowAccent,
+                                        Colors.orangeAccent,
+                                        Colors.redAccent,
+                                      ],
+                                      stops: [0.0, 0.5, 0.8, 1.0],
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.greenAccent
+                                            .withAlpha((255 * 0.2).toInt()),
+                                        blurRadius: 8,
+                                        spreadRadius: 1,
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
-                          ),
-                        ],
+                          );
+                        },
                       );
                     },
                   ),
                   const SizedBox(height: 10),
                   // Network level badge
                   Container(
+                    constraints: const BoxConstraints(maxWidth: double.infinity),
                     padding:
                         const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                     decoration: BoxDecoration(
@@ -338,48 +361,29 @@ class NavigationScreenState extends State<NavigationScreen>
                       border: Border.all(color: badgeColor, width: 1.2),
                     ),
                     child: Row(
-                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(badgeIcon, color: badgeColor, size: 20),
                         const SizedBox(width: 6),
-                        Text(
-                          'Network Level: $networkLevel',
-                          style: TextStyle(
-                            color: badgeColor,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
+                        Flexible(
+                          child: Text(
+                            'Network Level: $networkLevel',
+                            style: TextStyle(
+                              color: badgeColor,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 14),
-                  // Location info
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.location_on_rounded,
-                          color: Colors.orangeAccent, size: 24),
-                      const SizedBox(width: 8),
-                      const Text('Location:',
-                          style: TextStyle(
-                              color: Colors.orangeAccent,
-                              fontWeight: FontWeight.bold)),
-                      const SizedBox(width: 6),
-                      Flexible(
-                        child: Text(
-                          networkProvider.userLocation ?? 'Unknown',
-                          style: const TextStyle(
-                              color: Colors.white, fontWeight: FontWeight.w600),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
                   const SizedBox(height: 24),
                   // Close & Retry buttons
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 12,
+                    runSpacing: 10,
                     children: [
                       ElevatedButton.icon(
                         onPressed: () => Navigator.pop(context),
@@ -394,10 +398,9 @@ class NavigationScreenState extends State<NavigationScreen>
                               borderRadius: BorderRadius.circular(16)),
                           elevation: 0,
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 32, vertical: 12),
+                              horizontal: 20, vertical: 12),
                         ),
                       ),
-                      const SizedBox(width: 16),
                       if (!networkProvider.isConnected)
                         ElevatedButton.icon(
                           onPressed: () async {
@@ -431,7 +434,7 @@ class NavigationScreenState extends State<NavigationScreen>
                                 borderRadius: BorderRadius.circular(16)),
                             elevation: 0,
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 32, vertical: 12),
+                                horizontal: 20, vertical: 12),
                           ),
                         ),
                     ],

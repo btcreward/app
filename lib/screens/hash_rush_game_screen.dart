@@ -93,12 +93,12 @@ class HashRushGameScreenState extends State<HashRushGameScreen> {
       debugPrint('🎯 Hash Rush: Initializing ads...');
 
       // Load rewarded ad (async)
-      await _adService.loadRewardedAd();
+      await _adService.loadRewardedAd(slot: AdSlots.hashRushRewarded1);
       debugPrint(
           '🎯 Hash Rush: Rewarded ad loaded: ${_adService.isRewardedAdLoaded}');
 
       // Load interstitial ad for exit (MISSING!)
-      await _adService.loadInterstitialAd();
+      await _adService.loadInterstitialAd(slot: AdSlots.hashRushInterstitial1);
       debugPrint(
           '🎯 Hash Rush: Interstitial ad loaded: ${_adService.isInterstitialAdLoaded}');
 
@@ -151,7 +151,7 @@ class HashRushGameScreenState extends State<HashRushGameScreen> {
 
     _bannerAd = BannerAd(
       adUnitId:
-          'ca-app-pub-3940256099942544/6300978111', // Your banner ad unit ID
+          _adService.getBannerAdUnitId(slot: AdSlots.hashRushBanner1) ?? '',
       size: AdSize.mediumRectangle, // 300x250 banner ad
       request: const AdRequest(),
       listener: BannerAdListener(
@@ -405,7 +405,7 @@ class HashRushGameScreenState extends State<HashRushGameScreen> {
     });
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Task reward added to your game earnings!'),
+        content: Text('Task reward added to your game reward balance!'),
       ),
     );
     Navigator.pop(context); // Close task dialog after collection
@@ -426,7 +426,7 @@ class HashRushGameScreenState extends State<HashRushGameScreen> {
       });
 
       try {
-        await _adService.loadRewardedAd();
+        await _adService.loadRewardedAd(slot: AdSlots.hashRushRewarded1);
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -449,12 +449,13 @@ class HashRushGameScreenState extends State<HashRushGameScreen> {
 
     try {
       await _adService.showRewardedAd(
+        slot: AdSlots.hashRushRewarded1,
         onRewarded: (amount) {
           onAdComplete();
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('Reward earned! 🎉'),
+                content: Text('Reward collected! 🎉'),
                 backgroundColor: Colors.green,
                 duration: Duration(seconds: 2),
               ),
@@ -466,7 +467,7 @@ class HashRushGameScreenState extends State<HashRushGameScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text(
-                    'Ad dismissed. Please watch the full ad to earn rewards.'),
+                    'Ad dismissed. Please watch the full ad to collect rewards.'),
                 backgroundColor: Colors.orange,
                 duration: Duration(seconds: 2),
               ),
@@ -525,7 +526,7 @@ class HashRushGameScreenState extends State<HashRushGameScreen> {
                 const CircularProgressIndicator(),
                 const SizedBox(height: 16),
                 Text(earnedBTC > 0
-                    ? 'Saving ${earnedBTC.toStringAsFixed(18)} BTC to wallet...'
+                    ? 'Saving ${earnedBTC.toStringAsFixed(18)} BTC points...'
                     : 'Exiting game...'),
               ],
             ),
@@ -544,7 +545,9 @@ class HashRushGameScreenState extends State<HashRushGameScreen> {
         debugPrint('🔄 Hash Rush: Attempting to show interstitial ad');
 
         // Show the ad and wait for it to be dismissed
-        final adShown = await _adService.showInterstitialAd();
+        final adShown = await _adService.showInterstitialAd(
+          slot: AdSlots.hashRushInterstitial1,
+        );
         debugPrint('🎯 Hash Rush: Interstitial ad shown: $adShown');
 
         // Small delay after ad is dismissed
@@ -558,7 +561,7 @@ class HashRushGameScreenState extends State<HashRushGameScreen> {
         await walletProvider.addEarning(
           earnedBTC,
           type: 'game',
-          description: 'Hash Rush - Game Earnings',
+          description: 'Hash Rush - Game Rewards',
         );
         await SoundNotificationService.playNotificationSound('success_chime');
       }
@@ -624,7 +627,7 @@ class HashRushGameScreenState extends State<HashRushGameScreen> {
       // Play coin drop sound for periodic save
       await SoundNotificationService.playNotificationSound('success_chime');
 
-      // Reset earned BTC after saving
+      // Reset collected BTC after saving
       setState(() {
         earnedBTC = 0.0;
       });
@@ -656,7 +659,7 @@ class HashRushGameScreenState extends State<HashRushGameScreen> {
                   ],
                 ),
                 content: Text(
-                  'You have ${earnedBTC.toStringAsFixed(18)} BTC earnings!\n\nDo you want to save and exit?',
+                  'You have ${earnedBTC.toStringAsFixed(18)} BTC reward points!\n\nDo you want to save and exit?',
                   style: const TextStyle(fontSize: 16),
                 ),
                 actions: [
@@ -755,7 +758,7 @@ class HashRushGameScreenState extends State<HashRushGameScreen> {
                   children: [
                     const SizedBox(height: 20),
                     Text(
-                      'Total Earned: ${earnedBTC.toStringAsFixed(18)} BTC',
+                      'Total Collected: ${earnedBTC.toStringAsFixed(18)} BTC',
                       style: GoogleFonts.poppins(
                         color: Colors.yellowAccent,
                         fontSize: 16,
@@ -919,7 +922,7 @@ class HashRushGameScreenState extends State<HashRushGameScreen> {
                         ),
                         const SizedBox(height: 20),
                         Text(
-                          'Adding ${earnedBTC.toStringAsFixed(18)} BTC to wallet...',
+                          'Adding ${earnedBTC.toStringAsFixed(18)} BTC points to reward balance...',
                           style: GoogleFonts.poppins(
                             color: Colors.white,
                             fontSize: 16,
@@ -1205,4 +1208,3 @@ class CountdownOverlayState extends State<CountdownOverlay> {
     );
   }
 }
-

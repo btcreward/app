@@ -312,8 +312,8 @@ class NotificationService {
     if (Platform.isAndroid) {
       const miningChannel = AndroidNotificationChannel(
         'mining_channel',
-        'Mining Status',
-        description: 'Shows current mining stats and status',
+        'Reward Status',
+        description: 'Shows current reward progress and status',
         importance: Importance.max,
         enableVibration: false,
         enableLights: true,
@@ -339,8 +339,8 @@ class NotificationService {
 
       final androidDetails = AndroidNotificationDetails(
         'mining_channel',
-        'Mining Status',
-        channelDescription: 'Shows current mining stats and status',
+        'Reward Status',
+        channelDescription: 'Shows current reward progress and status',
         importance: Importance.max,
         ongoing: true, // 🔒 Makes it non-dismissible
         showWhen: false,
@@ -350,8 +350,8 @@ class NotificationService {
         color: const Color(0xFFFFC107), // Gold/Yellow (brand color)
         largeIcon: const DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
         styleInformation: BigTextStyleInformation(
-          '$content\n\n🚀 Keep mining, keep earning! 💸',
-          contentTitle: '⛏️ Bitcoin Mining Pro - Mining in Progress',
+          '$content\n\n🚀 Keep playing, keep collecting rewards! 💸',
+          contentTitle: '⛏️ BTC Reward - Reward Session Active',
           summaryText: 'Mining is active. Don\'t close the app!',
         ),
         category: AndroidNotificationCategory.service,
@@ -362,7 +362,7 @@ class NotificationService {
 
       await _notifications.show(
         _notificationId,
-        '⛏️ Bitcoin Mining Pro - Mining in Progress',
+        '⛏️ BTC Reward - Reward Session Active',
         null, // body is handled by BigTextStyleInformation
         notificationDetails,
       );
@@ -446,4 +446,3 @@ class NotificationService {
         'duration': _getMiningDuration(),
       };
 }
-

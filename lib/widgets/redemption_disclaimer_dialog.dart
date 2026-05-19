@@ -14,7 +14,7 @@ class RedemptionDisclaimerDialog extends StatelessWidget {
     super.key,
     this.title = 'Disclaimer',
     this.message =
-        '⚠️ This is a virtual mining simulation app. All BTC shown is virtual. Redemptions are enabled only when minimum thresholds are reached and verified.',
+        '⚠️ This is a mining simulation app. All BTC shown is. Redemptions are enabled only when minimum thresholds are reached and verified.',
     this.onContinue,
     this.icon = Icons.warning_amber_rounded,
   });
@@ -141,7 +141,7 @@ Future<void> showRedemptionDisclaimerDialog({
     builder: (ctx) => RedemptionDisclaimerDialog(
       title: title ?? 'Disclaimer',
       message: message ??
-          '⚠️ This is a virtual mining simulation app. All BTC shown is virtual. Redemptions are enabled only when minimum thresholds are reached and verified.',
+          '⚠️ This is a mining simulation app. All BTC shown is. Redemptions are enabled only when minimum thresholds are reached and verified.',
       onContinue: onContinue,
       icon: icon ?? Icons.warning_amber_rounded,
     ),

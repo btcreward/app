@@ -9,6 +9,77 @@ import 'package:unity_ads_plugin/unity_ads_plugin.dart';
 
 import '../config/mediation_config.dart';
 
+class AdSlots {
+  static const String defaultRewarded = 'default_rewarded';
+  static const String defaultInterstitial = 'default_interstitial';
+  static const String defaultBanner = 'default_banner';
+  static const String defaultNative = 'default_native';
+
+  // Bitcoin Machine
+  static const String bitcoinMachineBanner1 = 'bitcoin_machine_banner_1';
+  static const String bitcoinMachineRewarded1 = 'bitcoin_machine_rewarded_1';
+  static const String bitcoinMachineRewarded2 = 'bitcoin_machine_rewarded_2';
+  static const String bitcoinMachineRewarded3 = 'bitcoin_machine_rewarded_3';
+  static const String bitcoinMachineInterstitial1 = 'bitcoin_machine_interstitial_1';
+
+  // Bitcoin Blast
+  static const String bitcoinBlastBanner1 = 'bitcoin_blast_banner_1';
+  static const String bitcoinBlastRewarded1 = 'bitcoin_blast_rewarded_1';
+  static const String bitcoinBlastRewarded2 = 'bitcoin_blast_rewarded_2';
+  static const String bitcoinBlastInterstitial1 = 'bitcoin_blast_interstitial_1';
+
+  // Contract
+  static const String contractBanner1 = 'contract_banner_1';
+  static const String contractRewarded1 = 'contract_rewarded_1';
+
+  // Home
+  static const String homeBanner1 = 'home_banner_1';
+  static const String homeBanner2 = 'home_banner_2';
+  static const String homeRewarded1 = 'home_rewarded_1';
+  static const String homeRewarded2 = 'home_rewarded_2';
+
+  // Support
+  static const String contactSupportBanner1 = 'contact_support_banner_1';
+
+  // Crypto Runner
+  static const String cryptoRunnerInterstitial1 = 'crypto_runner_interstitial_1';
+
+  // Game
+  static const String gameBanner1 = 'game_banner_1';
+
+  // Hash Rush
+  static const String hashRushRewarded1 = 'hash_rush_rewarded_1';
+  static const String hashRushInterstitial1 = 'hash_rush_interstitial_1';
+  static const String hashRushBanner1 = 'hash_rush_banner_1';
+
+  // Miner Madness
+  static const String minerMadnessInterstitial1 = 'miner_madness_interstitial_1';
+  static const String minerMadnessBanner1 = 'miner_madness_banner_1';
+  static const String minerMadnessRewarded1 = 'miner_madness_rewarded_1';
+
+  // Referral
+  static const String referralRewarded1 = 'referral_rewarded_1';
+
+  // Reward
+  static const String rewardRewarded1 = 'reward_rewarded_1';
+  static const String rewardBanner1 = 'reward_banner_1';
+
+  // Wallet
+  static const String walletRewarded1 = 'wallet_rewarded_1';
+
+  // Flip Coin
+  static const String flipCoinBanner1 = 'flip_coin_banner_1';
+  static const String flipCoinInterstitial1 = 'flip_coin_interstitial_1';
+  static const String flipCoinRewarded1 = 'flip_coin_rewarded_1';
+  static const String flipCoinRewarded2 = 'flip_coin_rewarded_2';
+
+  // Crypto Craze
+  static const String cryptoCrazeBanner1 = 'crypto_craze_banner_1';
+  static const String cryptoCrazeInterstitial1 = 'crypto_craze_interstitial_1';
+  static const String cryptoCrazeRewarded1 = 'crypto_craze_rewarded_1';
+  static const String cryptoCrazeRewarded2 = 'crypto_craze_rewarded_2';
+}
+
 class AdService with ChangeNotifier {
   static final AdService _instance = AdService._internal();
   factory AdService() => _instance;
@@ -55,7 +126,6 @@ class AdService with ChangeNotifier {
   };
 
   // AdMob IDs
-  // AdMob IDs
   static const Map<String, Map<String, String>> _adMobUnitIds = {
     'android': {
       'native': 'ca-app-pub-3940256099942544/2247696110',
@@ -73,11 +143,299 @@ class AdService with ChangeNotifier {
     },
   };
 
+  // Platform and Slot specific AdMob IDs
+  static const Map<String, Map<String, String>> _adMobSlotIds = {
+    'android': {
+      // Default / Fallbacks
+      AdSlots.defaultRewarded: 'ca-app-pub-3940256099942544/5224354917',
+      AdSlots.defaultInterstitial: 'ca-app-pub-3940256099942544/1033173712',
+      AdSlots.defaultBanner: 'ca-app-pub-3940256099942544/6300978111',
+      AdSlots.defaultNative: 'ca-app-pub-3940256099942544/2247696110',
+
+      // Bitcoin Machine
+      AdSlots.bitcoinMachineBanner1: 'ca-app-pub-3940256099942544/6300978111',
+      AdSlots.bitcoinMachineRewarded1: 'ca-app-pub-3940256099942544/5224354917',
+      AdSlots.bitcoinMachineRewarded2: 'ca-app-pub-3940256099942544/5224354917',
+      AdSlots.bitcoinMachineRewarded3: 'ca-app-pub-3940256099942544/5224354917',
+      AdSlots.bitcoinMachineInterstitial1: 'ca-app-pub-3940256099942544/1033173712',
+
+      // Bitcoin Blast
+      AdSlots.bitcoinBlastBanner1: 'ca-app-pub-3940256099942544/6300978111',
+      AdSlots.bitcoinBlastRewarded1: 'ca-app-pub-3940256099942544/5224354917',
+      AdSlots.bitcoinBlastRewarded2: 'ca-app-pub-3940256099942544/5224354917',
+      AdSlots.bitcoinBlastInterstitial1: 'ca-app-pub-3940256099942544/1033173712',
+
+      // Contract
+      AdSlots.contractBanner1: 'ca-app-pub-3940256099942544/6300978111',
+      AdSlots.contractRewarded1: 'ca-app-pub-3940256099942544/5224354917',
+
+      // Home
+      AdSlots.homeBanner1: 'ca-app-pub-3940256099942544/6300978111',
+      AdSlots.homeBanner2: 'ca-app-pub-3940256099942544/6300978111',
+      AdSlots.homeRewarded1: 'ca-app-pub-3940256099942544/5224354917',
+      AdSlots.homeRewarded2: 'ca-app-pub-3940256099942544/5224354917',
+
+      // Support
+      AdSlots.contactSupportBanner1: 'ca-app-pub-3940256099942544/6300978111',
+
+      // Crypto Runner
+      AdSlots.cryptoRunnerInterstitial1: 'ca-app-pub-3940256099942544/1033173712',
+
+      // Game
+      AdSlots.gameBanner1: 'ca-app-pub-3940256099942544/6300978111',
+
+      // Hash Rush
+      AdSlots.hashRushRewarded1: 'ca-app-pub-3940256099942544/5224354917',
+      AdSlots.hashRushInterstitial1: 'ca-app-pub-3940256099942544/1033173712',
+      AdSlots.hashRushBanner1: 'ca-app-pub-3940256099942544/6300978111',
+
+      // Miner Madness
+      AdSlots.minerMadnessInterstitial1: 'ca-app-pub-3940256099942544/1033173712',
+      AdSlots.minerMadnessBanner1: 'ca-app-pub-3940256099942544/6300978111',
+      AdSlots.minerMadnessRewarded1: 'ca-app-pub-3940256099942544/5224354917',
+
+      // Referral
+      AdSlots.referralRewarded1: 'ca-app-pub-3940256099942544/5224354917',
+
+      // Reward
+      AdSlots.rewardRewarded1: 'ca-app-pub-3940256099942544/5224354917',
+      AdSlots.rewardBanner1: 'ca-app-pub-3940256099942544/6300978111',
+
+      // Wallet
+      AdSlots.walletRewarded1: 'ca-app-pub-3940256099942544/5224354917',
+
+      // Flip Coin
+      AdSlots.flipCoinBanner1: 'ca-app-pub-3940256099942544/6300978111',
+      AdSlots.flipCoinInterstitial1: 'ca-app-pub-3940256099942544/1033173712',
+      AdSlots.flipCoinRewarded1: 'ca-app-pub-3940256099942544/5224354917',
+      AdSlots.flipCoinRewarded2: 'ca-app-pub-3940256099942544/5224354917',
+
+      // Crypto Craze
+      AdSlots.cryptoCrazeBanner1: 'ca-app-pub-3940256099942544/6300978111',
+      AdSlots.cryptoCrazeInterstitial1: 'ca-app-pub-3940256099942544/1033173712',
+      AdSlots.cryptoCrazeRewarded1: 'ca-app-pub-3940256099942544/5224354917',
+      AdSlots.cryptoCrazeRewarded2: 'ca-app-pub-3940256099942544/5224354917',
+    },
+    'ios': {
+      // Default / Fallbacks
+      AdSlots.defaultRewarded: 'ca-app-pub-3940256099942544/1712485313',
+      AdSlots.defaultInterstitial: 'ca-app-pub-3940256099942544/4411468910',
+      AdSlots.defaultBanner: 'ca-app-pub-3940256099942544/2934735716',
+      AdSlots.defaultNative: 'ca-app-pub-3940256099942544/3986624511',
+
+      // Bitcoin Machine
+      AdSlots.bitcoinMachineBanner1: 'ca-app-pub-3940256099942544/2934735716',
+      AdSlots.bitcoinMachineRewarded1: 'ca-app-pub-3940256099942544/1712485313',
+      AdSlots.bitcoinMachineRewarded2: 'ca-app-pub-3940256099942544/1712485313',
+      AdSlots.bitcoinMachineRewarded3: 'ca-app-pub-3940256099942544/1712485313',
+      AdSlots.bitcoinMachineInterstitial1: 'ca-app-pub-3940256099942544/4411468910',
+
+      // Bitcoin Blast
+      AdSlots.bitcoinBlastBanner1: 'ca-app-pub-3940256099942544/2934735716',
+      AdSlots.bitcoinBlastRewarded1: 'ca-app-pub-3940256099942544/1712485313',
+      AdSlots.bitcoinBlastRewarded2: 'ca-app-pub-3940256099942544/1712485313',
+      AdSlots.bitcoinBlastInterstitial1: 'ca-app-pub-3940256099942544/4411468910',
+
+      // Contract
+      AdSlots.contractBanner1: 'ca-app-pub-3940256099942544/2934735716',
+      AdSlots.contractRewarded1: 'ca-app-pub-3940256099942544/1712485313',
+
+      // Home
+      AdSlots.homeBanner1: 'ca-app-pub-3940256099942544/2934735716',
+      AdSlots.homeBanner2: 'ca-app-pub-3940256099942544/2934735716',
+      AdSlots.homeRewarded1: 'ca-app-pub-3940256099942544/1712485313',
+      AdSlots.homeRewarded2: 'ca-app-pub-3940256099942544/1712485313',
+
+      // Support
+      AdSlots.contactSupportBanner1: 'ca-app-pub-3940256099942544/2934735716',
+
+      // Crypto Runner
+      AdSlots.cryptoRunnerInterstitial1: 'ca-app-pub-3940256099942544/4411468910',
+
+      // Game
+      AdSlots.gameBanner1: 'ca-app-pub-3940256099942544/2934735716',
+
+      // Hash Rush
+      AdSlots.hashRushRewarded1: 'ca-app-pub-3940256099942544/1712485313',
+      AdSlots.hashRushInterstitial1: 'ca-app-pub-3940256099942544/4411468910',
+      AdSlots.hashRushBanner1: 'ca-app-pub-3940256099942544/2934735716',
+
+      // Miner Madness
+      AdSlots.minerMadnessInterstitial1: 'ca-app-pub-3940256099942544/4411468910',
+      AdSlots.minerMadnessBanner1: 'ca-app-pub-3940256099942544/2934735716',
+      AdSlots.minerMadnessRewarded1: 'ca-app-pub-3940256099942544/1712485313',
+
+      // Referral
+      AdSlots.referralRewarded1: 'ca-app-pub-3940256099942544/1712485313',
+
+      // Reward
+      AdSlots.rewardRewarded1: 'ca-app-pub-3940256099942544/1712485313',
+      AdSlots.rewardBanner1: 'ca-app-pub-3940256099942544/2934735716',
+
+      // Wallet
+      AdSlots.walletRewarded1: 'ca-app-pub-3940256099942544/1712485313',
+
+      // Flip Coin
+      AdSlots.flipCoinBanner1: 'ca-app-pub-3940256099942544/2934735716',
+      AdSlots.flipCoinInterstitial1: 'ca-app-pub-3940256099942544/4411468910',
+      AdSlots.flipCoinRewarded1: 'ca-app-pub-3940256099942544/1712485313',
+      AdSlots.flipCoinRewarded2: 'ca-app-pub-3940256099942544/1712485313',
+
+      // Crypto Craze
+      AdSlots.cryptoCrazeBanner1: 'ca-app-pub-3940256099942544/2934735716',
+      AdSlots.cryptoCrazeInterstitial1: 'ca-app-pub-3940256099942544/4411468910',
+      AdSlots.cryptoCrazeRewarded1: 'ca-app-pub-3940256099942544/1712485313',
+      AdSlots.cryptoCrazeRewarded2: 'ca-app-pub-3940256099942544/1712485313',
+    }
+  };
+
+  // Platform and Slot specific Unity Placements
+  static const Map<String, Map<String, String>> _unitySlotIds = {
+    'android': {
+      // Fallbacks
+      AdSlots.defaultRewarded: 'Rewarded_Android',
+      AdSlots.defaultInterstitial: 'Interstitial_Android',
+      AdSlots.defaultBanner: 'Banner_Android',
+
+      // Bitcoin Machine
+      AdSlots.bitcoinMachineBanner1: 'Banner_Android',
+      AdSlots.bitcoinMachineRewarded1: 'Rewarded_Android',
+      AdSlots.bitcoinMachineRewarded2: 'Rewarded_Android',
+      AdSlots.bitcoinMachineRewarded3: 'Rewarded_Android',
+      AdSlots.bitcoinMachineInterstitial1: 'Interstitial_Android',
+
+      // Bitcoin Blast
+      AdSlots.bitcoinBlastBanner1: 'Banner_Android',
+      AdSlots.bitcoinBlastRewarded1: 'Rewarded_Android',
+      AdSlots.bitcoinBlastRewarded2: 'Rewarded_Android',
+      AdSlots.bitcoinBlastInterstitial1: 'Interstitial_Android',
+
+      // Contract
+      AdSlots.contractBanner1: 'Banner_Android',
+      AdSlots.contractRewarded1: 'Rewarded_Android',
+
+      // Home
+      AdSlots.homeBanner1: 'Banner_Android',
+      AdSlots.homeBanner2: 'Banner_Android',
+      AdSlots.homeRewarded1: 'Rewarded_Android',
+      AdSlots.homeRewarded2: 'Rewarded_Android',
+
+      // Support
+      AdSlots.contactSupportBanner1: 'Banner_Android',
+
+      // Crypto Runner
+      AdSlots.cryptoRunnerInterstitial1: 'Interstitial_Android',
+
+      // Game
+      AdSlots.gameBanner1: 'Banner_Android',
+
+      // Hash Rush
+      AdSlots.hashRushRewarded1: 'Rewarded_Android',
+      AdSlots.hashRushInterstitial1: 'Interstitial_Android',
+      AdSlots.hashRushBanner1: 'Banner_Android',
+
+      // Miner Madness
+      AdSlots.minerMadnessInterstitial1: 'Interstitial_Android',
+      AdSlots.minerMadnessBanner1: 'Banner_Android',
+      AdSlots.minerMadnessRewarded1: 'Rewarded_Android',
+
+      // Referral
+      AdSlots.referralRewarded1: 'Rewarded_Android',
+
+      // Reward
+      AdSlots.rewardRewarded1: 'Rewarded_Android',
+      AdSlots.rewardBanner1: 'Banner_Android',
+
+      // Wallet
+      AdSlots.walletRewarded1: 'Rewarded_Android',
+
+      // Flip Coin
+      AdSlots.flipCoinBanner1: 'Banner_Android',
+      AdSlots.flipCoinInterstitial1: 'Interstitial_Android',
+      AdSlots.flipCoinRewarded1: 'Rewarded_Android',
+      AdSlots.flipCoinRewarded2: 'Rewarded_Android',
+
+      // Crypto Craze
+      AdSlots.cryptoCrazeBanner1: 'Banner_Android',
+      AdSlots.cryptoCrazeInterstitial1: 'Interstitial_Android',
+      AdSlots.cryptoCrazeRewarded1: 'Rewarded_Android',
+      AdSlots.cryptoCrazeRewarded2: 'Rewarded_Android',
+    },
+    'ios': {
+      // Fallbacks
+      AdSlots.defaultRewarded: 'Rewarded_iOS',
+      AdSlots.defaultInterstitial: 'Interstitial_iOS',
+      AdSlots.defaultBanner: 'Banner_iOS',
+
+      // Bitcoin Machine
+      AdSlots.bitcoinMachineBanner1: 'Banner_iOS',
+      AdSlots.bitcoinMachineRewarded1: 'Rewarded_iOS',
+      AdSlots.bitcoinMachineRewarded2: 'Rewarded_iOS',
+      AdSlots.bitcoinMachineRewarded3: 'Rewarded_iOS',
+      AdSlots.bitcoinMachineInterstitial1: 'Interstitial_iOS',
+
+      // Bitcoin Blast
+      AdSlots.bitcoinBlastBanner1: 'Banner_iOS',
+      AdSlots.bitcoinBlastRewarded1: 'Rewarded_iOS',
+      AdSlots.bitcoinBlastRewarded2: 'Rewarded_iOS',
+      AdSlots.bitcoinBlastInterstitial1: 'Interstitial_iOS',
+
+      // Contract
+      AdSlots.contractBanner1: 'Banner_iOS',
+      AdSlots.contractRewarded1: 'Rewarded_iOS',
+
+      // Home
+      AdSlots.homeBanner1: 'Banner_iOS',
+      AdSlots.homeBanner2: 'Banner_iOS',
+      AdSlots.homeRewarded1: 'Rewarded_iOS',
+      AdSlots.homeRewarded2: 'Rewarded_iOS',
+
+      // Support
+      AdSlots.contactSupportBanner1: 'Banner_iOS',
+
+      // Crypto Runner
+      AdSlots.cryptoRunnerInterstitial1: 'Interstitial_iOS',
+
+      // Game
+      AdSlots.gameBanner1: 'Banner_iOS',
+
+      // Hash Rush
+      AdSlots.hashRushRewarded1: 'Rewarded_iOS',
+      AdSlots.hashRushInterstitial1: 'Interstitial_iOS',
+      AdSlots.hashRushBanner1: 'Banner_iOS',
+
+      // Miner Madness
+      AdSlots.minerMadnessInterstitial1: 'Interstitial_iOS',
+      AdSlots.minerMadnessBanner1: 'Banner_iOS',
+      AdSlots.minerMadnessRewarded1: 'Rewarded_iOS',
+
+      // Referral
+      AdSlots.referralRewarded1: 'Rewarded_iOS',
+
+      // Reward
+      AdSlots.rewardRewarded1: 'Rewarded_iOS',
+      AdSlots.rewardBanner1: 'Banner_iOS',
+
+      // Wallet
+      AdSlots.walletRewarded1: 'Rewarded_iOS',
+
+      // Flip Coin
+      AdSlots.flipCoinBanner1: 'Banner_iOS',
+      AdSlots.flipCoinInterstitial1: 'Interstitial_iOS',
+      AdSlots.flipCoinRewarded1: 'Rewarded_iOS',
+      AdSlots.flipCoinRewarded2: 'Rewarded_iOS',
+
+      // Crypto Craze
+      AdSlots.cryptoCrazeBanner1: 'Banner_iOS',
+      AdSlots.cryptoCrazeInterstitial1: 'Interstitial_iOS',
+      AdSlots.cryptoCrazeRewarded1: 'Rewarded_iOS',
+      AdSlots.cryptoCrazeRewarded2: 'Rewarded_iOS',
+    }
+  };
+
   /// Returns the banner ad unit ID for the current platform
-  /// This is specifically for the swipeable carousel banner ads
-  String? getBannerAdUnitId() {
-    final platform = Platform.isAndroid ? 'android' : 'ios';
-    return _adMobUnitIds[platform]?['swipeable_banner'];
+  String? getBannerAdUnitId({String? slot}) {
+    return _getAdUnitId('banner', network: 'admob', slot: slot);
   }
 
   // Unity Ad objects
@@ -85,12 +443,25 @@ class AdService with ChangeNotifier {
 
   // AdMob objects
   NativeAd? _nativeAd; // Legacy single instance
-  RewardedAd? _admobRewardedAd;
-  bool _isAdmobRewardedAdLoaded = false;
-  bool _isAdmobRewardedAdLoading = false;
-  InterstitialAd? _admobInterstitialAd;
-  bool _isAdmobInterstitialAdLoaded = false;
-  bool _isAdmobInterstitialAdLoading = false;
+  
+  // Multiple AdMob Rewarded ads per slot
+  final Map<String, RewardedAd> _admobRewardedAds = {};
+  final Map<String, bool> _isAdmobRewardedAdsLoaded = {};
+  final Map<String, bool> _isAdmobRewardedAdsLoading = {};
+
+  // Multiple AdMob Interstitial ads per slot
+  final Map<String, InterstitialAd> _admobInterstitialAds = {};
+  final Map<String, bool> _isAdmobInterstitialAdsLoaded = {};
+  final Map<String, bool> _isAdmobInterstitialAdsLoading = {};
+  
+  // Track currently active Unity rewarded/interstitial slots
+  String? _unityRewardedSlot;
+  String? _unityInterstitialSlot;
+
+  // Multiple AdMob standard Banner ads per slot
+  final Map<String, BannerAd> _adMobStandardBanners = {};
+  final Map<String, bool> _isAdMobStandardBannersLoaded = {};
+  final Map<String, bool> _isAdMobStandardBannersLoading = {};
 
   // Multiple Native Ads Manager (AdMob)
   // Format: 'screenId_adType_adId' -> NativeAd
@@ -110,15 +481,13 @@ class AdService with ChangeNotifier {
   // Unity Banner fallback for native ads
   final Map<String, bool> _nativeFallbackStates = {};
 
-  // Unity Ads retry state
-  int _unityInitRetryCount = 0;
-  Timer? _unityInitRetryTimer;
+
 
   // Banner widget singleton to prevent duplicates
   Widget? _bannerWidgetInstance;
 
   // Ad states
-  bool _isBannerAdLoaded = false; // Unity banner
+  final bool _isBannerAdLoaded = false; // Unity banner
   BannerAd?
       _admobBannerAd; // Legacy AdMob banner (to be removed after migration)
   bool _isRewardedAdLoaded = false; // Unity rewarded
@@ -187,16 +556,25 @@ class AdService with ChangeNotifier {
       };
 
   // Public getters for ad loaded states
-  bool get isRewardedAdLoaded => _isRewardedAdLoaded || _isAdmobRewardedAdLoaded;
-  bool get isBannerAdLoaded => _isBannerAdLoaded;
+  bool get isRewardedAdLoaded => _isRewardedAdLoaded || _isAdmobRewardedAdsLoaded.values.contains(true);
+  bool get isBannerAdLoaded => _isBannerAdLoaded || _isAdMobStandardBannersLoaded.values.contains(true);
   bool get isNativeAdLoaded => _isNativeAdLoaded;
   bool get isInterstitialAdLoaded =>
-      _isInterstitialAdLoaded || _isAdmobInterstitialAdLoaded;
+      _isInterstitialAdLoaded || _isAdmobInterstitialAdsLoaded.values.contains(true);
   bool get isInitialized => _isInitialized;
   bool get isInitializing => _isInitializing;
 
-  // Get ad unit ID based on platform, network and ad type
-  String _getAdUnitId(String adType, {String network = 'admob'}) {
+  // Check if a specific slot is loaded
+  bool isSlotRewardedAdLoaded(String slot) {
+    return _isRewardedAdLoaded || _isAdmobRewardedAdsLoaded[slot] == true;
+  }
+
+  bool isSlotInterstitialAdLoaded(String slot) {
+    return _isInterstitialAdLoaded || _isAdmobInterstitialAdsLoaded[slot] == true;
+  }
+
+  // Get ad unit ID based on platform, network, ad type and slot
+  String _getAdUnitId(String adType, {String network = 'admob', String? slot}) {
     if (kIsWeb) return '';
 
     String platform;
@@ -209,19 +587,38 @@ class AdService with ChangeNotifier {
     }
 
     String? id;
-    if (network == 'admob') {
-      id = _adMobUnitIds[platform]?[adType];
-    } else {
-      id = _unityAdUnitIds[platform]?[adType];
+    if (slot != null) {
+      if (network == 'admob') {
+        id = _adMobSlotIds[platform]?[slot];
+      } else {
+        id = _unitySlotIds[platform]?[slot];
+      }
+    }
+
+    // Fallback to general adType if slot ID is empty/null
+    if (id == null || id.isEmpty) {
+      if (network == 'admob') {
+        id = _adMobUnitIds[platform]?[adType];
+      } else {
+        id = _unityAdUnitIds[platform]?[adType];
+      }
     }
 
     if (id == null || id.isEmpty) {
-      // Try to fallback to android if ios fails or vice versa
       final otherPlatform = platform == 'android' ? 'ios' : 'android';
-      if (network == 'admob') {
-        id = _adMobUnitIds[otherPlatform]?[adType];
-      } else {
-        id = _unityAdUnitIds[otherPlatform]?[adType];
+      if (slot != null) {
+        if (network == 'admob') {
+          id = _adMobSlotIds[otherPlatform]?[slot];
+        } else {
+          id = _unitySlotIds[otherPlatform]?[slot];
+        }
+      }
+      if (id == null || id.isEmpty) {
+        if (network == 'admob') {
+          id = _adMobUnitIds[otherPlatform]?[adType];
+        } else {
+          id = _unityAdUnitIds[otherPlatform]?[adType];
+        }
       }
     }
 
@@ -333,79 +730,85 @@ class AdService with ChangeNotifier {
     onLoaded(false);
   }
 
-  // Check if cached ad is still valid
-  bool _isCachedAdValid(String adType) {
-    final cacheTime = _adCacheTimes[adType];
-    if (cacheTime == null) return false;
 
-    return DateTime.now().difference(cacheTime) < adCacheDuration;
-  }
 
   Timer? _bannerAdRefreshTimer;
 
   // Manual auto-refresh removed to prevent main thread lag.
-  // Load banner ad
-  Future<void> loadBannerAd() async {
-    if (_disposed || !_isUnityInitialized) {
+  // Load banner ad (Exclusively via AdMob)
+  Future<void> loadBannerAd({String? slot}) async {
+    if (_disposed || kIsWeb) return;
+
+    final activeSlot = slot ?? AdSlots.defaultBanner;
+
+    if (_isAdMobStandardBannersLoaded[activeSlot] == true || _isAdMobStandardBannersLoading[activeSlot] == true) {
       return;
     }
 
-    if (_isBannerAdLoaded && _isCachedAdValid('banner')) return;
+    _isAdMobStandardBannersLoading[activeSlot] = true;
+    final adUnitId = _getAdUnitId('banner', network: 'admob', slot: activeSlot);
 
-    await _loadAdWithRetry(
-      'banner',
-      () async {
-        final adUnitId = _getAdUnitId('banner', network: 'unity');
-        if (adUnitId.isEmpty) {
-          throw Exception('Invalid Unity banner ad unit ID');
-        }
+    if (adUnitId.isEmpty) {
+      _isAdMobStandardBannersLoading[activeSlot] = false;
+      return;
+    }
 
-        // Load Unity Banner Ad
-        await UnityAds.load(
-          placementId: adUnitId,
-          onComplete: (placementId) {
-            _isBannerAdLoaded = true;
+    try {
+      final bannerAd = BannerAd(
+        adUnitId: adUnitId,
+        size: AdSize.banner, // Standard banner (320x50)
+        request: const AdRequest(),
+        listener: BannerAdListener(
+          onAdLoaded: (ad) {
+            _adMobStandardBanners[activeSlot] = ad as BannerAd;
+            _isAdMobStandardBannersLoaded[activeSlot] = true;
+            _isAdMobStandardBannersLoading[activeSlot] = false;
+            notifyListeners();
           },
-          onFailed: (placementId, error, message) {
-            _isBannerAdLoaded = false;
-            throw Exception('Unity banner ad failed: $message');
+          onAdFailedToLoad: (ad, error) {
+            ad.dispose();
+            _adMobStandardBanners.remove(activeSlot);
+            _isAdMobStandardBannersLoaded[activeSlot] = false;
+            _isAdMobStandardBannersLoading[activeSlot] = false;
+            notifyListeners();
           },
-        );
-      },
-      (success) {
-        _isBannerAdLoaded = success;
-      },
-    );
+        ),
+      );
+
+      await bannerAd.load();
+    } catch (e) {
+      _isAdMobStandardBannersLoading[activeSlot] = false;
+    }
   }
 
-  /// Returns a Unity banner ad widget when loaded, or a placeholder if not available.
-  Future<Widget?> getBannerAdWidget() async {
-    if (!_isUnityInitialized) {
-      return _getBannerPlaceholder('Unity Ads not initialized');
-    }
+  /// Returns an AdMob banner ad widget when loaded, or a placeholder if not available.
+  Future<Widget?> getBannerAdWidget({String? slot}) async {
+    if (kIsWeb) return const SizedBox(height: 50);
 
-    // If already loaded, return Unity banner widget (singleton)
-    if (_isBannerAdLoaded) {
-      return getUnityBannerWidget();
-    }
+    final activeSlot = slot ?? AdSlots.defaultBanner;
 
-    // Only try to load if not already loading
-    if (!_isBannerAdLoaded) {
-      await loadBannerAd();
+    // Trigger load if not already loaded or loading
+    if (_isAdMobStandardBannersLoaded[activeSlot] != true) {
+      await loadBannerAd(slot: activeSlot);
 
-      // Wait for the ad to be loaded, polling every 100ms, up to 2 seconds
-      const int maxTries = 20; // 20 * 100ms = 2 seconds
-      int tries = 0;
-      while (!_isBannerAdLoaded && tries < maxTries) {
+      // Wait up to 3 seconds for it to load
+      int elapsedMs = 0;
+      while (_isAdMobStandardBannersLoaded[activeSlot] != true && elapsedMs < 3000) {
         await Future.delayed(const Duration(milliseconds: 100));
-        tries++;
+        elapsedMs += 100;
       }
     }
 
-    if (_isBannerAdLoaded) {
-      return getUnityBannerWidget();
+    final bannerAd = _adMobStandardBanners[activeSlot];
+    if (_isAdMobStandardBannersLoaded[activeSlot] == true && bannerAd != null) {
+      return Container(
+        alignment: Alignment.center,
+        width: bannerAd.size.width.toDouble(),
+        height: bannerAd.size.height.toDouble(),
+        child: AdWidget(ad: bannerAd),
+      );
     } else {
-      return _getBannerPlaceholder('Unity Banner Ad Loading...');
+      return _getBannerPlaceholder('AdMob Banner Ad Loading...');
     }
   }
 
@@ -475,101 +878,14 @@ class AdService with ChangeNotifier {
     return _bannerWidgetInstance!;
   }
 
-  // Unity fallback widget for native ad failures
-  Widget _getUnityFallbackWidget(String adId) {
-    final bannerAdUnitId = _getAdUnitId('banner', network: 'unity');
 
-    return Container(
-      height: 250,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.orange[300]!),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.orange.withAlpha(26),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          // Header indicating this is a fallback ad
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: Colors.orange[50],
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(8),
-                topRight: Radius.circular(8),
-              ),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.info_outline, size: 12, color: Colors.orange[700]),
-                const SizedBox(width: 4),
-                Text(
-                  'Unity Ad (Fallback)',
-                  style: TextStyle(
-                    color: Colors.orange[700],
-                    fontSize: 10,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const Spacer(),
-                GestureDetector(
-                  onTap: () {
-                    // Reset fallback state and try AdMob again
-                    _nativeFallbackStates[adId] = false;
-                    loadNativeAdWithId(adId);
-                  },
-                  child: Icon(
-                    Icons.refresh,
-                    size: 12,
-                    color: Colors.orange[700],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Unity banner ad content
-          Expanded(
-            child: Center(
-              child: Container(
-                height: 50,
-                width: double.infinity,
-                margin: const EdgeInsets.all(16),
-                child: UnityBannerAd(
-                  placementId: bannerAdUnitId,
-                  onLoad: (placementId) {},
-                  onClick: (placementId) {},
-                  onFailed: (placementId, error, message) {
-                    // Automatically try AdMob again if Unity fails to fill
-                    if (error.toString().contains('noFill') ||
-                        message.toLowerCase().contains('no fill') ||
-                        message.toLowerCase().contains('no_fill')) {
-                      Future.delayed(const Duration(seconds: 5), () {
-                        loadNativeAdWithId(adId);
-                      });
-                    }
-                  },
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   // Load AdMob rewarded ad
-  Future<void> _loadAdmobRewardedAd() async {
-    if (_isAdmobRewardedAdLoading || _isAdmobRewardedAdLoaded) return;
+  Future<void> _loadAdmobRewardedAd({String slot = AdSlots.defaultRewarded}) async {
+    if (_isAdmobRewardedAdsLoading[slot] == true || _isAdmobRewardedAdsLoaded[slot] == true) return;
 
-    _isAdmobRewardedAdLoading = true;
-    final adUnitId = _getAdUnitId('rewarded', network: 'admob');
+    _isAdmobRewardedAdsLoading[slot] = true;
+    final adUnitId = _getAdUnitId('rewarded', network: 'admob', slot: slot);
 
     try {
       await RewardedAd.load(
@@ -577,50 +893,60 @@ class AdService with ChangeNotifier {
         request: const AdRequest(),
         rewardedAdLoadCallback: RewardedAdLoadCallback(
           onAdLoaded: (ad) {
-            _admobRewardedAd = ad;
-            _isAdmobRewardedAdLoaded = true;
-            _isAdmobRewardedAdLoading = false;
+            _admobRewardedAds[slot] = ad;
+            _isAdmobRewardedAdsLoaded[slot] = true;
+            _isAdmobRewardedAdsLoading[slot] = false;
             
-            _admobRewardedAd!.fullScreenContentCallback = FullScreenContentCallback(
+            ad.fullScreenContentCallback = FullScreenContentCallback(
               onAdDismissedFullScreenContent: (ad) {
                 ad.dispose();
-                _isAdmobRewardedAdLoaded = false;
-                loadRewardedAd();
+                _admobRewardedAds.remove(slot);
+                _isAdmobRewardedAdsLoaded[slot] = false;
+                loadRewardedAd(slot: slot);
               },
               onAdFailedToShowFullScreenContent: (ad, error) {
                 ad.dispose();
-                _isAdmobRewardedAdLoaded = false;
-                loadRewardedAd();
+                _admobRewardedAds.remove(slot);
+                _isAdmobRewardedAdsLoaded[slot] = false;
+                loadRewardedAd(slot: slot);
               },
             );
           },
           onAdFailedToLoad: (error) {
-            _isAdmobRewardedAdLoading = false;
-            _isAdmobRewardedAdLoaded = false;
+            _isAdmobRewardedAdsLoading[slot] = false;
+            _isAdmobRewardedAdsLoaded[slot] = false;
           },
         ),
       );
     } catch (e) {
-      _isAdmobRewardedAdLoading = false;
+      _isAdmobRewardedAdsLoading[slot] = false;
     }
   }
 
   // Load rewarded ad with better error handling and mediation tracking
-  Future<void> loadRewardedAd() async {
+  Future<void> loadRewardedAd({String? slot}) async {
     if (_disposed || kIsWeb) return;
 
+    final activeSlot = slot ?? AdSlots.defaultRewarded;
+
     // Start loading AdMob in background (don't await here to allow parallel loading)
-    _loadAdmobRewardedAd();
+    _loadAdmobRewardedAd(slot: activeSlot);
 
     // Then try Unity
+    if (_unityRewardedSlot != null && _unityRewardedSlot != activeSlot) {
+      _isRewardedAdLoaded = false;
+      _isRewardedAdLoading = false;
+    }
+
     if (_isRewardedAdLoading) {
       return;
     }
 
     _isRewardedAdLoading = true;
+    _unityRewardedSlot = activeSlot;
 
     try {
-      final adUnitId = _getAdUnitId('rewarded', network: 'unity');
+      final adUnitId = _getAdUnitId('rewarded', network: 'unity', slot: activeSlot);
 
       if (adUnitId.isEmpty) {
         _isRewardedAdLoading = false;
@@ -814,6 +1140,7 @@ class AdService with ChangeNotifier {
   Future<bool> showRewardedAd({
     required Function(double) onRewarded,
     required VoidCallback onAdDismissed,
+    String? slot,
   }) async {
     if (kIsWeb) {
       // Simulate ad for web testing
@@ -826,29 +1153,36 @@ class AdService with ChangeNotifier {
       return false;
     }
 
+    final activeSlot = slot ?? AdSlots.defaultRewarded;
+
     // 1. Try AdMob first
-    if (_isAdmobRewardedAdLoaded && _admobRewardedAd != null) {
+    final isLoaded = _isAdmobRewardedAdsLoaded[activeSlot] == true;
+    final admobAd = _admobRewardedAds[activeSlot];
+
+    if (isLoaded && admobAd != null) {
       _isAdShowing = true;
       
-      _admobRewardedAd!.fullScreenContentCallback = FullScreenContentCallback(
+      admobAd.fullScreenContentCallback = FullScreenContentCallback(
         onAdDismissedFullScreenContent: (ad) {
           _isAdShowing = false;
-          _isAdmobRewardedAdLoaded = false;
+          _isAdmobRewardedAdsLoaded[activeSlot] = false;
+          _admobRewardedAds.remove(activeSlot);
           ad.dispose();
           onAdDismissed();
-          loadRewardedAd(); // Load next in background
+          loadRewardedAd(slot: activeSlot); // Load next in background
         },
         onAdFailedToShowFullScreenContent: (ad, error) {
           _isAdShowing = false;
-          _isAdmobRewardedAdLoaded = false;
+          _isAdmobRewardedAdsLoaded[activeSlot] = false;
+          _admobRewardedAds.remove(activeSlot);
           ad.dispose();
           onAdDismissed();
-          loadRewardedAd();
+          loadRewardedAd(slot: activeSlot);
         },
       );
 
       try {
-        await _admobRewardedAd!.show(
+        await admobAd.show(
           onUserEarnedReward: (AdWithoutView ad, RewardItem reward) {
             onRewarded(reward.amount.toDouble());
             _updateAdMetrics('rewarded', true, null);
@@ -857,7 +1191,8 @@ class AdService with ChangeNotifier {
         return true;
       } catch (e) {
         _isAdShowing = false;
-        _isAdmobRewardedAdLoaded = false;
+        _isAdmobRewardedAdsLoaded[activeSlot] = false;
+        _admobRewardedAds.remove(activeSlot);
         // Continue to Unity fallback
       }
     }
@@ -870,20 +1205,27 @@ class AdService with ChangeNotifier {
         return false;
       }
       
-      await loadRewardedAd();
+      await loadRewardedAd(slot: activeSlot);
+
+      // Wait up to 10 seconds for either Unity or AdMob ad to load asynchronously
+      int elapsedMs = 0;
+      while (!_isRewardedAdLoaded && _isAdmobRewardedAdsLoaded[activeSlot] != true && elapsedMs < 10000) {
+        await Future.delayed(const Duration(milliseconds: 200));
+        elapsedMs += 200;
+      }
       
-      if (!_isRewardedAdLoaded && !_isAdmobRewardedAdLoaded) {
+      if (!_isRewardedAdLoaded && _isAdmobRewardedAdsLoaded[activeSlot] != true) {
         onAdDismissed();
         return false;
       }
 
-      if (_isAdmobRewardedAdLoaded) {
+      if (_isAdmobRewardedAdsLoaded[activeSlot] == true) {
         return showRewardedAd(
-            onRewarded: onRewarded, onAdDismissed: onAdDismissed);
+            onRewarded: onRewarded, onAdDismissed: onAdDismissed, slot: activeSlot);
       }
     }
 
-    final adUnitId = _getAdUnitId('rewarded', network: 'unity');
+    final adUnitId = _getAdUnitId('rewarded', network: 'unity', slot: activeSlot);
 
     try {
       _isAdShowing = true;
@@ -894,21 +1236,21 @@ class AdService with ChangeNotifier {
           _isAdShowing = false;
           _isRewardedAdLoaded = false;
           onRewarded(1.0); // Default reward amount
-          loadRewardedAd();
+          loadRewardedAd(slot: activeSlot);
           _updateAdMetrics('rewarded', true, null);
         },
         onSkipped: (placementId) {
           _isAdShowing = false;
           _isRewardedAdLoaded = false;
           onAdDismissed();
-          loadRewardedAd();
+          loadRewardedAd(slot: activeSlot);
           _updateAdMetrics('rewarded', false, null);
         },
         onFailed: (placementId, error, message) {
           _isAdShowing = false;
           _isRewardedAdLoaded = false;
           onAdDismissed();
-          loadRewardedAd();
+          loadRewardedAd(slot: activeSlot);
           _updateAdMetrics('rewarded', false, null);
         },
       );
@@ -917,7 +1259,7 @@ class AdService with ChangeNotifier {
     } catch (e) {
       _isAdShowing = false;
       _isRewardedAdLoaded = false;
-      loadRewardedAd();
+      loadRewardedAd(slot: activeSlot);
       onAdDismissed();
       _updateAdMetrics('rewarded', false, null);
       return false;
@@ -925,11 +1267,11 @@ class AdService with ChangeNotifier {
   }
 
   // Load AdMob interstitial ad
-  Future<void> _loadAdmobInterstitialAd() async {
-    if (_isAdmobInterstitialAdLoading || _isAdmobInterstitialAdLoaded) return;
+  Future<void> _loadAdmobInterstitialAd({String slot = AdSlots.defaultInterstitial}) async {
+    if (_isAdmobInterstitialAdsLoading[slot] == true || _isAdmobInterstitialAdsLoaded[slot] == true) return;
 
-    _isAdmobInterstitialAdLoading = true;
-    final adUnitId = _getAdUnitId('interstitial', network: 'admob');
+    _isAdmobInterstitialAdsLoading[slot] = true;
+    final adUnitId = _getAdUnitId('interstitial', network: 'admob', slot: slot);
 
     try {
       await InterstitialAd.load(
@@ -937,41 +1279,49 @@ class AdService with ChangeNotifier {
         request: const AdRequest(),
         adLoadCallback: InterstitialAdLoadCallback(
           onAdLoaded: (ad) {
-            _admobInterstitialAd = ad;
-            _isAdmobInterstitialAdLoaded = true;
-            _isAdmobInterstitialAdLoading = false;
+            _admobInterstitialAds[slot] = ad;
+            _isAdmobInterstitialAdsLoaded[slot] = true;
+            _isAdmobInterstitialAdsLoading[slot] = false;
 
-            _admobInterstitialAd!.fullScreenContentCallback =
-                FullScreenContentCallback(
+            ad.fullScreenContentCallback = FullScreenContentCallback(
               onAdDismissedFullScreenContent: (ad) {
                 ad.dispose();
-                _isAdmobInterstitialAdLoaded = false;
-                loadInterstitialAd();
+                _admobInterstitialAds.remove(slot);
+                _isAdmobInterstitialAdsLoaded[slot] = false;
+                loadInterstitialAd(slot: slot);
               },
               onAdFailedToShowFullScreenContent: (ad, error) {
                 ad.dispose();
-                _isAdmobInterstitialAdLoaded = false;
-                loadInterstitialAd();
+                _admobInterstitialAds.remove(slot);
+                _isAdmobInterstitialAdsLoaded[slot] = false;
+                loadInterstitialAd(slot: slot);
               },
             );
           },
           onAdFailedToLoad: (error) {
-            _isAdmobInterstitialAdLoading = false;
-            _isAdmobInterstitialAdLoaded = false;
+            _isAdmobInterstitialAdsLoading[slot] = false;
+            _isAdmobInterstitialAdsLoaded[slot] = false;
           },
         ),
       );
     } catch (e) {
-      _isAdmobInterstitialAdLoading = false;
+      _isAdmobInterstitialAdsLoading[slot] = false;
     }
   }
 
   // Load Unity interstitial ad
-  Future<void> loadInterstitialAd() async {
+  Future<void> loadInterstitialAd({String? slot}) async {
     if (_disposed || kIsWeb) return;
 
+    final activeSlot = slot ?? AdSlots.defaultInterstitial;
+
     // Start loading AdMob in background
-    _loadAdmobInterstitialAd();
+    _loadAdmobInterstitialAd(slot: activeSlot);
+
+    if (_unityInterstitialSlot != null && _unityInterstitialSlot != activeSlot) {
+      _isInterstitialAdLoaded = false;
+      _isInterstitialAdLoading = false;
+    }
 
     if (_isInterstitialAdLoading || !_isUnityInitialized) {
       return;
@@ -979,13 +1329,14 @@ class AdService with ChangeNotifier {
 
     _isInterstitialAdLoading = true;
     _isInterstitialAdLoaded = false;
+    _unityInterstitialSlot = activeSlot;
 
     try {
-      final platform = Platform.isAndroid ? 'android' : 'ios';
-      final adUnitId = _unityAdUnitIds[platform]?['interstitial'] ?? '';
+      final adUnitId = _getAdUnitId('interstitial', network: 'unity', slot: activeSlot);
 
       if (adUnitId.isEmpty) {
-        throw Exception('Interstitial ad unit ID not found for $platform');
+        _isInterstitialAdLoading = false;
+        return;
       }
 
       await UnityAds.load(
@@ -1012,60 +1363,83 @@ class AdService with ChangeNotifier {
   // Show interstitial ad
   Future<bool> showInterstitialAd({
     VoidCallback? onAdDismissed,
+    String? slot,
   }) async {
     if (_isAdShowing) {
       return false;
     }
 
+    final activeSlot = slot ?? AdSlots.defaultInterstitial;
+
     // 1. Try AdMob first
-    if (_isAdmobInterstitialAdLoaded && _admobInterstitialAd != null) {
+    final isLoaded = _isAdmobInterstitialAdsLoaded[activeSlot] == true;
+    final admobAd = _admobInterstitialAds[activeSlot];
+
+    if (isLoaded && admobAd != null) {
       _isAdShowing = true;
       
-      _admobInterstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
+      admobAd.fullScreenContentCallback = FullScreenContentCallback(
         onAdDismissedFullScreenContent: (ad) {
           _isAdShowing = false;
-          _isAdmobInterstitialAdLoaded = false;
+          _isAdmobInterstitialAdsLoaded[activeSlot] = false;
+          _admobInterstitialAds.remove(activeSlot);
           ad.dispose();
           onAdDismissed?.call();
-          loadInterstitialAd(); // Load next in background
+          loadInterstitialAd(slot: activeSlot); // Load next in background
         },
         onAdFailedToShowFullScreenContent: (ad, error) {
           _isAdShowing = false;
-          _isAdmobInterstitialAdLoaded = false;
+          _isAdmobInterstitialAdsLoaded[activeSlot] = false;
+          _admobInterstitialAds.remove(activeSlot);
           ad.dispose();
           onAdDismissed?.call();
-          loadInterstitialAd();
+          loadInterstitialAd(slot: activeSlot);
         },
       );
 
       try {
-        await _admobInterstitialAd!.show();
+        await admobAd.show();
         _updateAdMetrics('interstitial', true, null);
         return true;
       } catch (e) {
         _isAdShowing = false;
-        _isAdmobInterstitialAdLoaded = false;
+        _isAdmobInterstitialAdsLoaded[activeSlot] = false;
+        _admobInterstitialAds.remove(activeSlot);
         // Continue to Unity fallback
       }
     }
 
     // 2. Fallback to Unity
-    if (!_isInterstitialAdLoaded || !_isUnityInitialized) {
-      await loadInterstitialAd();
-      if (!_isInterstitialAdLoaded && !_isAdmobInterstitialAdLoaded) {
+    if (_isInterstitialAdLoaded) {
+    } else {
+      if (!_isUnityInitialized) {
         onAdDismissed?.call();
         return false;
       }
+
+      await loadInterstitialAd(slot: activeSlot);
+
+      // Wait up to 10 seconds for either Unity or AdMob interstitial to load
+      int elapsedMs = 0;
+      while (!_isInterstitialAdLoaded && _isAdmobInterstitialAdsLoaded[activeSlot] != true && elapsedMs < 10000) {
+        await Future.delayed(const Duration(milliseconds: 200));
+        elapsedMs += 200;
+      }
+
+      if (!_isInterstitialAdLoaded && _isAdmobInterstitialAdsLoaded[activeSlot] != true) {
+        onAdDismissed?.call();
+        return false;
+      }
+
       // If AdMob loaded while waiting for Unity
-      if (_isAdmobInterstitialAdLoaded) {
-        return showInterstitialAd(onAdDismissed: onAdDismissed);
+      if (_isAdmobInterstitialAdsLoaded[activeSlot] == true) {
+        return showInterstitialAd(onAdDismissed: onAdDismissed, slot: activeSlot);
       }
     }
 
-    try {
-      final platform = Platform.isAndroid ? 'android' : 'ios';
-      final adUnitId = _unityAdUnitIds[platform]?['interstitial'] ?? '';
+    final adUnitId = _getAdUnitId('interstitial', network: 'unity', slot: activeSlot);
 
+    try {
       if (adUnitId.isEmpty) {
         onAdDismissed?.call();
         return false;
@@ -1076,25 +1450,30 @@ class AdService with ChangeNotifier {
         placementId: adUnitId,
         onComplete: (placementId) {
           _isAdShowing = false;
-          _isInterstitialAdLoaded = false; // Need to reload after showing
-          onAdDismissed?.call();
-          _updateAdMetrics('interstitial', true, null);
-          // Preload next interstitial ad
-          loadInterstitialAd();
-        },
-        onFailed: (placementId, error, message) {
-          // Ad started playing
-        },
-        onClick: (placementId) {
-          // User clicked on ad
-        },
-        onSkipped: (placementId) {
           _isInterstitialAdLoaded = false;
           onAdDismissed?.call();
+          loadInterstitialAd(slot: activeSlot);
+          _updateAdMetrics('interstitial', true, null);
+        },
+        onFailed: (placementId, error, message) {
+          _isAdShowing = false;
+          _isInterstitialAdLoaded = false;
+          onAdDismissed?.call();
+          loadInterstitialAd(slot: activeSlot);
+          _updateAdMetrics('interstitial', false, null);
+        },
+        onSkipped: (placementId) {
+          _isAdShowing = false;
+          _isInterstitialAdLoaded = false;
+          onAdDismissed?.call();
+          loadInterstitialAd(slot: activeSlot);
+          _updateAdMetrics('interstitial', false, null);
         },
       );
+
       return true;
     } catch (e) {
+      _isAdShowing = false;
       _isInterstitialAdLoaded = false;
       onAdDismissed?.call();
       _updateAdMetrics('interstitial', false, null);
@@ -1103,16 +1482,29 @@ class AdService with ChangeNotifier {
   }
 
 
-  // Get Unity banner ad widget (deprecated - use getBannerAdWidget instead)
-  Widget getBannerAd() {
-    if (!_isBannerAdLoaded || !_isUnityInitialized) {
-      return const SizedBox(height: 50);
+  // Get AdMob banner ad widget (Exclusively via AdMob)
+  Widget getBannerAd({String? slot}) {
+    if (kIsWeb) return const SizedBox(height: 50);
+
+    final activeSlot = slot ?? AdSlots.defaultBanner;
+    final bannerAd = _adMobStandardBanners[activeSlot];
+
+    if (_isAdMobStandardBannersLoaded[activeSlot] == true && bannerAd != null) {
+      try {
+        return Container(
+          alignment: Alignment.center,
+          width: bannerAd.size.width.toDouble(),
+          height: bannerAd.size.height.toDouble(),
+          child: AdWidget(ad: bannerAd),
+        );
+      } catch (e) {
+        return const SizedBox(height: 50);
+      }
     }
-    try {
-      return getUnityBannerWidget();
-    } catch (e) {
-      return const SizedBox(height: 50);
-    }
+
+    // Trigger load in background if not already loading/loaded
+    loadBannerAd(slot: activeSlot);
+    return const SizedBox(height: 50);
   }
 
   // Initialize ads
@@ -1159,39 +1551,7 @@ class AdService with ChangeNotifier {
     }
   }
 
-  // Initialize Unity Ads with retry logic
-  Future<void> _initializeUnityAdsWithRetry() async {
-    if (_unityInitRetryCount >= maxUnityInitRetries) {
-      debugPrint(
-          '❌ Max Unity initialization retries reached ($maxUnityInitRetries)');
-      return;
-    }
 
-    _unityInitRetryCount++;
-    debugPrint(
-        '🔄 Unity initialization attempt $_unityInitRetryCount/$maxUnityInitRetries');
-
-    try {
-      await _initializeUnityAds();
-      // Reset retry count on success
-      _unityInitRetryCount = 0;
-      _unityInitRetryTimer?.cancel();
-      _unityInitRetryTimer = null;
-    } catch (e) {
-      debugPrint(
-          '❌ Unity initialization attempt $_unityInitRetryCount failed: $e');
-
-      if (_unityInitRetryCount < maxUnityInitRetries) {
-        debugPrint(
-            '⏳ Scheduling retry in ${unityInitRetryDelay.inSeconds} seconds...');
-        _unityInitRetryTimer?.cancel();
-        _unityInitRetryTimer =
-            Timer(unityInitRetryDelay, _initializeUnityAdsWithRetry);
-      } else {
-        debugPrint('💥 All Unity initialization attempts failed');
-      }
-    }
-  }
 
   Future<void> _initializeUnityAds() async {
     try {
@@ -1764,18 +2124,7 @@ class AdService with ChangeNotifier {
     _nativeFallbackStates[adId] = true;
     _notifyAdStateChange();
 
-    // If Unity is not initialized, try to initialize it with retry logic
-    if (!_isUnityInitialized) {
-      debugPrint(
-          'Unity not initialized, attempting to initialize with retry...');
-      _initializeUnityAdsWithRetry();
-    } else if (!_isBannerAdLoaded) {
-      // Unity is initialized but banner not loaded, try loading banner
-      debugPrint('Unity initialized but banner not loaded, loading banner...');
-      loadBannerAd();
-    }
-
-    // Also try to load AdMob banner as an additional fallback
+    // Load AdMob banner as the exclusive fallback
     _loadAdmobFallbackBanner(adId);
   }
 
@@ -1892,37 +2241,18 @@ class AdService with ChangeNotifier {
 
     debugPrint('Native Ad Loaded: $isLoaded');
     debugPrint('Should Show Fallback: $shouldShowFallback');
-    debugPrint('Unity Initialized: $_isUnityInitialized');
-    debugPrint('Banner Ad Loaded: $_isBannerAdLoaded');
 
-    // Enhanced fallback logic with more flexible conditions
+    // Enhanced fallback logic using exclusively AdMob
     if (!isLoaded && shouldShowFallback) {
-      // 1. Try AdMob Banner Fallback first
+      // Try AdMob Banner Fallback
       if (_admobFallbackLoadedStates[adId] == true) {
         debugPrint('✅ Showing AdMob Fallback Banner for ad ID: $adId');
         return _getAdMobFallbackWidget(adId);
-      }
-
-      // 2. Try Unity Fallback Banner second
-      if (_isUnityInitialized && _isBannerAdLoaded) {
-        debugPrint('✅ Showing Unity Fallback Banner for ad ID: $adId');
-        return _getUnityFallbackWidget(adId);
-      } else if (_isUnityInitialized && !_isBannerAdLoaded) {
-        debugPrint(
-            '🔄 Unity initialized but banner not loaded, loading banner...');
-        loadBannerAd();
-        return _getUnityFallbackWidget(adId); // Show fallback anyway
-      } else if (!_isUnityInitialized) {
-        debugPrint('🔄 Unity not initialized, initializing with retry...');
-        _initializeUnityAdsWithRetry();
-        return _getUnityFallbackWidget(adId); // Show fallback anyway
       }
     } else if (!isLoaded) {
       debugPrint('Native ad not loaded, fallback conditions not met:');
       if (isLoaded) debugPrint('  - Native ad is loaded');
       if (!shouldShowFallback) debugPrint('  - Fallback is disabled');
-      if (!_isUnityInitialized) debugPrint('  - Unity Ads is not initialized');
-      if (!_isBannerAdLoaded) debugPrint('  - Unity Banner Ad is not loaded');
     }
 
     if (!isLoaded || nativeAd == null) {
@@ -2509,9 +2839,7 @@ class AdService with ChangeNotifier {
     _admobBannerAd?.dispose();
     _admobBannerAd = null;
 
-    // Cancel Unity initialization retry timer
-    _unityInitRetryTimer?.cancel();
-    _unityInitRetryTimer = null;
+
 
     // Clear banner widget instance to prevent memory leaks
     _bannerWidgetInstance = null;

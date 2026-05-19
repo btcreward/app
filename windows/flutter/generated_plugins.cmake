@@ -11,7 +11,6 @@ list(APPEND FLUTTER_PLUGIN_LIST
   firebase_auth
   firebase_core
   flutter_secure_storage_windows
-  geolocator_windows
   local_auth_windows
   permission_handler_windows
   screen_retriever_windows

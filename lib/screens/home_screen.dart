@@ -17,7 +17,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart'; // For Flutter Toast
 import 'package:font_awesome_flutter/font_awesome_flutter.dart'; // For FontAwesomeIcons
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // For SharedPreferences
@@ -101,155 +100,6 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   // Native ad timers removed
 
 
-  // AdMob Banner Ad
-  BannerAd? _bannerAd;
-  bool _isBannerAdLoaded = false;
-  late Future<Widget?> _middleBannerAdFuture;
-
-  // Initialize and load the Adaptive Banner ad
-  Future<void> _initializeBannerAd() async {
-    if (_bannerAd != null) {
-      _bannerAd!.dispose();
-    }
-
-    setState(() {
-      _isBannerAdLoaded = false;
-    });
-
-    try {
-      // Get the screen width to determine the best ad size
-      final screenWidth = MediaQuery.of(context).size.width.toInt();
-
-      // Try to get the adaptive banner size for the current orientation
-      AdSize? adSize;
-      try {
-        adSize =
-            AdSize.getCurrentOrientationInlineAdaptiveBannerAdSize(screenWidth);
-      } catch (e) {
-        debugPrint('⚠️ Could not get adaptive ad size: $e');
-      }
-
-      // Use the adaptive size if available, otherwise fall back to a standard banner
-      final targetAdSize = adSize ?? const AdSize(width: 320, height: 50);
-
-      // Create the banner ad with the determined size
-      _bannerAd = BannerAd(
-        adUnitId: 'ca-app-pub-3940256099942544/6300978111',
-        size: targetAdSize,
-        request: const AdRequest(),
-        listener: BannerAdListener(
-          onAdLoaded: (ad) async {
-            debugPrint('✅ Adaptive Banner ad loaded');
-            // Get the actual platform ad size after loading
-            final platformAdSize = await (ad as BannerAd).getPlatformAdSize();
-            debugPrint(
-                '📏 Ad size: ${platformAdSize?.width}x${platformAdSize?.height}');
-
-            if (mounted) {
-              setState(() {
-                _isBannerAdLoaded = true;
-              });
-            }
-          },
-          onAdFailedToLoad: (ad, error) {
-            debugPrint('❌ Adaptive Banner ad failed to load: $error');
-            ad.dispose();
-            // AdMob will retry automatically or on next view creation.
-          },
-          onAdImpression: (ad) {
-            debugPrint('👁️ Banner ad impression');
-          },
-        ),
-      );
-
-      await _bannerAd!.load();
-    } catch (e) {
-      debugPrint('❌ Error initializing banner ad: $e');
-      // Fallback to a standard banner ad if adaptive loading fails
-      _loadFallbackBannerAd();
-    }
-  }
-
-  // Fallback method to load a standard banner ad
-  Future<void> _loadFallbackBannerAd() async {
-    try {
-      _bannerAd = BannerAd(
-        adUnitId: 'ca-app-pub-3940256099942544/6300978111',
-        size: const AdSize(width: 320, height: 50), // Standard banner size
-        request: const AdRequest(),
-        listener: BannerAdListener(
-          onAdLoaded: (ad) {
-            debugPrint('✅ Fallback Banner ad loaded');
-            if (mounted) {
-              setState(() {
-                _isBannerAdLoaded = true;
-              });
-            }
-          },
-          onAdFailedToLoad: (ad, error) {
-            debugPrint('❌ Fallback Banner ad failed to load: $error');
-            ad.dispose();
-          },
-        ),
-      );
-      await _bannerAd!.load();
-    } catch (e) {
-      debugPrint('❌ Error loading fallback banner ad: $e');
-    }
-  }
-
-
-
-  Future<Widget?> _getMiddleBannerAdWidget() async {
-    return Container(
-      width: 330, // Fixed width for better ad display
-      height: 120, // Fixed height for better ad display
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: _isBannerAdLoaded && _bannerAd != null
-          ? SizedBox(
-              width: 330, // Fixed width for better ad display
-              height: 120, // Fixed height for better ad display
-              child: AdWidget(ad: _bannerAd!),
-            )
-          : Container(
-              width: 330, // Fixed width for better ad display
-              height: 120, // Fixed height for better ad display
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey[300]!),
-              ),
-              child: const Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.grey),
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      'Loading Ad...',
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-    );
-  }
 
   @override
   void initState() {
@@ -259,18 +109,11 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     _audioPlayer = AudioPlayer();
     _adService = AdService();
 
-    // Initialize banner ad after the first frame when MediaQuery is available
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        _initializeBannerAd();
-      }
-    });
-    _middleBannerAdFuture = _getMiddleBannerAdWidget();
-
     Future.microtask(() async {
       await _adService.initialize();
-      // हर बार ads reload करें
-      _reloadAds();
+      if (mounted) {
+        _reloadAds();
+      }
     });
     _initializeData();
     _loadUserProfile();
@@ -295,9 +138,7 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   void _reloadAds() {
-    setState(() {
-      _middleBannerAdFuture = _getMiddleBannerAdWidget();
-    });
+    if (mounted) setState(() {});
   }
 
   @override
@@ -317,8 +158,8 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         // App came to foreground
         if (mounted) {
           // setState(() {
-          //   _bottomNativeAdFuture = _getBottomNativeAdWidget();
-          //   _middleBannerAdFuture = _getMiddleBannerAdWidget();
+          // _bottomNativeAdFuture = _getBottomNativeAdWidget();
+          // _middleBannerAdFuture = _getMiddleBannerAdWidget();
           // });
         }
         if (_isMining && _miningStartTime != null) {
@@ -389,9 +230,6 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     WidgetsBinding.instance.removeObserver(this);
     _audioPlayer.dispose();
     _scrollController.dispose();
-    // Note: Don't dispose AdService here as it's a singleton shared across the app
-    _bannerAd?.dispose();
-    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -571,7 +409,7 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         await SoundNotificationService.showAlertNotification(
           title: '⛏️ Mining Session Completed!',
           message:
-              'Your mining session has completed successfully! You can start a new session now.',
+              'Your reward session has completed successfully! You can start a new session now.',
         );
       } else {
         // '⏰ Mining session not completed yet ($elapsedMinutes/$miningDurationMinutes minutes), no earnings added');
@@ -604,7 +442,7 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         walletProvider.addEarning(
           earningsToAdd,
           type: 'mining',
-          description: 'Mining session earnings',
+          description: 'reward session points',
         );
 
         // Show earnings notification immediately
@@ -620,7 +458,7 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'You earned ${earningsToAdd.toStringAsFixed(18)} BTC from mining! Added to your wallet.',
+                'You collected ${earningsToAdd.toStringAsFixed(18)} BTC points. Added to your reward balance.',
                 style: const TextStyle(fontSize: 16),
               ),
               backgroundColor: Colors.amber,
@@ -632,7 +470,7 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Failed to add mining earnings to wallet: $e'),
+              content: Text('Failed to add reward points: $e'),
               backgroundColor: Colors.red,
             ),
           );
@@ -646,7 +484,7 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
-              'Mining session completed! You can start a new session now.'),
+              'Reward session completed! You can start a new session now.'),
           backgroundColor: Colors.green,
           duration: Duration(seconds: 3),
         ),
@@ -883,7 +721,7 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       await SoundNotificationService.showAlertNotification(
         title: '⛏️ Mining Session Completed!',
         message:
-            'Your previous mining session has completed. You can start a new session now.',
+            'Your previous reward session has completed. You can start a new session now.',
       );
 
       if (mounted) {
@@ -958,8 +796,8 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               ),
               content: Text(
                 _isMining
-                    ? 'Are you sure you want to exit the app?\n\nYour mining session will continue in the background and earnings will be added when complete.'
-                    : 'Are you sure you want to exit the app?\n\nYour earnings have been saved.',
+                    ? 'Are you sure you want to exit the app?\n\nYour reward session will continue in the background and points will be added when complete.'
+                    : 'Are you sure you want to exit the app?\n\nYour rewards have been saved.',
                 style: const TextStyle(fontSize: 16),
               ),
               actions: [
@@ -1227,75 +1065,6 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             const SizedBox(height: 16),
             buildGameSection(),
             const SizedBox(height: 16),
-            // Middle Banner Ad (Below Game Section)
-            FutureBuilder<Widget?>(
-              future: _middleBannerAdFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done &&
-                    snapshot.data != null) {
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 16),
-                    child: snapshot.data,
-                  );
-                } else if (snapshot.connectionState ==
-                    ConnectionState.waiting) {
-                  return Container(
-                    height: 50,
-                    margin: const EdgeInsets.only(bottom: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[100],
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(color: Colors.grey[300]!),
-                    ),
-                    child: const Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(Colors.grey),
-                            ),
-                          ),
-                          SizedBox(width: 8),
-                          Text(
-                            'Loading Middle Banner...',
-                            style: TextStyle(
-                              color: Colors.grey,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                } else {
-                  return Container(
-                    height: 50,
-                    margin: const EdgeInsets.only(bottom: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[50],
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(color: Colors.grey[200]!),
-                    ),
-                    child: const Center(
-                      child: Text(
-                        'Ad',
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  );
-                }
-              },
-            ),
             Row(
               children: [
                 buildStatCard(
@@ -1305,7 +1074,7 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 ),
                 const SizedBox(width: 16),
                 buildStatCard(
-                  title: 'Mining Earnings',
+                  title: 'Rewards',
                   value: '${_miningEarnings.toStringAsFixed(18)} BTC',
                   icon: Icons.attach_money,
                 ),
@@ -1487,7 +1256,7 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 buildInfoCard(
                   title: 'Reward Program',
                   icon: Icons.card_giftcard,
-                  description: 'Complete tasks to earn rewards!',
+                  description: 'Complete tasks to collect rewards!',
                   color: Colors.orange,
                   onTap: _navigateToRewardScreen,
                 ),
@@ -1495,7 +1264,7 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 buildInfoCard(
                   title: 'Referral Program',
                   icon: Icons.group_add,
-                  description: 'Invite friends to earn extra rewards!',
+                  description: 'Invite friends to collect extra rewards!',
                   color: Colors.purple,
                   onTap: _navigateToReferralScreen,
                 ),
@@ -1580,7 +1349,7 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        _lastError ?? 'Mining Status: $_miningStatus',
+                        _lastError ?? 'Reward Status: $_miningStatus',
                         style: TextStyle(
                           color: _lastError != null ? Colors.red : Colors.blue,
                         ),
@@ -1629,7 +1398,7 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               ),
               SizedBox(width: 10),
               Text(
-                'Play & Earn BTC Rewards',
+                'Play & Collect BTC Rewards',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -1642,7 +1411,7 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           const Divider(color: Colors.white54, thickness: 1, height: 20),
           const SizedBox(height: 8),
           const Text(
-            'Play fun games and get BTC rewards for your achievements!',
+            'Play fun games and collect BTC rewards for your achievements!',
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 16, color: Colors.white70),
           ),
@@ -1830,8 +1599,6 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     // Implement the logic to load saved settings from SharedPreferences
   }
 
-
-
   Future<void> _startPowerBoost() async {
     if (!mounted || !_isMining) return;
     try {
@@ -1915,6 +1682,7 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             ),
           );
         },
+        slot: AdSlots.homeRewarded1,
       );
       if (!adWatched) {
         if (!mounted) return;
@@ -2038,6 +1806,7 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 backgroundColor: Colors.orange,
               );
             },
+            slot: AdSlots.homeRewarded2,
           );
           if (!adWatched && mounted) {
             Fluttertoast.showToast(
@@ -2121,7 +1890,7 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   Future<void> _savePendingEarnings() async {
     try {
       // Only save tap earnings periodically, NOT mining earnings
-      // Mining earnings should only be saved when mining session completes
+      // rewards should only be saved when mining session completes
 
       // Note: Tap rewards are already added immediately in _onSciFiObjectTapped()
       // So we don't need to add them again here
@@ -2186,4 +1955,3 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     debugPrint('✅ Mining timer started successfully');
   }
 }
-

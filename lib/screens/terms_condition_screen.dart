@@ -7,7 +7,7 @@ class TermsConditionScreen extends StatelessWidget {
   final String supportEmail;
   const TermsConditionScreen({
     super.key,
-    this.appName = 'Bitcoin Mining Pro',
+    this.appName = 'BTC Reward',
     this.supportEmail = 'bitcoincloudminingformobile@gmail.com',
   });
 
@@ -48,75 +48,75 @@ class TermsConditionScreen extends StatelessWidget {
           child: SingleChildScrollView(
             child: MarkdownBody(
               data: """
-⚠️ **Important Notice:** This is a reward-based simulation game. Virtual BTC shown in the app is a in-game currency earned through gameplay and watching ads. Users who meet the minimum threshold may submit a redemption request, which is reviewed and fulfilled at our discretion as a goodwill reward.
+⚠️ **Important Notice:** This is a reward-based simulation game. BTC shown in the app is a in-game currency earned through gameplay and watching ads. Users who meet the minimum threshold may submit a redemption request, which is reviewed and fulfilled at our discretion as a goodwill reward.
 
-**Terms & Conditions**  
+**Terms & Conditions** 
 _Last Updated: ${dynamicLastUpdated}_
 
 Welcome to **$appName**. By using our app, you agree to the following terms and conditions. Please read them carefully before using the service.
 
-## 1. Acceptance of Terms  
+## 1. Acceptance of Terms 
 By accessing or using **$appName**, you confirm that you have read, understood, and agreed to these Terms & Conditions. If you do not agree, please do not use the app.
 
-## 2. About This App  
-- **$appName** is a **reward-based simulation game** that simulates Bitcoin Mining Pro gameplay for entertainment purposes.
-- All BTC balances shown in the app are **virtual in-game currency** and do not represent real cryptocurrency.
+## 2. About This App 
+- **$appName** is a **reward-based simulation game** that simulates BTC Reward gameplay for entertainment purposes.
+- All BTC balances shown in the app are **in-game currency** and do not represent real cryptocurrency.
 - The app is **not a financial product**, cryptocurrency exchange, or investment platform.
-- Users can earn virtual BTC by engaging with the app, completing tasks, and watching rewarded advertisements.
+- Users can earn BTC by engaging with the app, completing tasks, and watching rewarded advertisements.
 
-## 3. Eligibility  
-- You must be at least **18 years old** or the age of majority in your jurisdiction.  
+## 3. Eligibility 
+- You must be at least **18 years old** or the age of majority in your jurisdiction. 
 - By using the app, you confirm that you are legally allowed to use entertainment and reward-based applications in your region.
 
-## 4. How Rewards Work  
-- Users earn **virtual BTC** (in-game points) by watching rewarded ads, completing tasks, and daily check-ins.
-- Virtual BTC has **no real monetary value** by itself.
-- Once a user accumulates a minimum of **0.00005 virtual BTC**, they may submit a **redemption request** through the app.
+## 4. How Rewards Work 
+- Users earn **BTC** (in-game points) by watching rewarded ads, completing tasks, and daily check-ins.
+- BTC has **no real monetary value** by itself.
+- Once a user accumulates a minimum of **0.00005 BTC**, they may submit a **redemption request** through the app.
 - Redemption requests are **manually reviewed** by our team. Approved requests are fulfilled as a goodwill reward (via Bitcoin, PayPal, or Paytm) at our sole discretion.
 - Redemption is **not guaranteed** and may be declined if fraudulent activity, bot usage, or abuse is detected.
 - Approved redemptions are typically processed within **48–72 hours** after verification.
 - **No fees** are charged for redemption requests.
 
-## 5. Virtual Currency Policy  
-- Virtual BTC earned in this app **cannot be traded, sold, or transferred** between users.
-- Virtual BTC has no cash value unless specifically fulfilled through our voluntary redemption program.
-- We reserve the right to modify, reset, or discontinue virtual currency balances at any time.
+## 5. Currency Policy 
+- BTC earned in this app **cannot be traded, sold, or transferred** between users.
+- BTC has no cash value unless specifically fulfilled through our voluntary redemption program.
+- We reserve the right to modify, reset, or discontinue currency balances at any time.
 
-## 6. Prohibited Activities  
-You agree **not** to:  
-- Use bots, automation, scripts, or emulators to manipulate in-game rewards or virtual currency.
+## 6. Prohibited Activities 
+You agree **not** to: 
+- Use bots, automation, scripts, or emulators to manipulate in-game rewards or currency.
 - Create multiple accounts to abuse the reward system.
 - Engage in hacking, fraudulent activities, or exploits.
 - Violate any applicable laws or regulations.
 
-## 7. Advertisements & Monetization  
-- The app displays advertisements powered by **Google AdMob**, including rewarded video ads that grant in-game virtual BTC.
+## 7. Advertisements & Monetization 
+- The app displays advertisements powered by **Google AdMob**, including rewarded video ads that grant in-game BTC.
 - Ad-blocking tools may restrict access to certain app features.
 - We do not control the content of third-party advertisements.
 
-## 8. Account Suspension & Termination  
-We reserve the right to suspend or terminate accounts that:  
+## 8. Account Suspension & Termination 
+We reserve the right to suspend or terminate accounts that: 
 - Violate these Terms & Conditions.
-- Use fraudulent methods to inflate virtual balances.
+- Use fraudulent methods to inflate balances.
 - Abuse the redemption request system.
 - Remain inactive for an extended period.
 
-## 9. No Guarantees & Liability Disclaimer  
+## 9. No Guarantees & Liability Disclaimer 
 - We do **not guarantee** any specific earnings, rewards, or redemption payouts.
 - The app is provided "as-is." We are **not responsible** for any financial loss or damages.
 - Bitcoin price estimates shown are for informational and entertainment purposes only.
 - This app is **not an investment product**. Do not make financial decisions based on in-app balances.
 
-## 10. Privacy  
+## 10. Privacy 
 - We collect basic account information (email, wallet address for redemption) to provide our services.
 - We use **Google AdMob** for advertising, which may collect device and usage data per Google's Privacy Policy.
 - We do not sell your personal data to third parties.
 - For full details, see our Privacy Policy below.
 
-## 11. Changes to Terms  
+## 11. Changes to Terms 
 We may update these Terms & Conditions at any time. Continued use of the app after updates constitutes acceptance of the revised terms.
 
-## 12. Contact Us  
+## 12. Contact Us 
 If you have any questions, please contact us at **$supportEmail**.
 
 ---
@@ -193,7 +193,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 12),
                 Text(
-                  '⚠️ This is a reward-based simulation game. All virtual BTC shown is in-game currency. Redemptions are enabled only when minimum thresholds are reached and verified by our team.',
+                  '⚠️ This is a reward-based simulation game. All BTC shown is in-game currency. Redemptions are enabled only when minimum thresholds are reached and verified by our team.',
                   style: TextStyle(fontSize: 15, color: Colors.amber),
                 ),
                 SizedBox(height: 16),
@@ -201,7 +201,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                   '1. Information We Collect\n\n'
                   '• Account Info: Email address and username when you register.\n'
                   '• Wallet/Payment Info: Bitcoin address, PayPal email, or Paytm number — only when you submit a redemption request.\n'
-                  '• Usage Data: App activity, virtual BTC earned, and redemption history.\n'
+                  '• Usage Data: App activity, BTC earned, and redemption history.\n'
                   '• Device Info: Device type, OS version, and app version for troubleshooting.\n\n'
                   '2. Advertising (Google AdMob)\n\n'
                   'This app uses Google AdMob to display rewarded video ads. AdMob may collect:\n'
@@ -235,7 +235,8 @@ class PrivacyPolicyScreen extends StatelessWidget {
                   'Email: bitcoincloudminingformobile@gmail.com\n\n'
                   'Full Privacy Policy:\n'
                   'https://doc-hosting.flycricket.io/bitcoin-cloud-mining-privacy-policy/140d10f0-13a2-42a0-a93a-ec68298f58db/privacy',
-                  style: TextStyle(fontSize: 15, color: Colors.white70, height: 1.5),
+                  style: TextStyle(
+                      fontSize: 15, color: Colors.white70, height: 1.5),
                 ),
               ],
             ),
@@ -245,5 +246,3 @@ class PrivacyPolicyScreen extends StatelessWidget {
     );
   }
 }
-
-

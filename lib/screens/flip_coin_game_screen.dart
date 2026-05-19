@@ -62,7 +62,7 @@ class _FlipCoinGameScreenState extends State<FlipCoinGameScreen>
 
     _bannerAd = BannerAd(
       adUnitId:
-          'ca-app-pub-3940256099942544/6300978111', // Same as hash rush screen
+          _adService.getBannerAdUnitId(slot: AdSlots.flipCoinBanner1) ?? '',
       size: AdSize.mediumRectangle, // 300x250 banner ad
       request: const AdRequest(),
       listener: BannerAdListener(
@@ -123,7 +123,7 @@ class _FlipCoinGameScreenState extends State<FlipCoinGameScreen>
 
   Future<void> _loadInterstitialAd() async {
     try {
-      await _adService.loadInterstitialAd();
+      await _adService.loadInterstitialAd(slot: AdSlots.flipCoinInterstitial1);
       if (mounted) {
         setState(() {
           _isInterstitialAdLoaded = true;
@@ -181,7 +181,7 @@ class _FlipCoinGameScreenState extends State<FlipCoinGameScreen>
       await walletProvider.addEarning(
         _gameWalletBalance.toDouble(),
         type: 'game',
-        description: 'Flip Coin Game Earnings',
+        description: 'Flip Coin Game Rewards',
       );
 
       // Play earning sound for game completion
@@ -191,7 +191,7 @@ class _FlipCoinGameScreenState extends State<FlipCoinGameScreen>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              '🎉 ${_gameWalletBalance.toStringAsFixed(18)} BTC added to wallet!',
+              '🎉 ${_gameWalletBalance.toStringAsFixed(18)} BTC points added!',
               style: const TextStyle(color: Colors.white, fontSize: 16),
             ),
             backgroundColor: ColorConstants.successColor,
@@ -204,7 +204,7 @@ class _FlipCoinGameScreenState extends State<FlipCoinGameScreen>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Error transferring earnings: ${e.toString()}',
+              'Error transferring rewards: ${e.toString()}',
               style: const TextStyle(color: Colors.white),
             ),
             backgroundColor: const Color(0xFFE53935), // Error color
@@ -279,6 +279,7 @@ class _FlipCoinGameScreenState extends State<FlipCoinGameScreen>
     if (_isInterstitialAdLoaded) {
       try {
         await _adService.showInterstitialAd(
+          slot: AdSlots.flipCoinInterstitial1,
           onAdDismissed: _exitAfterAd,
         );
       } catch (e) {
@@ -307,7 +308,7 @@ class _FlipCoinGameScreenState extends State<FlipCoinGameScreen>
             ],
           ),
           content: Text(
-            'You have ${_gameWalletBalance.toString()} BTC earnings!\n\nDo you want to save and exit?',
+            'You have ${_gameWalletBalance.toString()} BTC reward points!\n\nDo you want to save and exit?',
             style: const TextStyle(fontSize: 16),
           ),
           actions: [
@@ -673,7 +674,7 @@ class _FlipCoinGameScreenState extends State<FlipCoinGameScreen>
                                         Expanded(
                                           child: Text(
                                             _userChoice == _result
-                                                ? 'Correct! You earned ${_winAmount.toString()} BTC'
+                                                ? 'Correct! You collected ${_winAmount.toString()} BTC'
                                                 : 'Wrong! Penalty: ${_penaltyAmount.toString()} BTC',
                                             style: const TextStyle(
                                               color: Colors.white,
@@ -836,7 +837,7 @@ class _FlipCoinGameScreenState extends State<FlipCoinGameScreen>
                       ),
                       SizedBox(height: 16),
                       Text(
-                        'Transferring earnings to your wallet...',
+                        'Transferring rewards to your reward balance...',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 16,
@@ -908,7 +909,7 @@ class _FlipCoinGameScreenState extends State<FlipCoinGameScreen>
         Provider.of<WalletProvider>(context, listen: false).addEarning(
           _gameWalletBalance.toDouble(),
           type: 'game',
-          description: 'Flip Coin Game Earnings (Auto-saved)',
+          description: 'Flip Coin Game Rewards (Auto-saved)',
         );
       } catch (e) {
         AppLogger.error('FlipCoin error', error: e);
@@ -925,6 +926,7 @@ class _FlipCoinGameScreenState extends State<FlipCoinGameScreen>
       _isAdLoading = true;
     });
     await _adService.showRewardedAd(
+      slot: AdSlots.flipCoinRewarded1,
       onRewarded: (amount) {
         _add2xRewardToWallet();
       },
@@ -951,6 +953,7 @@ class _FlipCoinGameScreenState extends State<FlipCoinGameScreen>
       _isAdLoading = true;
     });
     await _adService.showRewardedAd(
+      slot: AdSlots.flipCoinRewarded2,
       onRewarded: (amount) {
         setState(() {
           _isRewardedAdRequired = false;
@@ -1012,6 +1015,4 @@ class _FlipCoinGameScreenState extends State<FlipCoinGameScreen>
       ),
     );
   }
-
 }
-

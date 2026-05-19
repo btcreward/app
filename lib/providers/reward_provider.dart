@@ -50,7 +50,7 @@ class RewardProvider with ChangeNotifier {
     },
     {
       'platform': 'whatsapp',
-      'handle': 'Bitcoin Mining Pro',
+      'handle': 'BTC Reward',
       'url': 'https://chat.whatsapp.com/InL9NrT9gtuKpXRJ3Gu5A5',
       'rewardAmount': '0.000000000000010000'
     },
@@ -62,13 +62,13 @@ class RewardProvider with ChangeNotifier {
     },
     {
       'platform': 'facebook',
-      'handle': 'Bitcoin Mining Pro',
+      'handle': 'BTC Reward',
       'url': 'https://www.facebook.com/groups/1743859249846928',
       'rewardAmount': '0.000000000000010000'
     },
     {
       'platform': 'youtube',
-      'handle': 'Bitcoin Mining Pro',
+      'handle': 'BTC Reward',
       'url': 'https://www.youtube.com/channel/UC1V43aMm3KYUJu_J9Lx2DAw',
       'rewardAmount': '0.000000000000010000'
     },
@@ -322,19 +322,19 @@ class RewardProvider with ChangeNotifier {
       },
       {
         'platform': 'facebook',
-        'handle': 'Bitcoin Mining Pro',
+        'handle': 'BTC Reward',
         'url': 'https://www.facebook.com/groups/1743859249846928',
         'rewardAmount': '0.000000000000010000'
       },
       {
         'platform': 'youtube',
-        'handle': 'Bitcoin Mining Pro',
+        'handle': 'BTC Reward',
         'url': 'https://www.youtube.com/channel/UC1V43aMm3KYUJu_J9Lx2DAw',
         'rewardAmount': '0.000000000000010000'
       },
       {
         'platform': 'whatsapp',
-        'handle': 'Bitcoin Mining Pro',
+        'handle': 'BTC Reward',
         'url': 'https://chat.whatsapp.com/InL9NrT9gtuKpXRJ3Gu5A5',
         'rewardAmount': '0.000000000000010000'
       }

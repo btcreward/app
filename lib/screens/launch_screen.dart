@@ -345,7 +345,7 @@ class _LaunchScreenState extends State<LaunchScreen>
                                     children: [
                                       // Shadow Text
                                       Text(
-                                        'Bitcoin Mining Pro',
+                                        'BTC Reward',
                                         style: GoogleFonts.poppins(
                                           fontSize: 28, // reduced from 40
                                           fontWeight: FontWeight.bold,
@@ -356,7 +356,7 @@ class _LaunchScreenState extends State<LaunchScreen>
                                       ),
                                       // Main Text
                                       Text(
-                                        'Bitcoin Mining Pro',
+                                        'BTC Reward',
                                         style: GoogleFonts.poppins(
                                           fontSize: 28, // reduced from 40
                                           fontWeight: FontWeight.bold,
@@ -502,4 +502,3 @@ class _LaunchScreenState extends State<LaunchScreen>
     );
   }
 }
-

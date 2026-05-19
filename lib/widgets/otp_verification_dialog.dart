@@ -263,7 +263,7 @@ class DisclaimerScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               const Text(
-                'This app simulates cloud mining. Rewards are virtual and based on ad interactions or in-app activities. It does not perform real Bitcoin mining.',
+                'This app provides BTC-themed reward simulation gameplay. Rewards are and based on ad interactions or in-app activities. It does not perform real Bitcoin mining.',
                 style: TextStyle(fontSize: 16, color: Colors.white70),
                 textAlign: TextAlign.center,
               ),
@@ -292,4 +292,3 @@ class DisclaimerScreen extends StatelessWidget {
     );
   }
 }
-

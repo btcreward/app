@@ -53,7 +53,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
               expandedHeight: 200,
               pinned: true,
               flexibleSpace: FlexibleSpaceBar(
-                title: const Text('📜 About Us – Bitcoin Mining Pro 🚀'),
+                title: const Text('📜 About Us – BTC Reward 🚀'),
                 background: Container(
                   decoration: const BoxDecoration(
                     color:
@@ -69,7 +69,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                   child: Padding(
                     padding: EdgeInsets.all(16.0),
                     child: Text(
-                      '⚠️ This is a virtual mining simulation app. All BTC shown is virtual. Redemptions are enabled only when minimum thresholds are reached and verified.',
+                      '⚠️ This is a mining simulation app. All BTC shown is. Redemptions are enabled only when minimum thresholds are reached and verified.',
                       style: TextStyle(fontSize: 16, color: Colors.black87),
                       textAlign: TextAlign.center,
                     ),
@@ -80,7 +80,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                   child: Padding(
                     padding: EdgeInsets.all(16.0),
                     child: Text(
-                      'Introduction\nWelcome to Bitcoin Mining Pro, your trusted platform for cloud-based cryptocurrency mining. We provide a secure, efficient, and user-friendly way to mine Bitcoin through our advanced cloud infrastructure.',
+                      'Introduction\nWelcome to BTC Reward, a BTC reward simulation game for entertainment. You can collect in-app BTC points through gameplay, tasks, and rewarded ads. This app does not perform real cryptocurrency mining.',
                       style: textStyle,
                     ),
                   ),
@@ -96,22 +96,22 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                           TextSpan(text: '🌍 Our Mission\n'),
                           TextSpan(
                               text:
-                                  'At Bitcoin Mining Pro, we are committed to making cryptocurrency mining accessible, efficient, and profitable for everyone.\n\n'),
+                                  'At BTC Reward, our mission is to provide a transparent entertainment experience built around BTC points and gameplay rewards.\n\n'),
                           TextSpan(
                               text:
-                                  '💎 Provide reliable and efficient cloud mining solutions.\n'),
+                                  '💎 Provide a clear reward simulation experience.\n'),
                           TextSpan(
                               text:
-                                  '⚡ Deliver transparent and competitive mining returns.\n'),
+                                  '⚡ Keep reward progress easy to understand.\n'),
                           TextSpan(
                               text:
-                                  '🔒 Ensure secure and timely redemptions.\n'),
+                                  '🔒 Review redemption requests fairly when eligible.\n'),
                           TextSpan(
                               text:
-                                  '🌐 Make Bitcoin mining accessible globally.\n'),
+                                  '🌐 Make BTC-themed gameplay accessible globally.\n'),
                           TextSpan(
                               text:
-                                  '💫 Maintain 99.9% mining facility uptime.\n'),
+                                  '💫 Avoid claims of real mining, investment, or guaranteed payout.\n'),
                         ],
                       ),
                     ),
@@ -122,13 +122,13 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                   child: Padding(
                     padding: EdgeInsets.all(16.0),
                     child: Text(
-                      '🔥 Why Choose Bitcoin Mining Pro?\n\n'
-                      '⚡ State-of-the-Art Mining Facilities – Advanced ASIC miners maintained in professional data centers with optimal conditions.\n\n'
-                      '🔐 Secure & Transparent Operations – Track your simulated hash rate and BTC earnings in real-time through our cloud mining interface.\n\n'
-                      '🎮 Simulated Bitcoin mining experience – Enjoy a rewarding gameplay experience with engaging in-app rewards.\n\n'
-                      '💫 24/7 Mining Performance – Continuous operation with 99.9% uptime and professional maintenance.\n\n'
+                      '🔥 Why Choose BTC Reward?\n\n'
+                      '⚡ BTC Gameplay - Collect in-app BTC points through simulated activities.\n\n'
+                      '🔐 Transparent Progress - Track your hash rate and reward balance in the app.\n\n'
+                      '🎮 Entertainment First - Enjoy a BTC-themed reward experience without real device or cloud mining.\n\n'
+                      '💫 No Investment Claims - Rewards are points and are not guaranteed income.\n\n'
                       '🛟 24/7 Support – Dedicated customer service team available round the clock.\n\n'
-                      '⚡ Redemptions processed within 48 hours if eligible. Redemption requests are reviewed and processed based on eligibility.\n',
+                      '⚡ Redemption requests, if available, are reviewed based on eligibility and are not guaranteed.\n',
                       style: textStyle,
                     ),
                   ),
@@ -141,7 +141,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Global Mining Statistics: ${totalBtcMined.toStringAsFixed(18)} BTC (simulated) earned by players through gameplay.',
+                          'Global Reward Stats: ${totalBtcMined.toStringAsFixed(18)} BTC points collected through gameplay.',
                           style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -174,14 +174,14 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                           name: 'Sundar Sah',
                           role: 'CEO & Founder',
                           description:
-                              'Visionary entrepreneur and blockchain expert with 10+ years in simulated mining and fintech innovation.',
+                              'Product leader focused on BTC-themed entertainment and reward simulations.',
                         ),
                         SizedBox(height: 16),
                         _TeamMember(
                           name: 'Update This',
                           role: 'CTO',
                           description:
-                              'Expert in distributed systems and mining optimization. Leading the development of next-gen simulated mining technology.',
+                              'Technology lead focused on reliable gameplay systems and reward tracking.',
                         ),
                       ],
                     ),
@@ -194,11 +194,11 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                     child: Text(
                       '🌟 Our Vision & Future Plans\n\n'
                       '🔮 Upcoming Developments:\n'
-                      '🚀 Expanding Mining Facilities – Adding more state-of-the-art data centers\n'
-                      '⚡ Enhanced Mining Efficiency – Implementing next-gen ASIC technology\n'
-                      '🌐 Global Expansion – New mining facilities in renewable energy locations\n'
-                      '💹 Advanced Analytics – Track your simulated hash rate and BTC earnings in real-time through our cloud mining interface.\n'
-                      '🔗 Multi-Chain Support – Expanding to simulated mining of other profitable cryptocurrencies',
+                      '🚀 More BTC-themed gameplay events and challenges\n'
+                      '⚡ Improved reward tracking and progress insights\n'
+                      '🌐 Additional entertainment modes with clear simulation wording\n'
+                      '💹 Advanced Analytics - Track your hash rate and in-app BTC points.\n'
+                      '🔗 More simulated crypto-themed experiences for entertainment',
                       style: textStyle,
                     ),
                   ),
@@ -222,7 +222,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                             children: const [
                               _TestimonialCard(
                                 text:
-                                    '“The best crypto mining game! Super fun and rewarding!”',
+                                    '“A fun BTC-themed reward simulator with clear points.”',
                                 rating: 5,
                               ),
                               _TestimonialCard(
@@ -232,7 +232,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                               ),
                               _TestimonialCard(
                                 text:
-                                    '“Finally, a mining app that lets you request BTC redemptions after reaching a minimum threshold and passing eligibility review!”',
+                                    '“I like that redemption requests are clearly eligibility-based and manually reviewed.”',
                                 rating: 5,
                               ),
                             ],
@@ -249,7 +249,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                     child: Column(
                       children: [
                         const Text(
-                          '🎮 Join the Mining Revolution Today!',
+                          '🎮 Join BTC Reward Today',
                           style: boldTextStyle,
                         ),
                         const SizedBox(height: 8),
@@ -337,7 +337,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                   padding:
                       EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                   child: Text(
-                    'Note: All earnings shown in this app are simulated and based on in-app gameplay. Bitcoin Mining Pro is not a real mining operation. BTC rewards are virtual unless stated otherwise.',
+                    'Note: All BTC values shown in this app are in-app reward points based on gameplay. BTC Reward is not a real mining operation, investment product, or guaranteed payout service.',
                     style: TextStyle(fontSize: 12, color: Colors.white54),
                     textAlign: TextAlign.center,
                   ),
@@ -598,4 +598,3 @@ class _SocialMediaButton extends StatelessWidget {
     );
   }
 }
-

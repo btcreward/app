@@ -78,7 +78,7 @@ class WalletScreenState extends State<WalletScreen>
   Future<void> _initializeAds() async {
     await _adService.initialize();
     // Pre-load a rewarded ad
-    await _adService.loadRewardedAd();
+    await _adService.loadRewardedAd(slot: AdSlots.walletRewarded1);
   }
 
   @override
@@ -350,7 +350,6 @@ class WalletScreenState extends State<WalletScreen>
     // Show 2 decimals for fiat currencies
     return amount.toStringAsFixed(2);
   }
-
 
   bool _isValidBitcoinAddress(String address) {
     // Basic validation for Bitcoin address
@@ -867,7 +866,7 @@ class WalletScreenState extends State<WalletScreen>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'Total Balance',
+                'Total Reward',
                 style: TextStyle(
                   color: Colors.white70,
                   fontSize: 16,
@@ -1557,13 +1556,14 @@ class WalletScreenState extends State<WalletScreen>
         ),
       );
 
-      await _adService.loadRewardedAd();
+      await _adService.loadRewardedAd(slot: AdSlots.walletRewarded1);
 
       if (mounted) {
         Navigator.pop(context);
       }
 
       final bool adShown = await _adService.showRewardedAd(
+        slot: AdSlots.walletRewarded1,
         onRewarded: (double rewardAmount) async {
           try {
             final claimNavigator = Navigator.of(context);
@@ -1601,8 +1601,7 @@ class WalletScreenState extends State<WalletScreen>
               }
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content:
-                      Text('Failed to claim transaction: ${e.toString()}'),
+                  content: Text('Failed to claim transaction: ${e.toString()}'),
                   backgroundColor: Colors.red,
                 ),
               );
@@ -1825,4 +1824,3 @@ class WalletScreenState extends State<WalletScreen>
     );
   }
 }
-

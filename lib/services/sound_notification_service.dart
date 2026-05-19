@@ -38,8 +38,8 @@ class SoundNotificationService {
       // Mining notification channel
       const miningChannel = AndroidNotificationChannel(
         'mining_channel',
-        'Mining Status',
-        description: 'Shows current mining stats and status',
+        'Reward Status',
+        description: 'Shows current reward progress and status',
         importance: Importance.max,
         enableVibration: true,
         enableLights: true,
@@ -50,7 +50,7 @@ class SoundNotificationService {
       const rewardChannel = AndroidNotificationChannel(
         'reward_channel',
         'Rewards',
-        description: 'Notifications for rewards and earnings',
+        description: 'Notifications for rewards',
         importance: Importance.high,
         enableVibration: true,
         enableLights: true,
@@ -214,7 +214,7 @@ class SoundNotificationService {
         styleInformation: BigTextStyleInformation(
           body,
           contentTitle: title,
-          summaryText: 'Bitcoin Mining Pro',
+          summaryText: 'BTC Reward',
         ),
         category: AndroidNotificationCategory.message,
         visibility: NotificationVisibility.public,
@@ -238,7 +238,7 @@ class SoundNotificationService {
   static String _getChannelName(String channelId) {
     switch (channelId) {
       case 'mining_channel':
-        return 'Mining Status';
+        return 'Reward Status';
       case 'reward_channel':
         return 'Rewards';
       case 'redemption_channel':
@@ -253,9 +253,9 @@ class SoundNotificationService {
   static String _getChannelDescription(String channelId) {
     switch (channelId) {
       case 'mining_channel':
-        return 'Shows current mining stats and status';
+        return 'Shows current reward progress and status';
       case 'reward_channel':
-        return 'Notifications for rewards and earnings';
+        return 'Notifications for rewards';
       case 'redemption_channel':
         return 'Notifications for redemptions';
       case 'alert_channel':
@@ -270,8 +270,9 @@ class SoundNotificationService {
     required String type,
   }) async {
     await showNotification(
-      title: '🎉 Reward Earned!',
-      body: 'You earned ${amount.toStringAsFixed(18)} BTC from $type!',
+      title: '🎉 Reward Collected!',
+      body:
+          'You collected ${amount.toStringAsFixed(18)} BTC points from $type!',
       soundType: 'reward',
       channelId: 'reward_channel',
       payload: {
@@ -289,7 +290,8 @@ class SoundNotificationService {
   }) async {
     await showNotification(
       title: '💰 Redemption Successful!',
-      body: '${amount.toStringAsFixed(18)} BTC redeemed via $method',
+      body:
+          '${amount.toStringAsFixed(18)} BTC redemption request submitted via $method',
       soundType: 'redemption',
       channelId: 'redemption_channel',
       payload: {
@@ -307,9 +309,9 @@ class SoundNotificationService {
     required String duration,
   }) async {
     await showNotification(
-      title: '⛏️ Mining Update',
+      title: '⛏️ Reward Update',
       body:
-          'Balance: $balance BTC | Hashrate: $hashRate H/s | Duration: $duration',
+          'Reward balance: $balance BTC points | Hashrate: $hashRate H/s | Duration: $duration',
       soundType: 'mining',
       channelId: 'mining_channel',
       payload: {
@@ -342,9 +344,9 @@ class SoundNotificationService {
   // Show welcome notification
   static Future<void> showWelcomeNotification() async {
     await showNotification(
-      title: '🚀 Welcome to Bitcoin Mining Pro!',
+      title: '🚀 Welcome to BTC Reward!',
       body:
-          'Start mining and earn Bitcoin rewards. Your journey to crypto wealth begins now!',
+          'Start playing and collect BTC rewards. This is an entertainment experience, not real cryptocurrency mining.',
       soundType: 'alert',
       channelId: 'alert_channel',
       payload: {
@@ -361,7 +363,7 @@ class SoundNotificationService {
     await showNotification(
       title: '🎯 Level Up!',
       body:
-          'Congratulations! You reached level $level and earned ${bonus.toStringAsFixed(18)} BTC bonus!',
+          'Congratulations! You reached level $level and collected ${bonus.toStringAsFixed(18)} BTC bonus points!',
       soundType: 'reward',
       channelId: 'reward_channel',
       payload: {
@@ -396,7 +398,7 @@ class SoundNotificationService {
     await showNotification(
       title: '👥 Referral Bonus!',
       body:
-          '$referrerName joined using your code! You earned ${amount.toStringAsFixed(18)} BTC bonus!',
+          '$referrerName joined using your code! You collected ${amount.toStringAsFixed(18)} BTC bonus!',
       soundType: 'reward',
       channelId: 'reward_channel',
       payload: {
@@ -459,4 +461,3 @@ class SoundNotificationService {
     _audioPlayer.dispose();
   }
 }
-

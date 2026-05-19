@@ -57,7 +57,9 @@ class _CryptoRunnerGameScreenState extends State<CryptoRunnerGameScreen>
     super.initState();
     _loadSoundEffects();
     _initializeGame();
-    _adService.loadInterstitialAd(); // Load interstitial ad on init
+    _adService.loadInterstitialAd(
+      slot: AdSlots.cryptoRunnerInterstitial1,
+    ); // Load interstitial ad on init
   }
 
   Future<void> _loadSoundEffects() async {
@@ -279,6 +281,7 @@ class _CryptoRunnerGameScreenState extends State<CryptoRunnerGameScreen>
     // Show interstitial ad before exiting
     try {
       final adShown = await _adService.showInterstitialAd(
+        slot: AdSlots.cryptoRunnerInterstitial1,
         onAdDismissed: _exitAfterAd,
       );
 
@@ -309,7 +312,7 @@ class _CryptoRunnerGameScreenState extends State<CryptoRunnerGameScreen>
             Text('Your Score: $score'),
             const SizedBox(height: 8),
             Text(
-              'You earned: ${reward.toStringAsFixed(8)} BTC',
+              'You collected: ${reward.toStringAsFixed(8)} BTC points',
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Colors.green,
@@ -683,4 +686,3 @@ class GameObject {
     required this.height,
   });
 }
-

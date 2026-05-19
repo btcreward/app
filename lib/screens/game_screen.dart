@@ -9,7 +9,6 @@ import 'package:bitcoin_cloud_mining/services/ad_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../utils/color_constants.dart';
 import '../widgets/custom_app_bar.dart';
@@ -71,7 +70,9 @@ class GameScreenState extends State<GameScreen> {
   }
 
   Future<void> _loadAd() async {
-    _adService.loadBannerAd(); // No await, as this is a void method
+    _adService.loadBannerAd(
+      slot: AdSlots.gameBanner1,
+    ); // No await, as this is a void method
     // Optionally, you can setState after a short delay to check if the ad loaded
     await Future.delayed(const Duration(milliseconds: 500));
     setState(() {
@@ -80,33 +81,6 @@ class GameScreenState extends State<GameScreen> {
   }
 
   void navigateToGameScreen(String title, double winAmount) async {
-    // Per-game disclaimer logic
-    final prefs = await SharedPreferences.getInstance();
-    final disclaimerKey = 'disclaimer_shown_${title.replaceAll(' ', '_')}';
-    final hasSeenDisclaimer = prefs.getBool(disclaimerKey) ?? false;
-
-    if (!hasSeenDisclaimer) {
-      if (!mounted || !context.mounted) return;
-      final accepted = await showDialog<bool>(
-        context: context,
-        barrierDismissible: false,
-        builder: (_) => AlertDialog(
-          title: const Text('Disclaimer'),
-          content: const Text(
-            'This is a simulated BTC earning experience. Rewards are virtual unless stated otherwise.\n\nThis is not real gambling. Rewards are virtual and the app does not offer cash-based betting or wagering.',
-          ),
-          actions: [
-            TextButton(
-              child: const Text('I Understand'),
-              onPressed: () => Navigator.pop(context, true),
-            ),
-          ],
-        ),
-      );
-      if (accepted != true) return;
-      await prefs.setBool(disclaimerKey, true);
-    }
-
     Widget targetScreen;
 
     if (title == 'Crypto Craze') {
@@ -144,7 +118,7 @@ class GameScreenState extends State<GameScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content: Text(
-                  'Congratulations! You earned ${result.toStringAsFixed(18)} BTC!')),
+                  'Congratulations! You collected ${result.toStringAsFixed(18)} BTC!')),
         );
       }
     }
@@ -277,4 +251,3 @@ class GameScreenState extends State<GameScreen> {
     );
   }
 }
-

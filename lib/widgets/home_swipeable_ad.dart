@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
@@ -25,42 +23,24 @@ class HomeSwipeableAd extends StatefulWidget {
 }
 
 class _HomeSwipeableAdState extends State<HomeSwipeableAd> {
-  late PageController _pageController;
   bool _isBannerAdLoading = false;
   bool _isBannerAdLoaded = false;
-  Widget? _bannerAdWidget;
-  Timer? _bannerAdTimer;
+  BannerAd? _bannerAd;
 
   @override
   void initState() {
     super.initState();
-    // Initialize page controller with initial page
-    _pageController = PageController(initialPage: 0);
 
     // Load only Banner Ad
     _loadBannerAd();
 
-    // Start timers
-    _startBannerAdAutoRefresh();
-  }
-
-  void _startBannerAdAutoRefresh() {
-    _bannerAdTimer?.cancel();
-    _bannerAdTimer = Timer.periodic(
-      const Duration(minutes: 1), // Refresh banner every minute
-      (_) {
-        if (mounted) {
-          _isBannerAdLoaded = false;
-          _loadBannerAd();
-        }
-      },
-    );
+    // AdMob refreshes eligible inventory internally; avoid recreating platform
+    // views aggressively because it can exhaust ImageReader buffers on devices.
   }
 
   @override
   void dispose() {
-    _bannerAdTimer?.cancel();
-    _pageController.dispose();
+    _bannerAd?.dispose();
     super.dispose();
   }
 
@@ -73,9 +53,9 @@ class _HomeSwipeableAdState extends State<HomeSwipeableAd> {
     final textColor = onSurfaceVariant.withAlpha((255 * 0.7).round());
 
     return Container(
-      height: 360, // Match native ad height
+      height: 260, // Match native ad height
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(4),
@@ -118,28 +98,31 @@ class _HomeSwipeableAdState extends State<HomeSwipeableAd> {
     );
   }
 
-  // Removed native ad loading as requested
-
-
-  // Removed native ad loading as requested
-
-
   Future<void> _loadBannerAd() async {
     if (_isBannerAdLoading || _isBannerAdLoaded) return;
+
+    if (!widget.adService.isInitialized) {
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) _loadBannerAd();
+      });
+      return;
+    }
 
     _isBannerAdLoading = true;
     if (mounted) setState(() {});
 
     try {
       // Get the banner ad unit ID from AdService
-      final bannerAdUnitId = widget.adService.getBannerAdUnitId();
+      final bannerAdUnitId =
+          widget.adService.getBannerAdUnitId(slot: AdSlots.homeBanner2);
 
       if (bannerAdUnitId == null || bannerAdUnitId.isEmpty) {
         throw Exception('Banner ad unit ID not available');
       }
 
       // Create and load the banner ad
-      final bannerAd = BannerAd(
+      _bannerAd?.dispose();
+      _bannerAd = BannerAd(
         adUnitId: bannerAdUnitId,
         size: AdSize.mediumRectangle, // 300x250 banner
         request: const AdRequest(),
@@ -147,22 +130,17 @@ class _HomeSwipeableAdState extends State<HomeSwipeableAd> {
           onAdLoaded: (ad) {
             if (mounted) {
               setState(() {
-                _bannerAdWidget = Container(
-                  height: 390, // Height for banner container
-                  margin:
-                      const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
-                  child: AdWidget(ad: ad as BannerAd),
-                );
                 _isBannerAdLoaded = true;
               });
             }
-            _startBannerAdAutoRefresh();
           },
           onAdFailedToLoad: (ad, error) {
             ad.dispose();
+            if (identical(_bannerAd, ad)) {
+              _bannerAd = null;
+            }
             if (mounted) {
               setState(() {
-                _bannerAdWidget = null;
                 _isBannerAdLoaded = false;
               });
             }
@@ -174,11 +152,12 @@ class _HomeSwipeableAdState extends State<HomeSwipeableAd> {
       );
 
       // Load the ad
-      await bannerAd.load();
+      await _bannerAd?.load();
     } catch (e) {
+      _bannerAd?.dispose();
+      _bannerAd = null;
       if (mounted) {
         setState(() {
-          _bannerAdWidget = _buildBannerPlaceholder('Ad failed to load');
           _isBannerAdLoaded = false;
         });
       }
@@ -188,50 +167,43 @@ class _HomeSwipeableAdState extends State<HomeSwipeableAd> {
     }
   }
 
-  // Auto-swipe and refresh timers removed or simplified for single ad
-
-
   @override
   Widget build(BuildContext context) {
-    final List<Widget> pages = [];
-    // Add only banner ad
-    if (_bannerAdWidget != null) {
-      pages.add(
-        Container(
-          height: 360,
-          width: double.infinity,
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(4),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0x1A000000), // 10% black opacity
-                blurRadius: 4,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: _bannerAdWidget!,
-        ),
-      );
-    } else {
-      pages.add(_buildBannerPlaceholder(_isBannerAdLoading ? 'Loading ad...' : 'Loading ad...'));
-    }
-
     return Container(
       width: double.infinity,
       margin: widget.margin ??
-          const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           SizedBox(
-            height: 392,
-            child: pages[0], // Show the single banner directly
+            height: 270,
+            child: Container(
+              height: 260,
+              width: double.infinity,
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(4),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0x1A000000), // 10% black opacity
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: _isBannerAdLoaded && _bannerAd != null
+                  ? Center(
+                      child: AdWidget(ad: _bannerAd!),
+                    )
+                  : _buildBannerPlaceholder(
+                      _isBannerAdLoading ? 'Loading ad...' : 'Loading ad...',
+                    ),
+            ),
           ),
         ],
       ),
     );
   }
 }
-

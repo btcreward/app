@@ -1,4 +1,4 @@
-package com.bitcoincloudmining.pro
+package com.btcreward.app
 
 import io.flutter.embedding.android.FlutterActivity
 

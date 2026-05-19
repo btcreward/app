@@ -26,14 +26,14 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
-import 'package:unity_ads_plugin/unity_ads_plugin.dart';
+
 import 'package:window_manager/window_manager.dart';
 import 'package:workmanager/workmanager.dart';
 
-import 'config/mediation_config.dart';
+
 import 'fcm_service.dart';
 import 'services/audio_service.dart';
 import 'services/sound_notification_service.dart';
@@ -44,42 +44,8 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 // Background message handling is managed in fcm_service.dart
 
-
 /// Initialize mobile-only services in parallel - non-critical, don't block startup
 void _initMobileServices() {
-  // Unity Ads
-  try {
-    final gameId = Platform.isAndroid ? '5916099' : '5916098';
-    UnityAds.init(
-      gameId: gameId,
-      testMode: false,
-      onComplete: () {},
-      onFailed: (error, message) {},
-    );
-  } catch (e) {
-    AppLogger.error('Unity Ads init failed', error: e);
-  }
-
-  // AdMob + mediation
-  try {
-    MobileAds.instance.initialize();
-    MobileAds.instance
-        .updateRequestConfiguration(
-          RequestConfiguration(
-            maxAdContentRating: MaxAdContentRating.pg,
-            tagForChildDirectedTreatment:
-                TagForChildDirectedTreatment.unspecified,
-            tagForUnderAgeOfConsent: TagForUnderAgeOfConsent.unspecified,
-            testDeviceIds: MediationConfig.enableTestDevices
-                ? MediationConfig.testDeviceIds
-                : null,
-          ),
-        )
-        .catchError((_) {});
-  } catch (e) {
-    AppLogger.error('AdMob init failed', error: e);
-  }
-
   // Workmanager
   try {
     Workmanager().initialize(
@@ -99,7 +65,7 @@ void _initMobileServices() {
           size: Size(800, 600),
           minimumSize: Size(800, 600),
           backgroundColor: Colors.transparent,
-          title: 'Bitcoin Mining Pro',
+          title: 'BTC Reward',
           titleBarStyle: TitleBarStyle.normal,
         );
         windowManager.waitUntilReadyToShow(windowOptions).then((_) {
@@ -411,7 +377,7 @@ class _MyAppState extends State<MyApp>
       ],
       child: MaterialApp(
         navigatorKey: navigatorKey,
-        title: 'Bitcoin Mining Pro',
+        title: 'BTC Reward',
         theme: ThemeData(
           primarySwatch: Colors.blue,
           visualDensity: VisualDensity.adaptivePlatformDensity,
@@ -450,4 +416,3 @@ class _MyAppState extends State<MyApp>
     );
   }
 }
-

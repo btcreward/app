@@ -1,35 +1,35 @@
 {
-    "name": "Bitcoin Mining Pro",
-    "short_name": "BTC Mining",
-    "start_url": ".",
-    "display": "standalone",
-    "background_color": "#FFFFFF",
-    "theme_color": "#000000",
-    "description": "A Bitcoin mining pro application",
-    "orientation": "portrait-primary",
-    "prefer_related_applications": false,
-    "icons": [
-        {
-            "src": "icons/Icon-192.png",
-            "sizes": "192x192",
-            "type": "image/png"
-        },
-        {
-            "src": "icons/Icon-512.png",
-            "sizes": "512x512",
-            "type": "image/png"
-        },
-        {
-            "src": "icons/Icon-maskable-192.png",
-            "sizes": "192x192",
-            "type": "image/png",
-            "purpose": "maskable"
-        },
-        {
-            "src": "icons/Icon-maskable-512.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "maskable"
-        }
-    ]
+ "name": "BTC Reward",
+ "short_name": "BTC Reward",
+ "start_url": ".",
+ "display": "standalone",
+ "background_color": "#FFFFFF",
+ "theme_color": "#000000",
+ "description": "A BTC reward simulation game",
+ "orientation": "portrait-primary",
+ "prefer_related_applications": false,
+ "icons": [
+ {
+ "src": "icons/Icon-192.png",
+ "sizes": "192x192",
+ "type": "image/png"
+ },
+ {
+ "src": "icons/Icon-512.png",
+ "sizes": "512x512",
+ "type": "image/png"
+ },
+ {
+ "src": "icons/Icon-maskable-192.png",
+ "sizes": "192x192",
+ "type": "image/png",
+ "purpose": "maskable"
+ },
+ {
+ "src": "icons/Icon-maskable-512.png",
+ "sizes": "512x512",
+ "type": "image/png",
+ "purpose": "maskable"
+ }
+ ]
 }

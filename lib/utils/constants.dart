@@ -57,7 +57,7 @@ class AppStrings {
   static const invalidCredentials = 'Invalid credentials';
 
   // Welcome Messages
-  static const appTitle = 'Bitcoin Mining Pro';
+  static const appTitle = 'BTC Reward';
   static const welcomeBack = 'Welcome back to your account';
   static const createAccount = 'Create a new account';
   static const resetPasswordMessage =

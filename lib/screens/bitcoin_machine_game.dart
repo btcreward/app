@@ -50,16 +50,18 @@ class _BitcoinMachineScreenState extends State<BitcoinMachineScreen> {
     _initializeReels();
     _loadAds();
     _loadInterstitialAd();
-    _bannerAdFuture = _adService.getBannerAdWidget();
+    _bannerAdFuture =
+        _adService.getBannerAdWidget(slot: AdSlots.bitcoinMachineBanner1);
     _loadAdRequiredState();
   }
 
   Future<void> _loadAds() async {
-    await _adService.loadRewardedAd();
+    await _adService.loadRewardedAd(slot: AdSlots.bitcoinMachineRewarded1);
   }
 
   Future<void> _showRewardedAd() async {
     if (await _adService.showRewardedAd(
+      slot: AdSlots.bitcoinMachineRewarded1,
       onRewarded: (double reward) {
         // Give bonus reward for watching ad
         setState(() {
@@ -82,7 +84,7 @@ class _BitcoinMachineScreenState extends State<BitcoinMachineScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
-              'Ad dismissed. Spin again to earn more!',
+              'Ad dismissed. Spin again to collect more!',
               style: TextStyle(color: Colors.white),
             ),
             backgroundColor: Colors.blue,
@@ -219,6 +221,7 @@ class _BitcoinMachineScreenState extends State<BitcoinMachineScreen> {
       isAdLoading = true;
     });
     await _adService.showRewardedAd(
+      slot: AdSlots.bitcoinMachineRewarded2,
       onRewarded: (amount) {
         setState(() {
           isRewardedAdRequired = false;
@@ -328,6 +331,7 @@ class _BitcoinMachineScreenState extends State<BitcoinMachineScreen> {
 
   Future<void> _showRewardedAdFor2x(double reward) async {
     await _adService.showRewardedAd(
+      slot: AdSlots.bitcoinMachineRewarded3,
       onRewarded: (amount) {
         setState(() {
           gameWalletBalance += reward * 2;
@@ -407,7 +411,9 @@ class _BitcoinMachineScreenState extends State<BitcoinMachineScreen> {
   }
 
   Future<void> _loadInterstitialAd() async {
-    await _adService.loadInterstitialAd();
+    await _adService.loadInterstitialAd(
+      slot: AdSlots.bitcoinMachineInterstitial1,
+    );
     if (mounted) {
       setState(() {
         _isInterstitialAdLoaded = true;
@@ -455,6 +461,7 @@ class _BitcoinMachineScreenState extends State<BitcoinMachineScreen> {
   Future<void> _exitAfterAd() async {
     if (_isInterstitialAdLoaded) {
       await _adService.showInterstitialAd(
+        slot: AdSlots.bitcoinMachineInterstitial1,
         onAdDismissed: () {
           if (mounted) {
             Navigator.of(context).pop();
@@ -750,4 +757,3 @@ class _BitcoinMachineScreenState extends State<BitcoinMachineScreen> {
     );
   }
 }
-

@@ -103,7 +103,8 @@ class _MinerMadnessGameScreenState extends State<MinerMadnessGameScreen>
   }
 
   Future<void> _loadInterstitialAd() async {
-    await _adService.loadInterstitialAd();
+    await _adService.loadInterstitialAd(
+        slot: AdSlots.minerMadnessInterstitial1);
     if (mounted) {
       setState(() {
         _isInterstitialAdLoaded = true;
@@ -153,6 +154,7 @@ class _MinerMadnessGameScreenState extends State<MinerMadnessGameScreen>
   Future<void> _exitAfterAd() async {
     if (_isInterstitialAdLoaded) {
       await _adService.showInterstitialAd(
+        slot: AdSlots.minerMadnessInterstitial1,
         onAdDismissed: () {
           if (mounted) {
             Navigator.of(context).pop();
@@ -209,7 +211,9 @@ class _MinerMadnessGameScreenState extends State<MinerMadnessGameScreen>
       _bannerSize ??= const AdSize(width: 320, height: 100);
 
       _bannerAd = BannerAd(
-        adUnitId: 'ca-app-pub-3940256099942544/6300978111',
+        adUnitId:
+            _adService.getBannerAdUnitId(slot: AdSlots.minerMadnessBanner1) ??
+                '',
         size: _bannerSize!,
         request: const AdRequest(),
         listener: BannerAdListener(
@@ -248,7 +252,9 @@ class _MinerMadnessGameScreenState extends State<MinerMadnessGameScreen>
   Future<void> _loadFallbackBannerAd() async {
     try {
       _bannerAd = BannerAd(
-        adUnitId: 'ca-app-pub-3940256099942544/6300978111',
+        adUnitId:
+            _adService.getBannerAdUnitId(slot: AdSlots.minerMadnessBanner1) ??
+                '',
         size: const AdSize(
             width: 320, height: 50), // Standard banner size as fallback
         request: const AdRequest(),
@@ -281,7 +287,7 @@ class _MinerMadnessGameScreenState extends State<MinerMadnessGameScreen>
     try {
       await _adService.initialize();
       // Load rewarded ad
-      await _adService.loadRewardedAd();
+      await _adService.loadRewardedAd(slot: AdSlots.minerMadnessRewarded1);
 
       // Load banner ad
       await _loadBannerAd();
@@ -323,11 +329,12 @@ class _MinerMadnessGameScreenState extends State<MinerMadnessGameScreen>
 
     try {
       if (!_adService.isRewardedAdLoaded) {
-        await _adService.loadRewardedAd();
+        await _adService.loadRewardedAd(slot: AdSlots.minerMadnessRewarded1);
       }
 
       if (mounted) {
         await _adService.showRewardedAd(
+          slot: AdSlots.minerMadnessRewarded1,
           onRewarded: (amount) {
             onRewarded();
           },
@@ -335,7 +342,7 @@ class _MinerMadnessGameScreenState extends State<MinerMadnessGameScreen>
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Please watch the full ad to earn rewards.'),
+                  content: Text('Please watch the full ad to collect rewards.'),
                   backgroundColor: Colors.orange,
                   duration: Duration(seconds: 2),
                 ),
@@ -1354,4 +1361,3 @@ class Confetti {
     required this.angle,
   });
 }
-

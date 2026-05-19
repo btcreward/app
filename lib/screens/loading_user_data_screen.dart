@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/auth_provider.dart';
-import '../providers/network_provider.dart';
 import '../providers/wallet_provider.dart';
 import '../services/version_check_service.dart';
-import '../widgets/redemption_disclaimer_dialog.dart';
 
 class LoadingUserDataScreen extends StatefulWidget {
   const LoadingUserDataScreen({super.key});
@@ -20,75 +17,30 @@ class _LoadingUserDataScreenState extends State<LoadingUserDataScreen> {
   bool _isLoading = true;
   String _loadingMessage = 'Loading user data...';
   String? _errorMessage;
-  bool _disclaimerShown = false;
 
   @override
   void initState() {
     super.initState();
     VersionCheckService.checkForUpdate(context);
-    // Pehle sirf disclaimer show karo, permission check baad me
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!_disclaimerShown) {
-        _disclaimerShown = true;
-        showRedemptionDisclaimerDialog(
-          context: context,
-          onContinue: _checkAndRequestPermissions,
-        );
-      }
+      _requestNotificationsAndLoadUserData();
     });
   }
 
-  Future<void> _checkAndRequestPermissions() async {
+  Future<void> _requestNotificationsAndLoadUserData() async {
     setState(() {
       _loadingMessage = 'Checking permissions...';
     });
-    // 1. Location permission
-    bool locationGranted = false;
-    LocationPermission locPerm = await Geolocator.checkPermission();
-    if (locPerm == LocationPermission.denied ||
-        locPerm == LocationPermission.deniedForever) {
-      locPerm = await Geolocator.requestPermission();
-    }
-    locationGranted = locPerm == LocationPermission.always ||
-        locPerm == LocationPermission.whileInUse;
 
-    // 2. Notification permission
-    bool notificationGranted = false;
-    if (await Permission.notification.isGranted) {
-      notificationGranted = true;
-    } else {
-      final notifStatus = await Permission.notification.request();
-      notificationGranted = notifStatus.isGranted;
-    }
-
-    if (!locationGranted || !notificationGranted) {
-      setState(() {
-        _isLoading = false;
-        _errorMessage =
-            'Permissions required. Please allow location and notification permissions.';
-      });
-      return;
-    }
-
-    // Location granted, now fetch current location and set in NetworkProvider
     try {
-      final position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
-        ),
-      );
-      if (mounted) {
-        final networkProvider =
-            Provider.of<NetworkProvider>(context, listen: false);
-        await networkProvider.setUserLocationFromCoordinates(
-            position.latitude, position.longitude);
+      if (!await Permission.notification.isGranted) {
+        await Permission.notification.request();
       }
-    } catch (e) {
-      // If location can't be fetched, ignore, will show as Unknown
+    } catch (_) {
+      // Notifications are useful, but they should not block sign-in.
     }
 
-    // All permissions granted, now load user data
-    _loadUserData();
+    await _loadUserData();
   }
 
   Future<void> _loadUserData() async {
@@ -200,7 +152,7 @@ class _LoadingUserDataScreenState extends State<LoadingUserDataScreen> {
                       _isLoading = true;
                       _errorMessage = null;
                     });
-                    _checkAndRequestPermissions();
+                    _requestNotificationsAndLoadUserData();
                   },
                   child: const Text('Retry'),
                 ),

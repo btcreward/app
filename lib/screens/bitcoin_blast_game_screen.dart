@@ -81,7 +81,7 @@ class BitcoinBlastGameScreenState extends State<BitcoinBlastGameScreen> {
   }
 
   Future<void> _reloadBannerAd() async {
-    await _adService.loadBannerAd();
+    await _adService.loadBannerAd(slot: AdSlots.bitcoinBlastBanner1);
     if (mounted) {
       setState(() {
         isAdLoaded = _adService.isBannerAdLoaded;
@@ -125,8 +125,8 @@ class BitcoinBlastGameScreenState extends State<BitcoinBlastGameScreen> {
     });
 
     try {
-      await _adService.loadBannerAd();
-      await _adService.loadRewardedAd();
+      await _adService.loadBannerAd(slot: AdSlots.bitcoinBlastBanner1);
+      await _adService.loadRewardedAd(slot: AdSlots.bitcoinBlastRewarded1);
 
       if (mounted) {
         setState(() {
@@ -164,11 +164,12 @@ class BitcoinBlastGameScreenState extends State<BitcoinBlastGameScreen> {
 
     try {
       if (!_adService.isRewardedAdLoaded) {
-        await _adService.loadRewardedAd();
+        await _adService.loadRewardedAd(slot: AdSlots.bitcoinBlastRewarded1);
       }
 
       if (mounted) {
         await _adService.showRewardedAd(
+          slot: AdSlots.bitcoinBlastRewarded1,
           onRewarded: (amount) {
             const double rewardAmount = 0.000000000000000100;
             setState(() {
@@ -187,7 +188,7 @@ class BitcoinBlastGameScreenState extends State<BitcoinBlastGameScreen> {
             onRewarded();
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('Reward earned! 🎉'),
+                content: Text('Reward collected! 🎉'),
                 backgroundColor: Colors.green,
                 duration: Duration(seconds: 2),
               ),
@@ -197,7 +198,7 @@ class BitcoinBlastGameScreenState extends State<BitcoinBlastGameScreen> {
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Please watch the full ad to earn rewards.'),
+                  content: Text('Please watch the full ad to collect rewards.'),
                   backgroundColor: Colors.orange,
                   duration: Duration(seconds: 2),
                 ),
@@ -418,6 +419,14 @@ class BitcoinBlastGameScreenState extends State<BitcoinBlastGameScreen> {
               child: const Text('Play Again',
                   style: TextStyle(color: Colors.white)),
             ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _onDialogClose();
+                exitGame();
+              },
+              child: const Text('Exit', style: TextStyle(color: Colors.white)),
+            ),
           ],
         );
       },
@@ -442,7 +451,7 @@ class BitcoinBlastGameScreenState extends State<BitcoinBlastGameScreen> {
                   fontWeight: FontWeight.bold,
                   color: Colors.white)),
           content: Text(
-              'Congrats! You earned ${gameEarnings.toStringAsFixed(18)} BTC.',
+              'Congrats! You collected ${gameEarnings.toStringAsFixed(18)} BTC points.',
               style: GoogleFonts.roboto(fontSize: 18, color: Colors.white)),
           actions: [
             TextButton(
@@ -495,7 +504,7 @@ class BitcoinBlastGameScreenState extends State<BitcoinBlastGameScreen> {
                 .addEarning(
               gameEarnings,
               type: 'game',
-              description: '${widget.gameTitle} - Game Earnings',
+              description: '${widget.gameTitle} - Game Rewards',
             );
 
             // Play earning sound
@@ -506,7 +515,7 @@ class BitcoinBlastGameScreenState extends State<BitcoinBlastGameScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    '🎉 ${gameEarnings.toStringAsFixed(18)} BTC added to wallet!',
+                    '🎉 ${gameEarnings.toStringAsFixed(18)} BTC points added!',
                     style: const TextStyle(color: Colors.white, fontSize: 16),
                   ),
                   backgroundColor: Colors.green,
@@ -540,7 +549,10 @@ class BitcoinBlastGameScreenState extends State<BitcoinBlastGameScreen> {
   }
 
   Future<void> exitGame() async {
-    if (gameOver) return;
+    if (gameOver) {
+      await _exitAfterAd();
+      return;
+    }
 
     // Show exit confirmation
     final shouldExit = await showExitConfirmation();
@@ -593,7 +605,7 @@ class BitcoinBlastGameScreenState extends State<BitcoinBlastGameScreen> {
         ),
         content: Text(
           gameEarnings > 0
-              ? 'You have ${gameEarnings.toStringAsFixed(18)} BTC earnings!\n\nDo you want to save and exit?'
+              ? 'You have ${gameEarnings.toStringAsFixed(18)} BTC reward points!\n\nDo you want to save and exit?'
               : 'Are you sure you want to exit the game?',
           style: const TextStyle(fontSize: 16),
         ),
@@ -683,7 +695,9 @@ class BitcoinBlastGameScreenState extends State<BitcoinBlastGameScreen> {
   Future<bool> _showInterstitialAd() async {
     try {
       if (!_adService.isInterstitialAdLoaded) {
-        await _adService.loadInterstitialAd();
+        await _adService.loadInterstitialAd(
+          slot: AdSlots.bitcoinBlastInterstitial1,
+        );
       }
 
       if (_adService.isInterstitialAdLoaded) {
@@ -691,6 +705,7 @@ class BitcoinBlastGameScreenState extends State<BitcoinBlastGameScreen> {
         bool adCompleted = false;
 
         final adShown = await _adService.showInterstitialAd(
+          slot: AdSlots.bitcoinBlastInterstitial1,
           onAdDismissed: () {
             if (!adCompleted) {
               adCompleted = true;
@@ -791,6 +806,7 @@ class BitcoinBlastGameScreenState extends State<BitcoinBlastGameScreen> {
   Future<void> _showRewardedAdFor2x() async {
     pauseGame();
     await _adService.showRewardedAd(
+      slot: AdSlots.bitcoinBlastRewarded2,
       onRewarded: (amount) {
         setState(() {
           doubleBTCActive = true;
@@ -900,7 +916,7 @@ class BitcoinBlastGameScreenState extends State<BitcoinBlastGameScreen> {
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Text(
-                        'Game Earnings: ${gameEarnings.toStringAsFixed(18)} BTC',
+                        'Game Rewards: ${gameEarnings.toStringAsFixed(18)} BTC',
                         style: GoogleFonts.roboto(
                             fontSize: 22, fontWeight: FontWeight.bold)),
                   ),
@@ -981,4 +997,3 @@ class FallingItem {
 
   FallingItem(this.type, this.xPosition, this.yPosition);
 }
-

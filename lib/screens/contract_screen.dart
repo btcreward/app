@@ -29,7 +29,6 @@ class ContractScreenState extends State<ContractScreen>
   Timer? _uiUpdateTimer;
   // Native ad timers removed
 
-
   List<Map<String, dynamic>> contracts = [
     {
       'title': '5 Days Contract (Trial)',
@@ -206,7 +205,6 @@ class ContractScreenState extends State<ContractScreen>
   }
 
   // Native ad reload method removed
-
 
   Future<void> _restoreAdCooldown() async {
     final prefs = await SharedPreferences.getInstance();
@@ -457,7 +455,7 @@ class ContractScreenState extends State<ContractScreen>
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Contract completed! Earned $earnings BTC'),
+              content: Text('Contract completed! Rewarded $earnings BTC'),
               backgroundColor: Colors.green,
             ),
           );
@@ -548,6 +546,7 @@ class ContractScreenState extends State<ContractScreen>
 
     try {
       await _adService.showRewardedAd(
+        slot: AdSlots.contractRewarded1,
         onRewarded: (double amount) async {
           final contract = contracts[index];
           setState(() {
@@ -561,7 +560,7 @@ class ContractScreenState extends State<ContractScreen>
         onAdDismissed: () {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Watch the full ad to claim earnings.'),
+              content: Text('Watch the full ad to claim reward.'),
               backgroundColor: Colors.orange,
             ),
           );
@@ -819,7 +818,7 @@ class ContractCard extends StatelessWidget {
                   Row(
                     children: [
                       const Text(
-                        'Earnings: ',
+                        'Reward: ',
                         style: TextStyle(
                           color: Colors.white70,
                           fontSize: 14,
@@ -844,7 +843,7 @@ class ContractCard extends StatelessWidget {
                   Row(
                     children: [
                       const Text(
-                        'Current Earnings: ',
+                        'Rewarded: ',
                         style: TextStyle(
                           fontSize: 14,
                           color: Color.fromARGB(255, 211, 198, 11),
@@ -1020,4 +1019,3 @@ class MiningBackgroundState extends State<MiningBackground>
     );
   }
 }
-

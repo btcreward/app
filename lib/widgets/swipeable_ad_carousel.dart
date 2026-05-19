@@ -49,6 +49,14 @@ class _SwipeableAdCarouselState extends State<SwipeableAdCarousel> {
 
   // Removed native ad loading as requested
 
+  String get _bannerSlot {
+    switch (widget.screenId) {
+      case 'contract_screen':
+        return AdSlots.contractBanner1;
+      default:
+        return '${widget.screenId}_banner_1';
+    }
+  }
 
   Future<void> _loadBannerAd() async {
     if (_isBannerAdLoading || _isBannerAdLoaded) return;
@@ -58,7 +66,8 @@ class _SwipeableAdCarouselState extends State<SwipeableAdCarousel> {
     });
 
     try {
-      final bannerAdUnitId = widget.adService.getBannerAdUnitId();
+      final bannerAdUnitId =
+          widget.adService.getBannerAdUnitId(slot: _bannerSlot);
 
       if (bannerAdUnitId == null || bannerAdUnitId.isEmpty) {
         throw Exception('Banner ad unit ID not available');
@@ -110,9 +119,7 @@ class _SwipeableAdCarouselState extends State<SwipeableAdCarousel> {
 
   // Ad refresh timers removed or simplified for single ad
 
-
   // Unused methods removed
-
 
   Widget _buildFallbackBannerAd() {
     final theme = Theme.of(context);
@@ -121,9 +128,9 @@ class _SwipeableAdCarouselState extends State<SwipeableAdCarousel> {
     final textColor = onSurfaceVariant.withAlpha((255 * 0.7).round());
 
     return Container(
-      height: 360,
+      height: 260,
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(4),
@@ -171,16 +178,16 @@ class _SwipeableAdCarouselState extends State<SwipeableAdCarousel> {
     return Container(
       width: double.infinity,
       margin: widget.margin ??
-          const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           SizedBox(
-            height: 392,
+            height: 270,
             child: Container(
-              height: 360,
+              height: 260,
               width: double.infinity,
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(4),
@@ -202,4 +209,3 @@ class _SwipeableAdCarouselState extends State<SwipeableAdCarousel> {
     );
   }
 }
-

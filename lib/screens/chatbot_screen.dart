@@ -30,7 +30,7 @@ class ChatBotScreenState extends State<ChatBotScreen> {
     'Wallet & Transactions': [
       'Check balance',
       'Recent transactions',
-      'Mining earnings',
+      'rewards',
     ],
     'Redemptions': [
       'Start redemption',
@@ -187,7 +187,7 @@ class ChatBotScreenState extends State<ChatBotScreen> {
     return '${acknowledgements[_random.nextInt(acknowledgements.length)]} '
         'I\'m here to help with your mining journey, $name!\n\n'
         'You can ask me about:\n'
-        '• Your earnings and current balance\n'
+        '• Your rewards and current balance\n'
         '• Redemption options and tracking\n'
         '• Boosting your mining speed\n'
         '• Transaction history and stats\n\n'
@@ -214,7 +214,7 @@ class ChatBotScreenState extends State<ChatBotScreen> {
     if (userProfile == null) return '';
     final progress = userProfile!.walletBalance / 0.000000000000000001 * 100;
     if (progress < 25) {
-      return 'Keep mining! You\'re making steady progress. 🌱';
+      return 'Keep playing! You\'re making steady progress. 🌱';
     } else if (progress < 50) {
       return 'You\'re getting there! Keep up the great work! 🚀';
     } else if (progress < 75) {
@@ -222,7 +222,7 @@ class ChatBotScreenState extends State<ChatBotScreen> {
     } else if (progress < 100) {
       return 'You\'re so close to reaching the redemption threshold! 🎯';
     } else {
-      return 'Congratulations! You can redeem your earnings now! 🎉';
+      return 'Congratulations! You can request reward redemption now! 🎉';
     }
   }
 
@@ -242,7 +242,7 @@ class ChatBotScreenState extends State<ChatBotScreen> {
       return [
         'Good afternoon, $name! Need help with anything?',
         'Hey $name! How\'s your mining journey going?',
-        'Afternoon, $name! Ready to check your earnings?'
+        'Afternoon, $name! Ready to check your rewards?'
       ];
     } else {
       return [
@@ -277,7 +277,7 @@ class ChatBotScreenState extends State<ChatBotScreen> {
       'track redemption',
       'redemption status',
       'payment',
-      'cash out',
+      'request redemption',
       'pending redemptions',
       'redemption history',
       'cancel redemption',
@@ -347,7 +347,7 @@ class ChatBotScreenState extends State<ChatBotScreen> {
             'Minimum needed: 0.000000000000000001 BTC\n'
             'Your balance: ${_formatBTC(balance)} BTC\n\n'
             '${_getProgressMessage()}\n'
-            'Keep mining to reach the minimum redemption amount! 💪';
+            'Keep collecting rewards to reach the minimum redemption request amount! 💪';
       }
 
       // Generate a new redemption ID
@@ -690,4 +690,3 @@ class ChatBotScreenState extends State<ChatBotScreen> {
     );
   }
 }
-
