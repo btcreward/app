@@ -342,7 +342,7 @@ class _ServerConnectionAnimationState extends State<ServerConnectionAnimation>
         ),
         const SizedBox(height: 8),
         Text(
-          'Ready for mining operations',
+          'Ready for computing operations',
           style: GoogleFonts.orbitron(
             fontSize: 12,
             color: Colors.green.withAlpha((0.8 * 255).toInt()),

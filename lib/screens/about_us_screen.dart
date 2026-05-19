@@ -69,7 +69,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                   child: Padding(
                     padding: EdgeInsets.all(16.0),
                     child: Text(
-                      '⚠️ This is a mining simulation app. All BTC shown is. Redemptions are enabled only when minimum thresholds are reached and verified.',
+                      '⚠️ This is a computing simulation app. All BTC shown is. Redemptions are enabled only when minimum thresholds are reached and verified.',
                       style: TextStyle(fontSize: 16, color: Colors.black87),
                       textAlign: TextAlign.center,
                     ),
@@ -80,7 +80,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                   child: Padding(
                     padding: EdgeInsets.all(16.0),
                     child: Text(
-                      'Introduction\nWelcome to BTC Reward, a BTC reward simulation game for entertainment. You can collect in-app BTC points through gameplay, tasks, and rewarded ads. This app does not perform real cryptocurrency mining.',
+                      'Introduction\nWelcome to BTC Reward, a BTC reward simulation game for entertainment. You can collect in-app BTC points through gameplay, tasks, and rewarded ads. This app does not perform real cryptocurrency computing.',
                       style: textStyle,
                     ),
                   ),
@@ -111,7 +111,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                                   '🌐 Make BTC-themed gameplay accessible globally.\n'),
                           TextSpan(
                               text:
-                                  '💫 Avoid claims of real mining, investment, or guaranteed payout.\n'),
+                                  '💫 Avoid claims of real computing, investment, or guaranteed payout.\n'),
                         ],
                       ),
                     ),
@@ -125,7 +125,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                       '🔥 Why Choose BTC Reward?\n\n'
                       '⚡ BTC Gameplay - Collect in-app BTC points through simulated activities.\n\n'
                       '🔐 Transparent Progress - Track your hash rate and reward balance in the app.\n\n'
-                      '🎮 Entertainment First - Enjoy a BTC-themed reward experience without real device or cloud mining.\n\n'
+                      '🎮 Entertainment First - Enjoy a BTC-themed reward experience without real device or cloud computing.\n\n'
                       '💫 No Investment Claims - Rewards are points and are not guaranteed income.\n\n'
                       '🛟 24/7 Support – Dedicated customer service team available round the clock.\n\n'
                       '⚡ Redemption requests, if available, are reviewed based on eligibility and are not guaranteed.\n',
@@ -337,7 +337,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                   padding:
                       EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                   child: Text(
-                    'Note: All BTC values shown in this app are in-app reward points based on gameplay. BTC Reward is not a real mining operation, investment product, or guaranteed payout service.',
+                    'Note: All BTC values shown in this app are in-app reward points based on gameplay. BTC Reward is not a real computing operation, investment product, or guaranteed payout service.',
                     style: TextStyle(fontSize: 12, color: Colors.white54),
                     textAlign: TextAlign.center,
                   ),

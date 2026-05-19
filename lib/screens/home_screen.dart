@@ -172,8 +172,8 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               balance: currentBalance,
               hashRate: _hashRate.toStringAsFixed(1),
               status: _isPowerBoostActive
-                  ? '⛏️ Mining with Power Boost!'
-                  : '⛏️ Mining in progress...',
+                  ? '⛏️ Computing with Power Boost!'
+                  : '⛏️ Computing in progress...',
             );
           }
         }
@@ -368,7 +368,7 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
-              'Mining started! Session will complete in 30 minutes',
+              'Computing started! Session will complete in 30 minutes',
               style: TextStyle(fontSize: 16),
             ),
             backgroundColor: Colors.green,
@@ -407,12 +407,12 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
         // Show mining completion notification
         await SoundNotificationService.showAlertNotification(
-          title: '⛏️ Mining Session Completed!',
+          title: '⛏️ Computing Session Completed!',
           message:
               'Your reward session has completed successfully! You can start a new session now.',
         );
       } else {
-        // '⏰ Mining session not completed yet ($elapsedMinutes/$miningDurationMinutes minutes), no earnings added');
+        // '⏰ Computing session not completed yet ($elapsedMinutes/$miningDurationMinutes minutes), no earnings added');
       }
     }
 
@@ -1130,7 +1130,7 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Text('Start Mining'),
+                        const Text('Start Computing'),
                         // Only show remaining if mining is active and not completed
                         if (_isMining &&
                             _miningStatus != 'Completed' &&

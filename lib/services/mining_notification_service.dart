@@ -15,7 +15,7 @@ class MiningNotificationService {
   // Mining stats
   static String _currentBalance = '0.00000000';
   static String _currentHashRate = '0.0';
-  static String _miningStatus = '⛏️ Mining in progress...';
+  static String _miningStatus = '⛏️ Computing in progress...';
   static DateTime? _miningStartTime;
   static DateTime? _lastUpdateTime;
   static String? _lastDuration; // Track last duration for change detection
@@ -67,7 +67,7 @@ class MiningNotificationService {
       _currentHashRate = initialHashRate;
       _miningStartTime = DateTime.now();
       _isNotificationActive = true;
-      _miningStatus = '⛏️ Mining in progress...';
+      _miningStatus = '⛏️ Computing in progress...';
 
       // Show initial notification
       await _showMiningNotification();
@@ -86,9 +86,9 @@ class MiningNotificationService {
   static Future<void> completeMiningNotification() async {
     try {
       _isNotificationActive = true; // notification bar me rahe
-      _miningStatus = '✅ Mining completed!';
+      _miningStatus = '✅ Computing completed!';
       await _showMiningNotification(
-          statusOverride: '✅ Mining completed!', timeOverride: '-');
+          statusOverride: '✅ Computing completed!', timeOverride: '-');
       _updateTimer?.cancel();
       _updateTimer = null;
     } catch (e) {
@@ -128,7 +128,7 @@ class MiningNotificationService {
         styleInformation: BigTextStyleInformation(
           '$content\n\n🚀 Keep playing, keep collecting rewards! 💸',
           contentTitle: '⛏️ BTC Reward - Reward Session Active',
-          summaryText: 'Mining is active. Don\'t close the app!',
+          summaryText: 'Computing is active. Don\'t close the app!',
         ),
         category: AndroidNotificationCategory.service,
         visibility: NotificationVisibility.public,

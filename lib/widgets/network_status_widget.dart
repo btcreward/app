@@ -50,7 +50,7 @@ class _NetworkStatusWidgetState extends State<NetworkStatusWidget>
   ];
 
   final List<String> _connectionSteps = [
-    '🔍 Searching for global mining node...',
+    '🔍 Searching for global computing node...',
     '🌐 Connecting to server...',
     '🔐 Secure tunnel established.',
     '✅ Connected successfully.',
@@ -135,7 +135,7 @@ class _NetworkStatusWidgetState extends State<NetworkStatusWidget>
           // Update status with random mining info
           final random = Random();
           final statuses = [
-            '⛏️ Mining in progress...',
+            '⛏️ Computing in progress...',
             '🔒 Secure connection maintained',
             '🌍 Global node synchronized',
             '⚡ Hashrate optimized',
@@ -259,7 +259,7 @@ class _NetworkStatusWidgetState extends State<NetworkStatusWidget>
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  '🌍 Global Mining Network',
+                  '🌍 Global Computing Network',
                   style: GoogleFonts.orbitron(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
