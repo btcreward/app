@@ -122,8 +122,8 @@ If you have any questions, please contact us at **$supportEmail**.
 ---
 By using **$appName**, you acknowledge that this is a **simulation game**, not a financial service, and you agree to these Terms & Conditions.
 
-Privacy Policy: https://doc-hosting.flycricket.io/bitcoin-cloud-mining-privacy-policy/140d10f0-13a2-42a0-a93a-ec68298f58db/privacy
-Terms & Conditions: https://doc-hosting.flycricket.io/bitcoin-cloud-mining-terms-of-use/8c21ec3c-9f18-4255-8ec1-9c8a4c98bf95/terms
+Privacy Policy: https://btcreward.github.io/btcreward/privacy.html
+Terms & Conditions: https://btcreward.github.io/btcreward/terms.html
 """,
               styleSheet: MarkdownStyleSheet(
                 p: const TextStyle(fontSize: 16, color: Colors.white),
@@ -234,7 +234,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                   'For privacy questions or data deletion requests:\n'
                   'Email: bitcoincloudminingformobile@gmail.com\n\n'
                   'Full Privacy Policy:\n'
-                  'https://doc-hosting.flycricket.io/bitcoin-cloud-mining-privacy-policy/140d10f0-13a2-42a0-a93a-ec68298f58db/privacy',
+                  'https://btcreward.github.io/btcreward/privacy.html',
                   style: TextStyle(
                       fontSize: 15, color: Colors.white70, height: 1.5),
                 ),

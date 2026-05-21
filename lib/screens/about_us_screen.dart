@@ -350,11 +350,11 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Privacy Policy: https://doc-hosting.flycricket.io/bitcoin-cloud-mining-privacy-policy/140d10f0-13a2-42a0-a93a-ec68298f58db/privacy',
+                          'Privacy Policy: https://btcreward.github.io/btcreward/privacy.html',
                           style: TextStyle(fontSize: 12, color: Colors.white54),
                         ),
                         Text(
-                          'Terms & Conditions: https://doc-hosting.flycricket.io/bitcoin-cloud-mining-terms-of-use/8c21ec3c-9f18-4255-8ec1-9c8a4c98bf95/terms',
+                          'Terms & Conditions: https://btcreward.github.io/btcreward/terms.html',
                           style: TextStyle(fontSize: 12, color: Colors.white54),
                         ),
                       ],

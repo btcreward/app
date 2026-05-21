@@ -786,7 +786,7 @@ class _SettingScreenState extends State<SettingScreen> {
             title: 'Privacy Policy',
             onTap: () async {
               final url = Uri.parse(
-                  'https://doc-hosting.flycricket.io/bitcoin-cloud-mining-privacy-policy/140d10f0-13a2-42a0-a93a-ec68298f58db/privacy');
+                  'https://btcreward.github.io/btcreward/privacy.html');
               if (await canLaunchUrl(url)) {
                 await launchUrl(url);
               } else {

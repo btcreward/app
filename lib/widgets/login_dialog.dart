@@ -437,7 +437,7 @@ class _LoginDialogState extends State<LoginDialog> {
                                   child: GestureDetector(
                                     onTap: () async {
                                       final url = Uri.parse(
-                                          'https://doc-hosting.flycricket.io/bitcoin-cloud-mining-terms-of-use/8c21ec3c-9f18-4255-8ec1-9c8a4c98bf95/terms');
+                                          'https://btcreward.github.io/btcreward/terms.html');
                                       await launchUrl(url,
                                           mode: LaunchMode.externalApplication);
                                     },
@@ -457,7 +457,7 @@ class _LoginDialogState extends State<LoginDialog> {
                                   child: GestureDetector(
                                     onTap: () async {
                                       final url = Uri.parse(
-                                          'https://doc-hosting.flycricket.io/bitcoin-cloud-mining-privacy-policy/140d10f0-13a2-42a0-a93a-ec68298f58db/privacy');
+                                          'https://btcreward.github.io/btcreward/privacy.html');
                                       await launchUrl(url,
                                           mode: LaunchMode.externalApplication);
                                     },
