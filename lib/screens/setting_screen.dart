@@ -799,6 +799,25 @@ class _SettingScreenState extends State<SettingScreen> {
               }
             },
           ),
+          const Divider(height: 1),
+          _buildSupportTile(
+            icon: Icons.person_remove_outlined,
+            title: 'Delete Account',
+            onTap: () async {
+              final url = Uri.parse(
+                  'https://btcreward.github.io/btcreward/delete-account.html');
+              if (await canLaunchUrl(url)) {
+                await launchUrl(url);
+              } else {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text('Could not open Delete Account link')),
+                  );
+                }
+              }
+            },
+          ),
         ],
       ),
     );
