@@ -1,22 +1,30 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Required Permissions -->
+    <!-- ✅ INTERNET: Required for API calls, AdMob ads, Firebase, and backend sync -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- ✅ POST_NOTIFICATIONS: Required to send mining status & reward alerts to user (Android 13+) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- ✅ VIBRATE: Used for notification vibration feedback when rewards are earned -->
     <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- ✅ WAKE_LOCK: Keeps CPU awake during active BTC reward computation simulation gameplay session -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- ✅ RECEIVE_BOOT_COMPLETED: Restarts scheduled reward & mining notifications after device reboot -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- ✅ FOREGROUND_SERVICE: Required to run mining status notification as a foreground service -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <!-- ✅ Required for Android 14+ foreground service type declaration -->
+    <!-- ✅ FOREGROUND_SERVICE_DATA_SYNC: Android 14+ requirement for dataSync foreground service type -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <!-- ✅ ACCESS_NETWORK_STATE: Checks internet connectivity before API calls and ad loading -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <!-- ✅ Required for AdMob Advertising ID (Android 13+) -->
+    <!-- ✅ AD_ID: Required for AdMob Advertising ID on Android 13+ per Google policy -->
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
-    
+
     <!-- ✅ Unity Ads Permissions -->
+    <!-- ACCESS_WIFI_STATE: Needed for Unity Ads to check network/connection quality -->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <!-- CHANGE_WIFI_STATE: Needed for Unity Ads SDK connectivity management -->
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-    
+
     <application
         android:label="BTC Reward"
         android:name="${applicationName}"
@@ -24,16 +32,17 @@
         android:usesCleartextTraffic="false"
         android:networkSecurityConfig="@xml/network_security_config">
 
+        <!-- ✅ AdMob App ID -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-3940256099942544~3347511713" />
-            
+
         <!-- ✅ Unity Ads Game ID for Android -->
         <meta-data
             android:name="unity.ads.game-id"
             android:value="5916099" />
-            
-        <!-- ✅ Unity Ads Test Mode: false for production -->
+
+        <!-- ✅ Unity Ads Test Mode: false for production release -->
         <meta-data
             android:name="unity.ads.test-mode"
             android:value="false" />
@@ -48,7 +57,8 @@
         </service>
 
         <!-- ✅ Mining Status Foreground Service (Android 14+ compliance) -->
-        <!-- Used to show live BTC reward computation status notifications to user -->
+        <!-- Purpose: Shows live BTC reward computation status notifications to user during gameplay -->
+        <!-- Data Safety justification: dataSync type - syncs mining progress data to notification -->
         <service
             android:name=".MiningNotificationService"
             android:exported="false"
