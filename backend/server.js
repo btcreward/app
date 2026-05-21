@@ -215,7 +215,7 @@ app.use('/api/transactions', transactionRoutes);  // Handle other transaction ro
 app.get('/', (req, res) => {
   res.status(200).json({
     status: 'ok',
-    message: 'Bitcoin Mining Pro API is running',
+    message: 'BTC Reward API is running',
     version: '1.0.6'
   });
 });

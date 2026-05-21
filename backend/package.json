@@ -1,7 +1,7 @@
 {
-  "name": "bitcoin-cloud-mining-backend",
+  "name": "btcreward-backend",
   "version": "1.0.6",
-  "description": "Backend for Bitcoin Cloud Mining Platform",
+  "description": "Backend for BTC Reward App",
   "private": true,
   "type": "commonjs",
   "main": "server.js",

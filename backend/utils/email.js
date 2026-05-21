@@ -54,7 +54,7 @@ exports.sendTransactionNotification = async (user, transaction) => {
     If you have any questions, please contact our support team.
 
     Best regards,
-    Bitcoin Mining Pro Team
+    BTC Reward Team
   `;
 
   // Send email

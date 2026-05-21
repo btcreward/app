@@ -4,7 +4,7 @@ const getBaseTemplate = (content) => `
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bitcoin Mining Pro</title>
+  <title>BTC Reward</title>
 </head>
 <body style="margin: 0; padding: 0; background-color: #f4f6f8; font-family: Arial, sans-serif;">
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f4f6f8;">
@@ -14,7 +14,7 @@ const getBaseTemplate = (content) => `
           <!-- Header -->
           <tr>
             <td style="background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%); padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
-              <img src="https://kommodo.ai/i/WAoS9bENMyn0GvvtAa8T" alt="Bitcoin Mining Pro Logo" style="width: 120px; height: auto; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto;">
+              <img src="https://kommodo.ai/i/WAoS9bENMyn0GvvtAa8T" alt="BTC Reward Logo" style="width: 120px; height: auto; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto;">
               <div style="margin-top: 10px; color: #fff; font-size: 14px; font-weight: bold;">If you find this email in your spam folder, please mark it as 'Not Spam' to receive future emails in your inbox.</div>
             </td>
           </tr>
@@ -37,10 +37,10 @@ const getBaseTemplate = (content) => `
             <td style="background-color: #f8f9fa; padding: 20px 30px; text-align: center; border-radius: 0 0 8px 8px;">
               <div style="margin-bottom: 20px;">
                 <p style="margin: 0 0 10px; color: #1a237e; font-weight: bold; font-size: 16px;">
-                  Bitcoin Mining Pro
+                  BTC Reward
                 </p>
                 <p style="margin: 0; color: #666; font-size: 14px; line-height: 1.5;">
-                  Your Trusted Platform for Cryptocurrency Mining
+                  Your Trusted Reward-Based Simulation Game
                 </p>
               </div>
               <div style="margin-bottom: 15px;">
@@ -52,11 +52,11 @@ const getBaseTemplate = (content) => `
                 <span style="color: #666;">|</span>
                 <a href="https://www.youtube.com/channel/UC1V43aMm3KYUJu_J9Lx2DAw" style="color: #1a237e; text-decoration: none; margin: 0 10px; font-size: 14px;">YouTube</a>
                 <span style="color: #666;">|</span>
-                <a href="mailto:support@your-domain.com" style="color: #1a237e; text-decoration: none; margin: 0 10px; font-size: 14px;">Support</a>
+                <a href="mailto:support@solvextechnology.in" style="color: #1a237e; text-decoration: none; margin: 0 10px; font-size: 14px;">Support</a>
               </div>
               <p style="margin: 15px 0 0; color: #666; font-size: 12px;">
-                © ${new Date().getFullYear()} Bitcoin Mining Pro. All rights reserved.<br>
-                This email was sent to you as part of your Bitcoin Mining Pro account services.
+                © ${new Date().getFullYear()} BTC Reward. All rights reserved.<br>
+                This email was sent to you as part of your BTC Reward account services.
               </p>
             </td>
           </tr>
@@ -90,7 +90,7 @@ const getOTPTemplate = (otp, type = 'verification', expiryMinutes = 10) => {
 
 const getOTPPlainText = (otp, type = 'verification', expiryMinutes = 10) => {
   const title = type === 'verification' ? 'Email Verification' : 'Password Reset';
-  return `${title}\n\nYour ${type} code is: ${otp}\n\nThis code will expire in ${expiryMinutes} minutes.\nIf you didn't request this code, please ignore this email.\n\nFor security reasons, never share this code with anyone.\n\nIf you find this email in your spam folder, please mark it as \'Not Spam\' to receive future emails in your inbox.\n\n-- Bitcoin Mining Pro`;
+  return `${title}\n\nYour ${type} code is: ${otp}\n\nThis code will expire in ${expiryMinutes} minutes.\nIf you didn't request this code, please ignore this email.\n\nFor security reasons, never share this code with anyone.\n\nIf you find this email in your spam folder, please mark it as \'Not Spam\' to receive future emails in your inbox.\n\n-- BTC Reward`;
 };
 
 const getPromotionalTemplate = (title, content, ctaText, ctaUrl) => {
