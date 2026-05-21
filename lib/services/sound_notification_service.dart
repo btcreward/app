@@ -346,7 +346,7 @@ class SoundNotificationService {
     await showNotification(
       title: '🚀 Welcome to BTC Reward!',
       body:
-          'Start playing and collect BTC rewards. This is an entertainment experience, not real cryptocurrency mining.',
+          'Start playing and collect BTC rewards. This is an entertainment experience, not real cryptocurrency computing.',
       soundType: 'alert',
       channelId: 'alert_channel',
       payload: {

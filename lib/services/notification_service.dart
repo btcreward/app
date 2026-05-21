@@ -30,7 +30,7 @@ class NotificationService {
   // Mining stats
   static String _currentBalance = '0.00000000';
   static String _currentHashRate = '0.0';
-  static String _miningStatus = '⛏️ Mining in progress...';
+  static String _miningStatus = '⛏️ Computing in progress...';
   static DateTime? _miningStartTime;
 
   NotificationService({
@@ -352,7 +352,7 @@ class NotificationService {
         styleInformation: BigTextStyleInformation(
           '$content\n\n🚀 Keep playing, keep collecting rewards! 💸',
           contentTitle: '⛏️ BTC Reward - Reward Session Active',
-          summaryText: 'Mining is active. Don\'t close the app!',
+          summaryText: 'Computing is active. Don\'t close the app!',
         ),
         category: AndroidNotificationCategory.service,
         visibility: NotificationVisibility.public,
