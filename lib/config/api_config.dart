@@ -9,7 +9,7 @@ class ApiConfig {
   static String get baseUrl {
     if (kReleaseMode) {
       // For Play Store / App Store builds
-      return 'https://bitcoincloudmining.onrender.com';
+      return 'https://btcreward-backend.onrender.com';
     }
 
     if (kIsWeb) {
@@ -20,7 +20,7 @@ class ApiConfig {
 
     if (Platform.isAndroid) {
       // 🧪 Android Emulator on PC - temporarily use production for testing
-      return 'https://bitcoincloudmining.onrender.com';
+      return 'https://btcreward-backend.onrender.com';
       // Original debug URL: return 'http://10.0.2.2:5000';
     }
 
@@ -37,7 +37,7 @@ class ApiConfig {
   static List<String> get fallbackUrls {
     if (kReleaseMode) {
       return [
-        'https://bitcoincloudmining.onrender.com',
+        'https://btcreward-backend.onrender.com',
         'https://bitcoin-cloud-mining-api.onrender.com',
         'https://bitcoin-mining-api.onrender.com',
         'https://bitcoincloudmining-backend.onrender.com',
@@ -46,7 +46,7 @@ class ApiConfig {
 
     if (kIsWeb) {
       return [
-        'https://bitcoincloudmining.onrender.com',
+        'https://btcreward-backend.onrender.com',
         'http://localhost:5000',
         'https://bitcoin-cloud-mining-api.onrender.com',
         'https://bitcoin-mining-api.onrender.com',
@@ -232,7 +232,7 @@ class ApiConfig {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
       'Origin': kIsWeb
-          ? 'https://bitcoincloudmining.onrender.com'
+          ? 'https://btcreward-backend.onrender.com'
           : 'http://localhost:3000',
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
