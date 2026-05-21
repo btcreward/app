@@ -21,6 +21,13 @@ android {
     ndkVersion = "27.0.12077973"
 
     signingConfigs {
+        create("debugCustom") {
+            storeFile = rootProject.file("keystore/btc_reward_debug_20260521111852.jks")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+
         create("release") {
             storeFile = file(keystoreProperties["storeFile"] as String)
             storePassword = keystoreProperties["storePassword"] as String
@@ -80,9 +87,13 @@ android {
             isShrinkResources = true
         }
         debug {
+            signingConfig = signingConfigs.getByName("debugCustom")
             // Keep debug builds fast by only enabling minification in release
             isMinifyEnabled = false
             isShrinkResources = false
+        }
+        getByName("profile") {
+            signingConfig = signingConfigs.getByName("debugCustom")
         }
     }
     

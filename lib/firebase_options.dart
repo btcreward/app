@@ -51,11 +51,11 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAwS7-6JQyZVEsnEg72ZZf-LQ0872lHLiM',
-    appId: '1:486206486627:android:be96c44548e59eab73e056',
-    messagingSenderId: '486206486627',
-    projectId: 'bitcoin-cloud-mining-19fb5',
-    storageBucket: 'bitcoin-cloud-mining-19fb5.firebasestorage.app',
+    apiKey: 'AIzaSyBtfRCuuLe504umD2P4pl315oj_rEZj-Vg',
+    appId: '1:470010228741:android:5c132dfd504e9752e9ec6c',
+    messagingSenderId: '470010228741',
+    projectId: 'btc-reward-35f8c',
+    storageBucket: 'btc-reward-35f8c.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
