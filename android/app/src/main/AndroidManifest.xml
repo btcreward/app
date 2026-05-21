@@ -7,6 +7,8 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <!-- ✅ Required for Android 14+ foreground service type declaration -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- ✅ Required for AdMob Advertising ID (Android 13+) -->
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
@@ -31,10 +33,10 @@
             android:name="unity.ads.game-id"
             android:value="5916099" />
             
-        <!-- ✅ Unity Ads Test Mode (Debug only) -->
+        <!-- ✅ Unity Ads Test Mode: false for production -->
         <meta-data
             android:name="unity.ads.test-mode"
-            android:value="true" />
+            android:value="false" />
 
         <!-- ✅ Firebase Messaging Services -->
         <service
@@ -44,6 +46,13 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+
+        <!-- ✅ Mining Status Foreground Service (Android 14+ compliance) -->
+        <!-- Used to show live BTC reward computation status notifications to user -->
+        <service
+            android:name=".MiningNotificationService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
 
         <receiver
             android:name="io.flutter.plugins.firebase.messaging.FlutterFirebaseMessagingReceiver"
