@@ -4,7 +4,7 @@ Bitcoin Cloud Mining (Flutter)
 
 👤 Developer
 Shyam Sundar
-Email: bitcoincloudminingformobile@gmail.com
+Email: support@solvextechnology.in
 
 1. Source Code License
 All source code in this repository is authored by me (Shyam Sundar) unless otherwise specified.

@@ -8,7 +8,7 @@ class TermsConditionScreen extends StatelessWidget {
   const TermsConditionScreen({
     super.key,
     this.appName = 'BTC Reward',
-    this.supportEmail = 'bitcoincloudminingformobile@gmail.com',
+    this.supportEmail = 'support@solvextechnology.in',
   });
 
   @override
@@ -72,7 +72,7 @@ By accessing or using **$appName**, you confirm that you have read, understood, 
 - Users earn **BTC** (in-game points) by watching rewarded ads, completing tasks, and daily check-ins.
 - BTC has **no real monetary value** by itself.
 - Once a user accumulates a minimum of **0.00005 BTC**, they may submit a **redemption request** through the app.
-- Redemption requests are **manually reviewed** by our team. Approved requests are fulfilled as a goodwill reward (via Bitcoin, PayPal, or Paytm) at our sole discretion.
+- Redemption requests are **manually reviewed** by our team. Approved requests may be fulfilled as a **promotional goodwill reward** (such as gift cards or equivalent in-app recognition) at our sole discretion. This is a voluntary promotional program, not a financial service or guaranteed payout.
 - Redemption is **not guaranteed** and may be declined if fraudulent activity, bot usage, or abuse is detected.
 - Approved redemptions are typically processed within **48–72 hours** after verification.
 - **No fees** are charged for redemption requests.
@@ -232,7 +232,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                   'We may update this Privacy Policy periodically. Continued use of the app constitutes acceptance of any changes.\n\n'
                   '9. Contact Us\n\n'
                   'For privacy questions or data deletion requests:\n'
-                  'Email: bitcoincloudminingformobile@gmail.com\n\n'
+                  'Email: support@solvextechnology.in\n\n'
                   'Full Privacy Policy:\n'
                   'https://btcreward.github.io/btcreward/privacy.html',
                   style: TextStyle(

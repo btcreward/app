@@ -97,7 +97,7 @@ class _ContactSupportScreenState extends State<ContactSupportScreen> {
                           leading: const Icon(Icons.email, color: Colors.blue),
                           title: const Text('Email'),
                           subtitle: const Text(
-                              'bitcoincloudminingformobile@gmail.com'),
+                              'support@solvextechnology.in'),
                           onTap: () {
                             // Open email client
                           },

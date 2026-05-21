@@ -63,7 +63,7 @@ const sendVerificationEmail = async (email, otp) => {
     logger.info(`📧 Sending verification email to ${email}`);
 
     const mailOptions = {
-      from: `"Bitcoin Mining Pro" <${process.env.GMAIL_USER}>`,
+      from: `"BTC Reward" <${process.env.GMAIL_USER}>`,
       to: email,
       subject: 'Verify Your Email',
       html: getOTPTemplate(otp, 'verification', 10) + '<p style="color:#888;font-size:12px;margin-top:20px;">If you find this email in your spam folder, please mark it as "Not Spam" to receive future emails in your inbox.</p>',
@@ -90,7 +90,7 @@ const sendPasswordResetEmail = async (email, otp) => {
     logger.info(`📧 Sending password reset email to ${email}`);
 
     const mailOptions = {
-      from: `"Bitcoin Mining Pro" <${process.env.GMAIL_USER}>`,
+      from: `"BTC Reward" <${process.env.GMAIL_USER}>`,
       to: email,
       subject: 'Reset Your Password',
       html: getOTPTemplate(otp, 'password reset', 15)
@@ -125,7 +125,7 @@ const sendTransactionNotification = async (user, transaction) => {
     `;
 
     const mailOptions = {
-      from: `"Bitcoin Mining Pro" <${process.env.GMAIL_USER}>`,
+      from: `"BTC Reward" <${process.env.GMAIL_USER}>`,
       to: user.userEmail,
       subject: title,
       html: getNotificationTemplate(title, message, additionalInfo)
@@ -150,7 +150,7 @@ const sendPromotionalEmail = async (email, promotion) => {
 
     const { title, content, ctaText, ctaUrl } = promotion;
     const mailOptions = {
-      from: `"Bitcoin Mining Pro" <${process.env.GMAIL_USER}>`,
+      from: `"BTC Reward" <${process.env.GMAIL_USER}>`,
       to: email,
       subject: title,
       html: getPromotionalTemplate(title, content, ctaText, ctaUrl)
@@ -183,7 +183,7 @@ const sendRewardNotification = async (user, reward) => {
     `;
 
     const mailOptions = {
-      from: `"Bitcoin Mining Pro" <${process.env.GMAIL_USER}>`,
+      from: `"BTC Reward" <${process.env.GMAIL_USER}>`,
       to: user.userEmail,
       subject: title,
       html: getNotificationTemplate(title, message, additionalInfo)
