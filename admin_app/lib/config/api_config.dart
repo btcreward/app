@@ -8,9 +8,9 @@ class ApiConfig {
   // static const String proxyImageBase = 'http://localhost:5000/api/proxy?url=';
 
   // Production ke liye (deploy ke time isko uncomment karen):
-  static const String baseUrl = 'https://bitcoincloudmining.onrender.com/api';
+  static const String baseUrl = 'https://app-c66g.onrender.com/api';
   static const String proxyImageBase =
-      'https://bitcoincloudmining.onrender.com/api/proxy?url=';
+      'https://app-c66g.onrender.com/api/proxy?url=';
 
   // Auth
   static const String adminLogin = '/admin/login';

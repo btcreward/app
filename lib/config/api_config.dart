@@ -66,7 +66,7 @@ class ApiConfig {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
             'Origin': kIsWeb
-                ? 'https://bitcoincloudmining.onrender.com'
+                ? 'https://app-c66g.onrender.com'
                 : 'http://localhost:3000',
           },
         ).timeout(const Duration(seconds: 10));

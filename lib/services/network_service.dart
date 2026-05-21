@@ -182,7 +182,7 @@ class NetworkService {
     for (int attempt = 0; attempt <= retries; attempt++) {
       try {
         final response = await http
-            .get(Uri.parse('https://bitcoincloudmining.onrender.com/health'))
+            .get(Uri.parse('https://app-c66g.onrender.com/health'))
             .timeout(const Duration(seconds: 4));
         if (response.statusCode == 200) return true;
       } catch (_) {}

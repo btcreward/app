@@ -66,10 +66,9 @@ io.on('connection', (socket) => {
 
 // Middleware
 const allowedOrigins = [
-  'https://bitcoincloudmining.web.app',
-  'https://bitcoincloudmining.firebaseapp.com',
-  'https://web.bitcoincloudmining.onrender.com',
-  'https://bitcoincloudmining.onrender.com',
+  'https://app-c66g.onrender.com',
+  'https://btcreward.web.app',
+  'https://btcreward.firebaseapp.com',
   'http://localhost:3000',
   'http://localhost:5000',
   'http://localhost:51581',
