@@ -352,8 +352,8 @@ const startServer = async () => {
     logger.info(`Server running on port ${PORT}`);
     console.log('\n\x1b[32m%s\x1b[0m', '🚀 Server is running on port:', PORT);
     console.log('\x1b[36m%s\x1b[0m', '🌐 Environment:', process.env.NODE_ENV || 'development');
-    console.log('\x1b[33m%s\x1b[0m', '🔗 Base URL:', `https://btcreward-backend.onrender.com`);
-    console.log('\x1b[35m%s\x1b[0m', '📊 Health Check:', `https://btcreward-backend.onrender.com/health`);
+    console.log('\x1b[33m%s\x1b[0m', '🔗 Base URL:', `https://app-c66g.onrender.com`);
+    console.log('\x1b[35m%s\x1b[0m', '📊 Health Check:', `https://app-c66g.onrender.com/health`);
     console.log('----------------------------------------\n');
   });
 };
