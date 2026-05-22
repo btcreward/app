@@ -35,12 +35,12 @@
         <!-- ✅ AdMob App ID -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713" />
+            android:value="ca-app-pub-9510341737360907~6383161275" />
 
         <!-- ✅ Unity Ads Game ID for Android -->
         <meta-data
             android:name="unity.ads.game-id"
-            android:value="800000445" />
+            android:value="800000486" />
 
         <!-- ✅ Unity Ads Test Mode: false for production release -->
         <meta-data

@@ -100,9 +100,9 @@ class AdService with ChangeNotifier {
 
   // Unity Ads Configuration - User's real Game IDs
   static const String unityGameIdAndroid =
-      '800000445'; // User's Unity Game ID for Android
+      '800000486'; // User's Unity Game ID for Android
   static const String unityGameIdIos =
-      '800000477'; // User's Unity Game ID for iOS
+      '800000487'; // User's Unity Game ID for iOS
   static const bool unityTestMode =
       forceTestMode; // Use forceTestMode for Unity test ads
 
@@ -128,11 +128,11 @@ class AdService with ChangeNotifier {
   // AdMob IDs
   static const Map<String, Map<String, String>> _adMobUnitIds = {
     'android': {
-      'native': 'ca-app-pub-5148158708243364/3952895904',
-      'banner': 'ca-app-pub-5148158708243364/4475640088',
-      'swipeable_banner': 'ca-app-pub-5148158708243364/4475640088',
-      'rewarded': 'ca-app-pub-5148158708243364/1793636421',
-      'interstitial': 'ca-app-pub-5148158708243364/1518304257',
+      'native': 'ca-app-pub-9510341737360907/2437697319',
+      'banner': 'ca-app-pub-9510341737360907/4171930901',
+      'swipeable_banner': 'ca-app-pub-9510341737360907/4171930901',
+      'rewarded': 'ca-app-pub-9510341737360907/9667800160',
+      'interstitial': 'ca-app-pub-9510341737360907/1980881835',
     },
     'ios': {
       'native': 'ca-app-pub-3940256099942544/3986624511',
@@ -147,74 +147,74 @@ class AdService with ChangeNotifier {
   static const Map<String, Map<String, String>> _adMobSlotIds = {
     'android': {
       // Default / Fallbacks
-      AdSlots.defaultRewarded: 'ca-app-pub-5148158708243364/1793636421',
-      AdSlots.defaultInterstitial: 'ca-app-pub-5148158708243364/1518304257',
-      AdSlots.defaultBanner: 'ca-app-pub-5148158708243364/4475640088',
-      AdSlots.defaultNative: 'ca-app-pub-5148158708243364/3952895904',
+      AdSlots.defaultRewarded: 'ca-app-pub-9510341737360907/9667800160',
+      AdSlots.defaultInterstitial: 'ca-app-pub-9510341737360907/1980881835',
+      AdSlots.defaultBanner: 'ca-app-pub-9510341737360907/4171930901',
+      AdSlots.defaultNative: 'ca-app-pub-9510341737360907/2437697319',
 
       // Bitcoin Machine
-      AdSlots.bitcoinMachineBanner1: 'ca-app-pub-5148158708243364/4475640088',
-      AdSlots.bitcoinMachineRewarded1: 'ca-app-pub-5148158708243364/1793636421',
-      AdSlots.bitcoinMachineRewarded2: 'ca-app-pub-5148158708243364/1793636421',
-      AdSlots.bitcoinMachineRewarded3: 'ca-app-pub-5148158708243364/1793636421',
-      AdSlots.bitcoinMachineInterstitial1: 'ca-app-pub-5148158708243364/1518304257',
+      AdSlots.bitcoinMachineBanner1: 'ca-app-pub-9510341737360907/4171930901',
+      AdSlots.bitcoinMachineRewarded1: 'ca-app-pub-9510341737360907/9667800160',
+      AdSlots.bitcoinMachineRewarded2: 'ca-app-pub-9510341737360907/9667800160',
+      AdSlots.bitcoinMachineRewarded3: 'ca-app-pub-9510341737360907/9667800160',
+      AdSlots.bitcoinMachineInterstitial1: 'ca-app-pub-9510341737360907/1980881835',
 
       // Bitcoin Blast
-      AdSlots.bitcoinBlastBanner1: 'ca-app-pub-5148158708243364/4475640088',
-      AdSlots.bitcoinBlastRewarded1: 'ca-app-pub-5148158708243364/1793636421',
-      AdSlots.bitcoinBlastRewarded2: 'ca-app-pub-5148158708243364/1793636421',
-      AdSlots.bitcoinBlastInterstitial1: 'ca-app-pub-5148158708243364/1518304257',
+      AdSlots.bitcoinBlastBanner1: 'ca-app-pub-9510341737360907/4171930901',
+      AdSlots.bitcoinBlastRewarded1: 'ca-app-pub-9510341737360907/9667800160',
+      AdSlots.bitcoinBlastRewarded2: 'ca-app-pub-9510341737360907/9667800160',
+      AdSlots.bitcoinBlastInterstitial1: 'ca-app-pub-9510341737360907/1980881835',
 
       // Contract
-      AdSlots.contractBanner1: 'ca-app-pub-5148158708243364/4475640088',
-      AdSlots.contractRewarded1: 'ca-app-pub-5148158708243364/1793636421',
+      AdSlots.contractBanner1: 'ca-app-pub-9510341737360907/4171930901',
+      AdSlots.contractRewarded1: 'ca-app-pub-9510341737360907/9667800160',
 
       // Home
-      AdSlots.homeBanner1: 'ca-app-pub-5148158708243364/4475640088',
-      AdSlots.homeBanner2: 'ca-app-pub-5148158708243364/4475640088',
-      AdSlots.homeRewarded1: 'ca-app-pub-5148158708243364/1793636421',
-      AdSlots.homeRewarded2: 'ca-app-pub-5148158708243364/1793636421',
+      AdSlots.homeBanner1: 'ca-app-pub-9510341737360907/4171930901',
+      AdSlots.homeBanner2: 'ca-app-pub-9510341737360907/4171930901',
+      AdSlots.homeRewarded1: 'ca-app-pub-9510341737360907/9667800160',
+      AdSlots.homeRewarded2: 'ca-app-pub-9510341737360907/9667800160',
 
       // Support
-      AdSlots.contactSupportBanner1: 'ca-app-pub-5148158708243364/4475640088',
+      AdSlots.contactSupportBanner1: 'ca-app-pub-9510341737360907/4171930901',
 
       // Crypto Runner
-      AdSlots.cryptoRunnerInterstitial1: 'ca-app-pub-5148158708243364/1518304257',
+      AdSlots.cryptoRunnerInterstitial1: 'ca-app-pub-9510341737360907/1980881835',
 
       // Game
-      AdSlots.gameBanner1: 'ca-app-pub-5148158708243364/4475640088',
+      AdSlots.gameBanner1: 'ca-app-pub-9510341737360907/4171930901',
 
       // Hash Rush
-      AdSlots.hashRushRewarded1: 'ca-app-pub-5148158708243364/1793636421',
-      AdSlots.hashRushInterstitial1: 'ca-app-pub-5148158708243364/1518304257',
-      AdSlots.hashRushBanner1: 'ca-app-pub-5148158708243364/4475640088',
+      AdSlots.hashRushRewarded1: 'ca-app-pub-9510341737360907/9667800160',
+      AdSlots.hashRushInterstitial1: 'ca-app-pub-9510341737360907/1980881835',
+      AdSlots.hashRushBanner1: 'ca-app-pub-9510341737360907/4171930901',
 
       // Miner Madness
-      AdSlots.minerMadnessInterstitial1: 'ca-app-pub-5148158708243364/1518304257',
-      AdSlots.minerMadnessBanner1: 'ca-app-pub-5148158708243364/4475640088',
-      AdSlots.minerMadnessRewarded1: 'ca-app-pub-5148158708243364/1793636421',
+      AdSlots.minerMadnessInterstitial1: 'ca-app-pub-9510341737360907/1980881835',
+      AdSlots.minerMadnessBanner1: 'ca-app-pub-9510341737360907/4171930901',
+      AdSlots.minerMadnessRewarded1: 'ca-app-pub-9510341737360907/9667800160',
 
       // Referral
-      AdSlots.referralRewarded1: 'ca-app-pub-5148158708243364/1793636421',
+      AdSlots.referralRewarded1: 'ca-app-pub-9510341737360907/9667800160',
 
       // Reward
-      AdSlots.rewardRewarded1: 'ca-app-pub-5148158708243364/1793636421',
-      AdSlots.rewardBanner1: 'ca-app-pub-5148158708243364/4475640088',
+      AdSlots.rewardRewarded1: 'ca-app-pub-9510341737360907/9667800160',
+      AdSlots.rewardBanner1: 'ca-app-pub-9510341737360907/4171930901',
 
       // Wallet
-      AdSlots.walletRewarded1: 'ca-app-pub-5148158708243364/1793636421',
+      AdSlots.walletRewarded1: 'ca-app-pub-9510341737360907/9667800160',
 
       // Flip Coin
-      AdSlots.flipCoinBanner1: 'ca-app-pub-5148158708243364/4475640088',
-      AdSlots.flipCoinInterstitial1: 'ca-app-pub-5148158708243364/1518304257',
-      AdSlots.flipCoinRewarded1: 'ca-app-pub-5148158708243364/1793636421',
-      AdSlots.flipCoinRewarded2: 'ca-app-pub-5148158708243364/1793636421',
+      AdSlots.flipCoinBanner1: 'ca-app-pub-9510341737360907/4171930901',
+      AdSlots.flipCoinInterstitial1: 'ca-app-pub-9510341737360907/1980881835',
+      AdSlots.flipCoinRewarded1: 'ca-app-pub-9510341737360907/9667800160',
+      AdSlots.flipCoinRewarded2: 'ca-app-pub-9510341737360907/9667800160',
 
       // Crypto Craze
-      AdSlots.cryptoCrazeBanner1: 'ca-app-pub-5148158708243364/4475640088',
-      AdSlots.cryptoCrazeInterstitial1: 'ca-app-pub-5148158708243364/1518304257',
-      AdSlots.cryptoCrazeRewarded1: 'ca-app-pub-5148158708243364/1793636421',
-      AdSlots.cryptoCrazeRewarded2: 'ca-app-pub-5148158708243364/1793636421',
+      AdSlots.cryptoCrazeBanner1: 'ca-app-pub-9510341737360907/4171930901',
+      AdSlots.cryptoCrazeInterstitial1: 'ca-app-pub-9510341737360907/1980881835',
+      AdSlots.cryptoCrazeRewarded1: 'ca-app-pub-9510341737360907/9667800160',
+      AdSlots.cryptoCrazeRewarded2: 'ca-app-pub-9510341737360907/9667800160',
     },
     'ios': {
       // Default / Fallbacks
