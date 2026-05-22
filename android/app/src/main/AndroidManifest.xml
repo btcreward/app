@@ -40,7 +40,7 @@
         <!-- ✅ Unity Ads Game ID for Android -->
         <meta-data
             android:name="unity.ads.game-id"
-            android:value="5916099" />
+            android:value="800000445" />
 
         <!-- ✅ Unity Ads Test Mode: false for production release -->
         <meta-data

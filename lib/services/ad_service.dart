@@ -100,9 +100,9 @@ class AdService with ChangeNotifier {
 
   // Unity Ads Configuration - User's real Game IDs
   static const String unityGameIdAndroid =
-      '5916099'; // User's Unity Game ID for Android
+      '800000445'; // User's Unity Game ID for Android
   static const String unityGameIdIos =
-      '5916098'; // User's Unity Game ID for iOS
+      '800000477'; // User's Unity Game ID for iOS
   static const bool unityTestMode =
       forceTestMode; // Use forceTestMode for Unity test ads
 
