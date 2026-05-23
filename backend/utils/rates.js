@@ -64,19 +64,7 @@ async function getBTCUSDRate() {
         });
         return null;
       }),
-      getBinanceRate().catch(error => {
-        logger.error('Binance rate fetch failed:', {
-          message: error.message,
-          stack: error.stack,
-          code: error.code,
-          config: error.config,
-          response: error.response ? {
-            status: error.response.status,
-            data: error.response.data
-          } : undefined
-        });
-        return null;
-      }),
+
       getKrakenRate().catch(error => {
         logger.error('Kraken rate fetch failed:', error.message);
         return null;
@@ -87,8 +75,7 @@ async function getBTCUSDRate() {
 
     const rates = {
       coinGecko: results[0].status === 'fulfilled' ? results[0].value : null,
-      binance: results[1].status === 'fulfilled' ? results[1].value : null,
-      kraken: results[2].status === 'fulfilled' ? results[2].value : null
+      kraken: results[1].status === 'fulfilled' ? results[1].value : null
     };
 
     logger.info('BTC/USD Rates:', rates);
